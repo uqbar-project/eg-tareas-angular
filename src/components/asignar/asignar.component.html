@@ -1,0 +1,31 @@
+<!--  FORMULARIO MODAL QUE HAY QUE AGREGAR -->
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" aria-hidden="true" (click)="close()">&times;</button>
+      <h4 class="modal-title" id="myModalLabel">Editar Tarea</h4>
+    </div>
+    <div class="modal-body">
+      <h3><i>{{tarea.descripcion}}</i></h3>
+
+      <form name="editarLibroForm" role="form">
+        <fieldset>
+          <div class="form-group">
+            <label for="asignatario">Asignado a</label>
+            <select id="asignatario" name="asignatario" class="form-control" [(ngModel)]="asignatario">
+              <option *ngFor="let usuario of usuariosPosibles" [ngValue]="usuario">{{usuario.nombre}}</option>
+            </select>
+          </div>
+          <div class="example-animate-container" style="padding-top:10px">
+            <div class="alert alert-danger animate-repeat" *ngFor="let error of errors">{{error}}</div>
+          </div>
+        </fieldset>
+      </form>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" (click)="close()">Cerrar</button>
+      <button type="button" class="btn btn-primary" (click)="asignar()">Guardar</button>
+    </div>
+  </div>
+</div>

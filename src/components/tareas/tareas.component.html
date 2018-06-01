@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="row">
+
+    <!-- Busqueda y resultados -->
+    <div class="col-lg-12">
+      <div class="filtro">
+        <form role="form">
+          <div class="form-group">
+            <label for="tareaBuscada">Buscar</label>
+            <input [(ngModel)]="tareaBuscada" class="form-control" id="tareaBuscada" name="tareaBuscada" placeholder="Tarea o Asignado">
+          </div>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed example-animate-container">
+          <tbody>
+            <tr>
+              <th>Descripci&oacute;n</th>
+              <th>Iteraci&oacute;n</th>
+              <th>Asignado a</th>
+              <th>Fecha</th>
+              <th>% cumplido</th>
+              <th>Acciones</th>
+            </tr>
+            <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+              <td class="col-xs-4">{{tarea.descripcion}}</td>
+              <td class="col-xs-2">{{tarea.iteracion}}</td>
+              <td class="col-xs-3">{{tarea.asignatario.nombre}}</td>
+              <td class="col-xs-2">{{tarea.fecha}}</td>
+              <td class="col-xs-1 label" [ngClass]="{'label-danger': tarea.cumplio(0),
+              'label-warning': tarea.cumplioMenosDe(50),
+              'label-info': tarea.cumplioMenosDe(100),
+              'label-success': tarea.cumplio(100)}">
+                <span>{{tarea.porcentajeCumplimiento}}</span>
+              </td>
+
+              <td nowrap class="col-xs-2">
+                <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()">
+                  <fa-icon icon="calendar-check"></fa-icon>
+                </button>
+                &nbsp;
+                <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success" (click)="mostrarModal(tarea)" aria-label="Asignarme">
+                  <fa-icon icon="user-check"></fa-icon>
+                </button>
+                &nbsp;
+                <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger" (click)="desasignar(tarea);" *ngIf="tarea.estaAsignada()" aria-label="Desasignarme">
+                  <fa-icon icon="user-minus"></fa-icon>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="alert alert-danger animate-repeat" *ngFor="let error of errors">{{error}}</div>
+    </div>
+  </div>
+</div>
