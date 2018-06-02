@@ -21,7 +21,8 @@ export class TareasComponent implements OnInit {
   ngOnInit() {
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
-      error => this.errors.push(error))
+      error => this.errors.push(error)
+    )
   }
 
   public cumplir(tarea: Tarea) {
@@ -31,6 +32,7 @@ export class TareasComponent implements OnInit {
 
   public desasignar(tarea: Tarea) {
     tarea.desasignar()
+    console.log(tarea)
     this.tareasService.actualizarTarea(tarea)
   }
 
