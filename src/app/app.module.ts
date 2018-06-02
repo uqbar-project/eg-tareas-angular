@@ -10,10 +10,16 @@ import { HttpModule } from '@angular/http'
 // Font Awesome para los íconos
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCheck, faUserMinus, faCalendarCheck } from '@fortawesome/free-solid-svg-icons'
+import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
 
+library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+//
 
-library.add(faUserCheck, faUserMinus, faCalendarCheck)
+/** Registramos el locale ES para formatear números */
+import { registerLocaleData } from '@angular/common'
+import localeEs from '@angular/common/locales/es'
+
+registerLocaleData(localeEs)
 //
 
 @NgModule({

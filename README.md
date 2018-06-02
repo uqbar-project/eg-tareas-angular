@@ -11,6 +11,8 @@ $ npm install @fortawesome/angular-fontawesome --save
 Configuración Browser para CORS
 https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en-US
 
+Configuración Font Awesome
+https://github.com/FortAwesome/angular-fontawesome
 
 Configuración ruteo
 

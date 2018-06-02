@@ -2,11 +2,10 @@
 <div class="modal-dialog">
   <div class="modal-content">
     <div class="modal-header">
-      <button type="button" class="close" aria-hidden="true" (click)="close()">&times;</button>
       <h4 class="modal-title" id="myModalLabel">Editar Tarea</h4>
     </div>
     <div class="modal-body">
-      <h3><i>{{tarea.descripcion}}</i></h3>
+      <h5><i>{{tarea$?.descripcion}}</i></h5>
 
       <form name="editarLibroForm" role="form">
         <fieldset>
@@ -24,7 +23,7 @@
 
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" (click)="close()">Cerrar</button>
+      <button type="button" class="btn btn-default" (click)="navegarAHome()">Cerrar</button>
       <button type="button" class="btn btn-primary" (click)="asignar()">Guardar</button>
     </div>
   </div>

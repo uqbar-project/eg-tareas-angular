@@ -1,7 +1,6 @@
 import { Usuario } from "./usuario"
 export class Tarea {
-
-    constructor(public id?: number, private descripcion?: string, private iteracion?: number, private asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
+    constructor(public id?: number, private descripcion?: string, private iteracion?: number, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
     contiene(palabra: string): boolean {
         return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
@@ -16,7 +15,7 @@ export class Tarea {
     }
 
     sePuedeCumplir(): boolean {
-        return this.porcentajeCumplimiento < 100
+        return this.porcentajeCumplimiento < 100 && this.estaAsignada()
     }
 
     cumplir() {
@@ -37,13 +36,13 @@ export class Tarea {
 
     static fromJson(tareaJSON) {
         return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
-            new Usuario(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)
+            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)
     }
 
     toJSON(): any {
         const result : any = Object.assign({}, this)
         result.asignatario = null 
-        result.asignadoA = this.asignatario.nombre
+        result.asignadoA = this.asignatario ? this.asignatario.nombre : ''
         return result
     }
 

@@ -18,8 +18,8 @@ export class UsuariosService{
   private extractData(res: Response) {
     let body = res.json()
     let usuarios = []
-    body.forEach(nombreUsuario => usuarios.push(
-      new Usuario(nombreUsuario)
+    body.forEach(usuarioJson => usuarios.push(
+      new Usuario(usuarioJson.nombre)
     ))
     return usuarios
   }

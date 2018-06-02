@@ -25,25 +25,28 @@
             <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
               <td class="col-xs-4">{{tarea.descripcion}}</td>
               <td class="col-xs-2">{{tarea.iteracion}}</td>
-              <td class="col-xs-3">{{tarea.asignatario.nombre}}</td>
+              <td class="col-xs-3">{{tarea.asignatario?.nombre}}</td>
               <td class="col-xs-2">{{tarea.fecha}}</td>
-              <td class="col-xs-1 label" [ngClass]="{'label-danger': tarea.cumplio(0),
-              'label-warning': tarea.cumplioMenosDe(50),
-              'label-info': tarea.cumplioMenosDe(100),
-              'label-success': tarea.cumplio(100)}">
-                <span>{{tarea.porcentajeCumplimiento}}</span>
+              <td class="col-xs-1 text-right" [ngClass]="{'table-danger': tarea.cumplio(0),
+              'table-warning': tarea.cumplioMenosDe(50),
+              'table-info': tarea.cumplioMenosDe(100),
+              'table-success': tarea.cumplio(100)}">
+                <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
               </td>
 
               <td nowrap class="col-xs-2">
-                <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()">
+                <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir"
+                  *ngIf="tarea.sePuedeCumplir()">
                   <fa-icon icon="calendar-check"></fa-icon>
                 </button>
                 &nbsp;
-                <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success" (click)="mostrarModal(tarea)" aria-label="Asignarme">
+                <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success" (click)="asignar(tarea)"
+                  aria-label="Asignarme">
                   <fa-icon icon="user-check"></fa-icon>
                 </button>
                 &nbsp;
-                <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger" (click)="desasignar(tarea);" *ngIf="tarea.estaAsignada()" aria-label="Desasignarme">
+                <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger" (click)="desasignar(tarea)" *ngIf="tarea.estaAsignada()"
+                  aria-label="Desasignarme">
                   <fa-icon icon="user-minus"></fa-icon>
                 </button>
               </td>

@@ -3,6 +3,7 @@ import { TareasService } from "../../services/tareas.service"
 import { Tarea } from "../../domain/tarea"
 import { Usuario } from "../../domain/usuario"
 import { DialogService } from "ng2-bootstrap-modal"
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'my-app',
@@ -12,10 +13,10 @@ import { DialogService } from "ng2-bootstrap-modal"
 export class TareasComponent implements OnInit {
 
   private tareaBuscada: string = ''
-  private tareas = []
+  private tareas: Array<Tarea> = []
   private errors = []
 
-  constructor(private tareasService: TareasService) { }
+  constructor(private tareasService: TareasService, private router: Router) { }
 
   ngOnInit() {
     this.tareasService.todasLasTareas().subscribe(
@@ -33,7 +34,8 @@ export class TareasComponent implements OnInit {
     this.tareasService.actualizarTarea(tarea)
   }
 
-  mostrarModal(tarea: Tarea) {
-    // this._dialogService.addDialog(ComboUsuariosComponent, {tarea: tarea})
+  asignar(tarea: Tarea) {
+    this.router.navigate(['/asignarTarea', tarea.id])
   }
+
 }
