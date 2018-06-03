@@ -19,6 +19,9 @@ export class TareasComponent implements OnInit {
   constructor(private tareasService: TareasService, private router: Router) { }
 
   ngOnInit() {
+    // Truco para que refresque la pantalla 
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+    
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
       error => this.errors.push(error)
@@ -32,7 +35,6 @@ export class TareasComponent implements OnInit {
 
   public desasignar(tarea: Tarea) {
     tarea.desasignar()
-    console.log(tarea)
     this.tareasService.actualizarTarea(tarea)
   }
 

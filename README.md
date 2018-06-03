@@ -3,7 +3,7 @@
 
 TODO: Build de travis
 
-TODO Demo
+![demo](videos/TareasDemo.gif)
 
 Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y permite mostrar una aplicación completa en Angular con los siguientes conceptos
 
@@ -16,6 +16,10 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 - de yapa, repasaremos el uso de **pipes built-in** para formatear decimales en los números y uno propio para realizar el filtro de tareas en base a un valor ingresado
 
 # Preparación del proyecto
+
+## Levantar el backend
+
+Pueden descargar [la implementación XTRest del backend](https://github.com/uqbar-project/eg-tareas-xtrest). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
 
 ## Componentes adicionales
 
@@ -139,15 +143,155 @@ El import final del NgModule queda:
 
 # Resumen de la arquitectura
 
-TODO
+![image](images/Arquitectura.png)
 
 ## Objetos de dominio
 
+La tarea es un objeto de dominio al que podemos
+
+- asignarle una persona para que la realice
+- determinar si se puede asignar, esto ocurre mientras no esté cumplida
+- desasignarle la persona actual
+- saber si se puede cumplir una tarea o desasignarle una persona, siempre que tenga una persona asignada y no esté cumplida
+- marcarla como cumplida
+
+Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un simple JSON. Pero además como vamos a recibir una Tarea desde el backend que sí es un JSON, vamos a incorporarle dos servicios: la exportación de un objeto Tarea a su correspondiente JSON y la importación de un JSON para crear un objeto tarea. El primero se implementa con un método de instancia toJSON(), el segundo requiere crear una tarea, por lo que el método fromJSON() es **estático**. El JSON del server tiene esta estructura:
+
+```json
+{
+    "id": 1,
+    "descripcion": "Desarrollar componente de envio de mails",
+    "iteracion": "Iteración 1",
+    "porcentajeCumplimiento": 0,
+    "new": false,
+    "asignadoA": "Juan Contardo",
+    "fecha": "02/06/2018"
+}
+``` 
+
+Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework Jackson de XTRest, es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
+
+- en el fromJson() debemos tomar el string y convertirlo a un objeto Usuario cuyo nombre será ese string. Actualizamos la variable asignatario con ese usuario.
+- en el toJson() generamos un Json con un atributo "asignadoA" que contiene el nombre del usuario asignatario
+
+Los atributos de Tarea son privados, a excepción del asignatario ya que lo necesitan otros objetos.
+
+```typescript
+export class Tarea {
+    constructor(public id?: number, private descripcion?: string, private iteracion?: number, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
+
+    contiene(palabra: string): boolean {
+        return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
+    }
+
+    cumplio(porcentaje: number): boolean {
+        return this.porcentajeCumplimiento == porcentaje
+    }
+
+    cumplioMenosDe(porcentaje: number): boolean {
+        return this.porcentajeCumplimiento < porcentaje
+    }
+
+    sePuedeCumplir(): boolean {
+        return this.porcentajeCumplimiento < 100 && this.estaAsignada()
+    }
+
+    cumplir() {
+        this.porcentajeCumplimiento = 100
+    }
+
+    desasignar() {
+        this.asignatario = null
+    }
+
+    sePuedeDesasignar() {
+        return this.sePuedeCumplir()
+    }
+    
+    asignarA(asignatario: Usuario) {
+        this.asignatario = asignatario
+    }
+
+    sePuedeAsignar() {
+        return this.estaCumplida()
+    }
+
+    estaCumplida() {
+        return this.porcentajeCumplimiento != 100
+    }
+    
+    estaAsignada() {
+        return this.asignatario != null
+    }
+
+    static fromJson(tareaJSON) {
+        return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
+            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)
+    }
+
+    toJSON(): any {
+        const result : any = Object.assign({}, this)
+        result.asignatario = null 
+        result.asignadoA = this.asignatario ? this.asignatario.nombre : ''
+        return result
+    }
+
+}
+```
+
 ## Servicios
+
+Vamos a disparar pedidos a nuestro server local de XTRest ubicado en el puerto 9000. Pero no queremos repetir el mismo _endpoint_ en todos los lugares, entonces creamos un archivo _configuration.ts_ en el directorio services y exportamos una constante:
+
+```typescript
+export const REST_SERVER_URL = 'http://localhost:9000'
+```
+
+Esa constante la vamos a utilizar en todas las llamadas de nuestros services.
+
+### TareasService
+
+¿Qué necesitamos hacer?
+
+- traer todas las tareas en la página principal (método GET)
+- actualizar una tarea, tanto al cumplirla como en la asignación/desasignación (termina siendo un método PUT)
+- y traer una tarea específica, esto será útil en la asignación, para mostrar los datos de la tarea que estamos asignando
+
+Veamos cómo es la definición de TareasService:
+
+```typescript
+@Injectable({
+  providedIn: 'root'
+})
+export class TareasService {
+
+  constructor(private http: Http) { }
+
+  todasLasTareas() {
+    return this.http.get(REST_SERVER_URL + "/tareas").pipe(map(this.convertToTareas))
+  }
+```
+
+- le inyectamos el objeto http que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST. Para eso debemos importar la clase Http de "@angular/http" (vean el código del service para más detalles)
+- **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_, según se explica [en esta página](https://www.uno-de-piera.com/di-angular-6-providedin/). 
+
+Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "http://localhost:9000/tareas". Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
+
+```javascript 
+(method) Http.get(url: string, options?: RequestOptionsArgs): Observable<Response>
+```
+
+Devuelve la "promesa" de que cuando termine la operación recibiremos el resultado, en este caso la lista de Tareas en formato JSON. Para ello estaremos siendo observadores de la respuesta y seremos notificados cuando el server responda.
+
+Angular 6 utiliza un framework para los servicios que permite encademnar varias operaciones asincrónicas de una manera simple, mediante **piping**:
+
+
 
 ## Componentes
 
 ## Vistas
+
+## Pipes
 
 # Testing
 

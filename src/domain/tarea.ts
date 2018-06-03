@@ -26,8 +26,20 @@ export class Tarea {
         this.asignatario = null
     }
 
+    sePuedeDesasignar() {
+        return this.sePuedeCumplir()
+    }
+
     asignarA(asignatario: Usuario) {
         this.asignatario = asignatario
+    }
+
+    sePuedeAsignar() {
+        return this.estaCumplida()
+    }
+
+    estaCumplida() {
+        return this.porcentajeCumplimiento != 100
     }
 
     estaAsignada() {
