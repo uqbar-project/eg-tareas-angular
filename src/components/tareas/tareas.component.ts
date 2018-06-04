@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core'
 import { TareasService } from "../../services/tareas.service"
 import { Tarea } from "../../domain/tarea"
 import { Usuario } from "../../domain/usuario"
-import { DialogService } from "ng2-bootstrap-modal"
 import { Router } from '@angular/router'
 
 @Component({

@@ -346,7 +346,7 @@ Le dejamos la tarea para que la realice.
 
 ### UsuarioService
 
-El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend.
+El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Response>)...
 
 ```typescript
 @Injectable({
@@ -357,23 +357,146 @@ export class UsuariosService{
   constructor(private http: Http){}
 
   usuariosPosibles() {
-    return this.http.get(REST_SERVER_URL + "/usuarios").pipe(map(this.extractData))
+    return this.http.get(REST_SERVER_URL + "/usuarios").toPromise()
   }
 
-  private extractData(res: Response) {
-    return res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
-  }
-  
 }
 ```
+
+Luego el componente de asignación debe convertir la respuesta en JSON con la lista de tareas como veremos más abajo.
 
 ## Casos de uso
 
 ### Lista de Tareas
 
+La página inicial muestra la lista de tareas:
+
+![image](images/tareas_vista.png)
+
+La vista html 
+
+- tiene binding bidireccional para sincronizar el valor de búsqueda (variable _tareaBuscada_), 
+- también tiene una lista de errores que se visualizan si por ejemplo hay error al llamar al service
+- un ngFor que recorre la lista de tareas que sale de un callback que le pasamos al service (vean la primera expresión lambda que le pasamos al suscribe)
+- respecto a la botonera, tanto el cumplir como el desasignar actualizan el estado de la tarea en forma local y luego disparan un pedido PUT al server para sincronizar el estado...
+- ...y por último la asignación dispara la llamada a una página específica mediante el uso del router
+
+```typescript
+export class TareasComponent implements OnInit {
+
+  private tareaBuscada: string = ''
+  private tareas: Array<Tarea> = []
+  private errors = []
+
+  constructor(private tareasService: TareasService, private router: Router) { }
+
+  ngOnInit() {
+    // Truco para que refresque la pantalla 
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+    
+    this.tareasService.todasLasTareas().subscribe(
+      data => this.tareas = data,
+      error => this.errors.push(error)
+    )
+  }
+
+  public cumplir(tarea: Tarea) {
+    tarea.cumplir()
+    this.tareasService.actualizarTarea(tarea)
+  }
+
+  public desasignar(tarea: Tarea) {
+    tarea.desasignar()
+    this.tareasService.actualizarTarea(tarea)
+  }
+
+  asignar(tarea: Tarea) {
+    this.router.navigate(['/asignarTarea', tarea.id])
+  }
+
+}
+```
+
 ### Asignación de una persona a una tarea
 
+![image](images/asignar_tarea_vista.png)
+
+En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tarea llamando al TareaService, lo llamamos tarea$ para indicar con el sufijo $ que se trata de un objeto Observable. Eso nos sirve para mostrar información de la tarea que estamos actualizando pero además
+
+- la lista de usuarios posibles que mostraremos como opciones del combo sale de una llamada al service propio para usuarios, pero en lugar de suscribe utilizamos el método _then()_ propio de las _Promises_ de Javascript
+- además queremos tener binding contra el elemento seleccionado del combo. Las opciones serían 1) que sea "tarea.asignatario", 2) que sea una referencia que vive dentro del componente de asignación: la variable asignatario. Elegimos la segunda opción porque es más sencillo cancelar sin que haya cambios en el asignatario de la tarea (botón Cancelar). En caso de Aceptar el cambio, aquí sí actualizaremos el asignatario de la tarea dentro de nuestro entorno local y luego haremos un pedido PUT al servidor para sincronizar la información.
+
+```typescript
+export class AsignarComponent {
+  tarea$: Tarea
+  private asignatario: Usuario
+  private usuariosPosibles = []
+  private errors = []
+
+  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { 
+    // Llenamos el combo de usuarios
+    this.usuariosService.usuariosPosibles().then(
+      res => this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+    )  
+    
+    // Truco para que refresque la pantalla 
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+
+    // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+    this.route.params.subscribe(params => {
+      this.tareasService.getTareaById(params['id']).subscribe(data => {
+        this.tarea$ = data
+        this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea$.asignatario))
+      },
+      error => this.errors.push(error))
+    })
+  }
+
+  ngOnInit() {}
+
+  asignar() {
+    this.errors = []
+    if (this.asignatario == null) {
+      this.errors.push("Debe seleccionar un usuario")
+      return
+    }
+    this.tarea$.asignarA(this.asignatario)
+    this.tareasService.actualizarTarea(this.tarea$)
+    this.navegarAHome()
+  }
+
+  navegarAHome() {
+    this.router.navigate(['/tareas'])
+  }
+
+}
+```
+
 ## Pipes
+
+La página inicial permite filtrar las tareas:
+
+```html
+  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+```
+
+El criterio de filtro delega a su vez en la tarea esa responsabilidad:
+
+```typescript
+export class FilterTareas implements PipeTransform {
+
+  transform(tareas: Tarea[], palabra: string): any {
+    return tareas.filter(tarea => tarea.contiene(palabra))
+  }
+
+}
+```
+
+Además, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
+
+```html
+  <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+```
 
 # Testing
 

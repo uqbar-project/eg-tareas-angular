@@ -20,7 +20,9 @@ export class AsignarComponent {
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { 
     // Llenamos el combo de usuarios
-    this.usuariosService.usuariosPosibles().subscribe(data => this.usuariosPosibles = data)
+    this.usuariosService.usuariosPosibles().then(
+      res => this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+    )  
     
     // Truco para que refresque la pantalla 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false

@@ -10,5 +10,4 @@ export class FilterTareas implements PipeTransform {
     return tareas.filter(tarea => tarea.contiene(palabra))
   }
 
-
 }

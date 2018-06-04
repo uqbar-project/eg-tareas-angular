@@ -1,28 +1,68 @@
-/* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
+import { DebugElement } from '@angular/core'
 
-import { TareasComponent } from './tareas.component';
+import { BrowserModule } from '@angular/platform-browser'
+import { NgModule } from '@angular/core'
+import { FormsModule } from '@angular/forms'
+import { HttpModule } from '@angular/http'
+
+// Font Awesome para los íconos
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+//
+
+/** Registramos el locale ES para formatear números */
+import { registerLocaleData, APP_BASE_HREF } from '@angular/common'
+import localeEs from '@angular/common/locales/es'
+
+registerLocaleData(localeEs)
+//
+
+// routing
+import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
+
+// componentes propios
+import { TareasComponent } from './tareas.component'
+import { UsuariosService } from '../../services/usuarios.service'
+import { TareasService } from '../../services/tareas.service'
+import { FilterTareas } from '../../pipes/filterTareas.pipe'
+import { Tarea } from "../../domain/tarea"
+import { Usuario } from "../../domain/usuario"
+import { Router } from '@angular/router'
 
 describe('TareasComponent', () => {
-  let component: TareasComponent;
-  let fixture: ComponentFixture<TareasComponent>;
+  let component: TareasComponent
+  let fixture: ComponentFixture<TareasComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TareasComponent ]
+      declarations: [
+        FilterTareas,
+        routingComponents
+      ],
+      imports: [
+        BrowserModule,
+        FormsModule,
+        HttpModule,
+        AppRoutingModule,
+        FontAwesomeModule
+      ],
+      providers: [{provide: APP_BASE_HREF, useValue : '/' }]
     })
-    .compileComponents();
-  }));
+      .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TareasComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(TareasComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

@@ -12,11 +12,7 @@ export class UsuariosService{
   constructor(private http: Http){}
 
   usuariosPosibles() {
-    return this.http.get(REST_SERVER_URL + "/usuarios").pipe(map(this.extractData))
+    return this.http.get(REST_SERVER_URL + "/usuarios").toPromise()
   }
 
-  private extractData(res: Response) {
-    return res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
-  }
-  
 }
