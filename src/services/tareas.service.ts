@@ -27,7 +27,7 @@ export class TareasService {
     return res.json().map(tareaJson => Tarea.fromJson(tareaJson))
   }
 
-  tareaAsJson(tareaJSON) : Tarea {
+  private tareaAsJson(tareaJSON) : Tarea {
     return Tarea.fromJson(tareaJSON)
   }
 }

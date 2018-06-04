@@ -283,13 +283,95 @@ Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "htt
 
 Devuelve la "promesa" de que cuando termine la operación recibiremos el resultado, en este caso la lista de Tareas en formato JSON. Para ello estaremos siendo observadores de la respuesta y seremos notificados cuando el server responda.
 
-Angular 6 utiliza un framework para los servicios que permite encademnar varias operaciones asincrónicas de una manera simple, mediante **piping**:
+Angular 6 utiliza Reactive Javascript (RxJs) para encademnar varias operaciones asincrónicas de una manera simple, mediante la técnica de [**piping**](https://github.com/ReactiveX/rxjs/blob/91088dae1df097be2370c73300ffa11b27fd0100/doc/pipeable-operators.md), similar a la que probablemente conozcas si utilizaste Linux en algún momento:
 
+```bash
+$ ps -fe | grep chrome   # busca los procesos asociados con el navegador Google Chrome
+```
 
+En este caso, el output del primer comando (`ps -fe` que devuelve los procesos activos en el sistema operativo) sirve como input para el segundo comando(`grep chrome` que busca la palabra chrome dentro del _stream_).
 
-## Componentes
+Volviendo a la función map dentro del pipe:
 
-## Vistas
+```typescript
+....pipe(map(this.convertToTareas))
+```
+
+El map se importa de Reactive Javascript, y es una función que dice cómo debemos trabajar la respuesta del server. Veamos cómo se implementa la función convertToTareas dentro del service 
+
+```typescript
+  private convertToTareas(res: Response) {
+    return res.json().map(tareaJson => Tarea.fromJson(tareaJson))
+  }
+```
+
+Este map no es el mismo que el que utiliza pipe, pero su objetivo es similar: transforma una lista de jsons en una lista de tareas.
+
+Recibimos un _response_ como input, y devolvemos la lista de tareas convertida. Esta función se ejecutará solo cuando el backend conteste la lista de tareas, por lo tanto **lo que devuelve el service no es la lista de tareas, sino un observable de una lista de tareas**. En el componente llamamos al service, y a ese observable le definimos un _callback_, una función que sirve como observer. Si la operación termina bien, tendremos la lista de tareas en la variable _tareas_ correspondiente:
+
+```typescript
+  ngOnInit() {
+    ....
+    
+    this.tareasService.todasLasTareas().subscribe(
+      data => this.tareas = data,
+      error => this.errors.push(error)
+    )
+  }
+```
+_tareas.component.ts_
+
+Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
+
+```typescript
+  getTareaById(id: number) {
+    return this.http.get(REST_SERVER_URL + "/tareas/" + id).pipe(map(res => this.tareaAsJson(res.json())))
+  }
+
+  actualizarTarea(tarea: Tarea) {
+    this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).subscribe()
+  }
+
+  private tareaAsJson(tareaJSON) : Tarea {
+    return Tarea.fromJson(tareaJSON)
+  }
+```
+
+El lector podrá advertir que el método actualizarTarea no tiene 
+
+- un callback para procesar el resultado (por ejemplo para avisar al usuario que la operación se completó exitosamente)
+- un callback para el tratamiento de los errores
+
+Le dejamos la tarea para que la realice.
+
+### UsuarioService
+
+El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend.
+
+```typescript
+@Injectable({
+  providedIn: 'root'
+})
+export class UsuariosService{
+
+  constructor(private http: Http){}
+
+  usuariosPosibles() {
+    return this.http.get(REST_SERVER_URL + "/usuarios").pipe(map(this.extractData))
+  }
+
+  private extractData(res: Response) {
+    return res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+  }
+  
+}
+```
+
+## Casos de uso
+
+### Lista de Tareas
+
+### Asignación de una persona a una tarea
 
 ## Pipes
 

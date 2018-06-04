@@ -16,12 +16,7 @@ export class UsuariosService{
   }
 
   private extractData(res: Response) {
-    let body = res.json()
-    let usuarios = []
-    body.forEach(usuarioJson => usuarios.push(
-      new Usuario(usuarioJson.nombre)
-    ))
-    return usuarios
+    return res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
   }
   
 }
