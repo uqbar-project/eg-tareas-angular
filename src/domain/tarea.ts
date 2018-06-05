@@ -1,6 +1,6 @@
 import { Usuario } from "./usuario"
 export class Tarea {
-    constructor(public id?: number, private descripcion?: string, private iteracion?: number, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
+    constructor(public id?: number, private descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
     contiene(palabra: string): boolean {
         return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)

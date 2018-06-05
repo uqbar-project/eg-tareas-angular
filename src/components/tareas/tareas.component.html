@@ -25,18 +25,18 @@
             <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
               <td class="col-xs-4">{{tarea.descripcion}}</td>
               <td class="col-xs-2">{{tarea.iteracion}}</td>
-              <td class="col-xs-3">{{tarea.asignatario?.nombre}}</td>
+              <td class="col-xs-3" id="asignatario_{{tarea.id}}">{{tarea.asignatario?.nombre}}</td>
               <td class="col-xs-2">{{tarea.fecha}}</td>
               <td class="col-xs-1 text-right" [ngClass]="{'table-danger': tarea.cumplio(0),
               'table-warning': tarea.cumplioMenosDe(50),
               'table-info': tarea.cumplioMenosDe(100),
               'table-success': tarea.cumplio(100)}">
-                <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+                <span class="text-xs-right" id="porcentaje_{{tarea.id}}">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
               </td>
 
               <td nowrap class="col-xs-2">
                 <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir"
-                  *ngIf="tarea.sePuedeCumplir()">
+                  *ngIf="tarea.sePuedeCumplir()" id="cumplir_{{tarea.id}}">
                   <fa-icon icon="calendar-check"></fa-icon>
                 </button>
                 &nbsp;
@@ -46,7 +46,7 @@
                 </button>
                 &nbsp;
                 <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger" (click)="desasignar(tarea)" *ngIf="tarea.sePuedeDesasignar()"
-                  aria-label="Desasignarme">
+                  aria-label="Desasignarme" id="desasignar_{{tarea.id}}">
                   <fa-icon icon="user-minus"></fa-icon>
                 </button>
               </td>

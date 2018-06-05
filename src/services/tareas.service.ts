@@ -3,11 +3,18 @@ import { Http, Response } from "@angular/http"
 import { Injectable } from "@angular/core"
 import { map } from 'rxjs/operators'
 import { REST_SERVER_URL } from "./configuration"
+import { Observable } from "rxjs"
+
+export interface ITareasService {
+  todasLasTareas(): Observable<any>
+  getTareaById(id: number) : Observable<Tarea>
+  actualizarTarea(tarea: Tarea): void
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class TareasService {
+export class TareasService implements ITareasService {
 
   constructor(private http: Http) { }
 

@@ -384,9 +384,9 @@ La vista html
 ```typescript
 export class TareasComponent implements OnInit {
 
-  private tareaBuscada: string = ''
-  private tareas: Array<Tarea> = []
-  private errors = []
+  tareaBuscada: string = ''
+  tareas: Array<Tarea> = []
+  errors = []
 
   constructor(private tareasService: TareasService, private router: Router) { }
 
@@ -429,9 +429,9 @@ En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tar
 ```typescript
 export class AsignarComponent {
   tarea$: Tarea
-  private asignatario: Usuario
-  private usuariosPosibles = []
-  private errors = []
+  asignatario: Usuario
+  usuariosPosibles = []
+  errors = []
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { 
     // Llenamos el combo de usuarios
@@ -500,4 +500,205 @@ Además, el % de cumplimiento se muestra con dos decimales y con comas, mediante
 
 # Testing
 
-TODO
+El testeo requiere una parte burocrática que es repetir la importación de todos los elementos del NgModule y los particulares de TareasComponent en nuestro spec. El lector puede ver la lista de imports completa en el archivo [tareas.component.spec.ts](src/components/tareas/tareas.component.spec.ts).
+
+## Inyección de un stub service
+
+Queremos mantener la unitariedad de los tests y cierto grado de determinismo que nos permita tener un entorno controlado de eventos y respuestas. Dado que nuestro service real hace una llamada http, vamos a
+
+- definir una interfaz general ITareasService con tres servicios básicos (en el archivo _tareas.service.ts_)
+
+```typescript
+export interface ITareasService {
+  todasLasTareas(): Observable<any>
+  getTareaById(id: number) : Observable<Tarea>
+  actualizarTarea(tarea: Tarea): void
+}
+```
+
+- luego generaremos un stub de nuestro TareasService que trabajará con datos fijos (archivo _stubs.service.ts_)
+
+```typescript
+export const juana = new Usuario('Juana Molina')
+
+export class StubTareasService implements ITareasService {
+    tareas = [
+        new Tarea(1, "Tarea 1", "Iteracion 1", juana, "10/05/2019", 50), 
+        new Tarea(2, "Tarea 2", "Iteracion 1", null, "13/08/2019", 0)
+    ]
+
+    todasLasTareas() {
+        return of(this.tareas)
+    }
+
+    getTareaById(id: number) {
+        const tarea = this.tareas.find((tarea) => tarea.id == id)
+        return of(tarea)
+    }
+
+    actualizarTarea(tarea: Tarea) {}
+}
+```
+
+Fíjense que el método _todasLasTareas()_ no puede devolver una lista de tareas, sino un Observable de una lista de tareas. Para lograr eso utilizamos el método of() de rxjs, que convierte un valor fijo en un observable.
+
+- la clase TareasService implementará la nueva interfaz (archivo _tareas.service.ts_)
+
+```typescript
+export class TareasService implements ITareasService {
+```
+
+No es estrictamente necesario que stub y tarea implementen la misma interfaz, porque internamente Javascript no tiene chequeo estricto de tipos, pero didácticamente nos sirve como ejemplo de uso de interfaz de ES6 y nos permite ser más explícito en la definición de tipos, así que como primer acercamiento nos es útil. En la práctica ustedes pueden obviar este paso para no hacerlo tan burocrático.
+
+Ahora sí, en nuestro archivo de test tenemos que inyectarle al constructor del componente el stub del service:
+
+```typescript
+  constructor(private tareasService: TareasService, private router: Router) { }
+```
+
+Para eso debemos pisar el servicio a inyectar en el método beforeEach de nuestro test, de la siguiente manera:
+
+```typescript
+  TestBed.overrideComponent(TareasComponent, {               // línea 1
+    set: {
+      providers: [
+        { provide: TareasService, useClass: StubTareasService }
+      ]
+    }
+  })
+  
+  fixture = TestBed.createComponent(TareasComponent)          // línea 2
+```
+
+Es importante el orden aquí, si instanciamos el componente primero (la línea 2) ya no será posible modificar el servicio a inyectar y veremos un error al correr nuestros tests:
+
+```
+Failed: Cannot override component metadata when the test module has already been instantiated. Make sure you are not using `inject` before `overrideComponent`.
+```
+
+Recordamos que se corren los tests mediante
+
+```
+$ ng test --sourceMap=false --watch
+```
+
+Otra opción, si queremos tener acceso al stub y manipularlo, es crear nosotros el stub y luego pasárselo al componente de la siguiente manera:
+
+```typescript
+  const stubTareasService = new StubTareasService
+  
+  TestBed.overrideComponent(TareasComponent, {
+    set: {
+      providers: [
+        { provide: TareasService, useValue: stubTareasService }
+      ]
+    }
+  })
+```
+
+La referencia stubTareasService la podemos crear dentro del beforeEach o bien puede ser una variable de instancia dentro del test.
+
+## Otras configuraciones
+
+Dado que estamos utilizando el framework de routing de Angular, es importante agregar la configuración de nuestra ruta por defecto dentro de los providers del componente que genera el TestBed:
+
+```typescript
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ ... ],
+      imports: [ ... ],
+      providers: [
+       { provide: APP_BASE_HREF, useValue: '/' }
+      ]
+    })
+    ...
+``` 
+
+De lo contrario te aparecerá el siguiente mensaje de error al correr los tests:
+
+```
+Failed: No base href set. Please provide a value for the APP_BASE_HREF token or add a base element to the document.
+```
+
+## Tests
+
+### Stub service bien inyectado
+
+Veamos los tests más interesantes: este prueba que el stub service fue inyectado correctamente
+
+```typescript
+  it('should show 2 pending tasks', () => {
+    expect(2).toBe(component.tareas.length)
+  })
+```
+
+Dado que el stub genera dos tareas, el componente debe tenerlas en su variable tareas (que no es privada para poder ser accedidas desde el test).
+
+### Verificar que una tarea puede cumplirse
+
+El segundo test prueba que una tarea que no está cumplida y está asignada puede marcarse como cumplida:
+
+```typescript
+  it('first task could be mark as done', () => {
+    const resultHtml = fixture.debugElement.nativeElement
+    expect(resultHtml.querySelector('#cumplir_1')).toBeTruthy()
+  })
+```
+
+En la vista agregamos un identificador para el botón cumplir de cada tarea, que consiste en el string "cumplir_" concatenado con el identificador de la tarea:
+
+```html
+  <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir"
+    *ngIf="tarea.sePuedeCumplir()" id="cumplir_{{tarea.id}}">
+```
+
+Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag con id "cumplir_1" dentro del HTML que genera el componente.
+
+Dejamos [aquí](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) el link para entender las búsquedas que soporta querySelector.
+
+### Cumplir una tarea
+
+¿Qué pasa si queremos marcar una tarea como cumplida?
+
+- hacemos click sobre el botón cumplir
+- esto debería mostrar el porcentaje de cumplimiento de dicha tarea con 100
+
+Bueno, no exactamente 100, sino "100,00" porque le aplicamos un filter. Aquí vemos que el testeo que estamos haciendo involucra no es tan unitario, sino más bien end-to-end, ya que se prueba componente, objeto de dominio (que es quien cumple la tarea), el pipe de Angular que customizamos a dos decimales y con coma decimal y la vista html:
+
+```typescript
+  it('mark first task as done', () => {
+    const resultHtml = fixture.debugElement.nativeElement
+    resultHtml.querySelector('#cumplir_1').click()
+    fixture.detectChanges()
+    expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe("100,00")
+  })
+```
+
+A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento dentro de la tabla:
+
+```html
+<span class="text-xs-right" id="porcentaje_{{tarea.id}}">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+```
+
+### Búsqueda de tareas
+
+Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar las clases "animate-repeat" que tienen nuestros tr en la vista _tareas.component.html_:
+
+```html
+  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+```
+
+de la siguiente manera:
+
+```typescript
+  it('searching for second task should have one tr in tasks list', () => {
+    component.tareaBuscada = "2"
+    fixture.detectChanges()
+    const resultHtml = fixture.debugElement.nativeElement
+    expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
+  })
+```
+
+Aquí utilizamos querySelectorAll() que devuelve la lista de elementos html que cumplen nuestro criterio de búsqueda, esperando que solo haya una tarea.
+
+Dejamos al lector que siga revisando los otros tests, que tienen características similares.

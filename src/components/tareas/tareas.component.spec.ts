@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { By } from '@angular/platform-browser'
 import { DebugElement } from '@angular/core'
 
 import { BrowserModule } from '@angular/platform-browser'
@@ -27,12 +26,9 @@ import { AppRoutingModule, routingComponents } from '../../app/app-routing.modul
 
 // componentes propios
 import { TareasComponent } from './tareas.component'
-import { UsuariosService } from '../../services/usuarios.service'
 import { TareasService } from '../../services/tareas.service'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
-import { Tarea } from "../../domain/tarea"
-import { Usuario } from "../../domain/usuario"
-import { Router } from '@angular/router'
+import { StubTareasService } from '../../services/stubs.service'
 
 describe('TareasComponent', () => {
   let component: TareasComponent
@@ -51,13 +47,24 @@ describe('TareasComponent', () => {
         AppRoutingModule,
         FontAwesomeModule
       ],
-      providers: [{provide: APP_BASE_HREF, useValue : '/' }]
+      providers: [
+        { provide: APP_BASE_HREF, useValue: '/' }
+      ]
     })
       .compileComponents()
+
+      TestBed.overrideComponent(TareasComponent, {
+        set: {
+          providers: [
+            { provide: TareasService, useClass: StubTareasService }
+          ]
+        }
+      })
+      
+      fixture = TestBed.createComponent(TareasComponent)
   }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(TareasComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
   })
@@ -65,4 +72,35 @@ describe('TareasComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy()
   })
+
+  it('should show 2 pending tasks', () => {
+    expect(2).toBe(component.tareas.length)
+  })
+
+  it('first task could be mark as done', () => {
+    const resultHtml = fixture.debugElement.nativeElement
+    expect(resultHtml.querySelector('#cumplir_1')).toBeTruthy()
+  })
+
+  it('mark first task as done', () => {
+    const resultHtml = fixture.debugElement.nativeElement
+    resultHtml.querySelector('#cumplir_1').click()
+    fixture.detectChanges()
+    expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe("100,00")
+  })
+
+  it('unassign first task', () => {
+    const resultHtml = fixture.debugElement.nativeElement
+    resultHtml.querySelector('#desasignar_1').click()
+    fixture.detectChanges()
+    expect(resultHtml.querySelector('#asignatario_1').textContent).toBe("")
+  })
+
+  it('searching for second task should have one tr in tasks list', () => {
+    component.tareaBuscada = "2"
+    fixture.detectChanges()
+    const resultHtml = fixture.debugElement.nativeElement
+    expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
+  })
+  
 })

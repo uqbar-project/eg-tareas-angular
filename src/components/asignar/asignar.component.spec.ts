@@ -13,7 +13,7 @@ import { APP_BASE_HREF } from '@angular/common'
 import { AsignarComponent } from './asignar.component'
 import { UsuariosService } from '../../services/usuarios.service'
 import { TareasService } from '../../services/tareas.service'
-import { FilterTareas } from '../../pipes/filterTareas.pipe';
+import { FilterTareas } from '../../pipes/filterTareas.pipe'
 
 describe('AsignarComponent', () => {
   let component: AsignarComponent

@@ -11,9 +11,9 @@ import { Router } from '@angular/router'
 })
 export class TareasComponent implements OnInit {
 
-  private tareaBuscada: string = ''
-  private tareas: Array<Tarea> = []
-  private errors = []
+  tareaBuscada: string = ''
+  tareas: Array<Tarea> = []
+  errors = []
 
   constructor(private tareasService: TareasService, private router: Router) { }
 
