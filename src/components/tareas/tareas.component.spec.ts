@@ -35,7 +35,7 @@ describe('TareasComponent', () => {
   let component: TareasComponent
   let fixture: ComponentFixture<TareasComponent>
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [
         FilterTareas,
@@ -66,7 +66,7 @@ describe('TareasComponent', () => {
     fixture = TestBed.createComponent(TareasComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
-  }))
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy()
