@@ -65,7 +65,6 @@ describe('TareasComponent', () => {
 
     fixture = TestBed.createComponent(TareasComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {
@@ -73,15 +72,18 @@ describe('TareasComponent', () => {
   })
 
   it('should show 2 pending tasks', () => {
+    fixture.detectChanges()
     expect(2).toBe(component.tareas.length)
   })
 
   it('first task could be mark as done', () => {
+    fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelector('#cumplir_1')).toBeTruthy()
   })
 
   it('mark first task as done', () => {
+    fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#cumplir_1').click()
     fixture.detectChanges()
@@ -89,6 +91,7 @@ describe('TareasComponent', () => {
   })
 
   it('unassign first task', () => {
+    fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#desasignar_1').click()
     fixture.detectChanges()
