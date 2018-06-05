@@ -29,7 +29,6 @@ import { TareasComponent } from './tareas.component'
 import { TareasService } from '../../services/tareas.service'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { StubTareasService } from '../../services/stubs.service'
-import { Router } from '@angular/router';
 
 describe('TareasComponent', () => {
   let component: TareasComponent
@@ -57,8 +56,7 @@ describe('TareasComponent', () => {
     TestBed.overrideComponent(TareasComponent, {
       set: {
         providers: [
-          { provide: TareasService, useClass: StubTareasService },
-          { provide: Router, useValue: { routeReuseStrategy: {}}}
+          { provide: TareasService, useClass: StubTareasService }
         ]
       }
     })
