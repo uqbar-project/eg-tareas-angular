@@ -20,4 +20,4 @@ before_install:
 
 before_script:
 
-script: ng test --sourceMap=false --watch=false
+script: ng test --sourceMap=true --watch=false
