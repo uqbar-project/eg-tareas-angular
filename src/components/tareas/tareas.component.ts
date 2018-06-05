@@ -19,7 +19,7 @@ export class TareasComponent implements OnInit {
 
   ngOnInit() {
     // Truco para que refresque la pantalla 
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+    //this.router.routeReuseStrategy.shouldReuseRoute = () => false
     
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
