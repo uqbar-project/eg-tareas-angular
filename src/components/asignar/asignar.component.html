@@ -5,9 +5,9 @@
       <h4 class="modal-title" id="myModalLabel">Asignar Tarea</h4>
     </div>
     <div class="modal-body">
-      <h5><i>{{tarea$?.descripcion}}</i></h5>
+      <h5><i id="tareaDescripcion">{{tarea$?.descripcion}}</i></h5>
 
-      <form name="editarLibroForm" role="form">
+      <form name="asignarTareaForm" role="form">
         <fieldset>
           <div class="form-group">
             <label for="asignatario">Asignado a</label>
@@ -24,7 +24,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" (click)="navegarAHome()">Cerrar</button>
-      <button type="button" class="btn btn-primary" (click)="asignar()">Guardar</button>
+      <button type="button" class="btn btn-primary" id="guardar" (click)="asignar()">Guardar</button>
     </div>
   </div>
 </div>

@@ -6,10 +6,11 @@ import { ITareasService } from "./tareas.service"
 export const juana = new Usuario('Juana Molina')
 
 export class StubUsuariosService {
-    usuarios = [new Usuario('John Doe'), juana]
-
+    
     usuariosPosibles() {
-        return this.usuarios
+        const usuarios = [new Usuario('John Doe'), juana]
+        const fakeHttpResponse = { json() { return usuarios }, status: 200}
+        return Promise.resolve(fakeHttpResponse)
     }
 }
 

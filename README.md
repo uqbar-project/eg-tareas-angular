@@ -433,23 +433,23 @@ export class AsignarComponent {
   usuariosPosibles = []
   errors = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { 
+  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) {
     // Llenamos el combo de usuarios
     this.usuariosService.usuariosPosibles().then(
-      res => this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
-    )  
-    
+      res => {
+        this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+        // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+        this.route.params.subscribe(params => {
+          this.tareasService.getTareaById(params['id']).subscribe(data => {
+            this.tarea$ = data
+            this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea$.asignatario))
+          }
+        )})
+      }
+    ).catch(error => this.errors.push(error))
+
     // Truco para que refresque la pantalla 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
-
-    // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
-    this.route.params.subscribe(params => {
-      this.tareasService.getTareaById(params['id']).subscribe(data => {
-        this.tarea$ = data
-        this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea$.asignatario))
-      },
-      error => this.errors.push(error))
-    })
   }
 
   ngOnInit() {}
