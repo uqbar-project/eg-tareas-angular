@@ -62,12 +62,9 @@ describe('TareasComponent', () => {
       })
       
       fixture = TestBed.createComponent(TareasComponent)
+      component = fixture.componentInstance
+      fixture.detectChanges()
   }))
-
-  beforeEach(() => {
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  })
 
   it('should create', () => {
     expect(component).toBeTruthy()
