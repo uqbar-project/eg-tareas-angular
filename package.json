@@ -26,6 +26,7 @@
     "bootstrap": "^4.1.2",
     "core-js": "^2.5.4",
     "cors": "^2.8.4",
+    "cryptiles": ">=4.1.2",
     "jquery": "^3.3.1",
     "ng2-bootstrap-modal": "^1.0.1",
     "popper": "^1.0.1",
