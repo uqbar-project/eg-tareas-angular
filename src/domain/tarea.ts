@@ -35,15 +35,15 @@ export class Tarea {
     }
 
     sePuedeAsignar() {
-        return this.estaCumplida()
+        return !this.estaCumplida()
     }
 
     estaCumplida() {
-        return this.porcentajeCumplimiento != 100
+        return this.porcentajeCumplimiento == 100
     }
 
     estaAsignada() {
-        return this.asignatario != null
+        return this.asignatario !== null
     }
 
     static fromJson(tareaJSON) {

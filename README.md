@@ -217,7 +217,7 @@ export class Tarea {
     }
 
     estaCumplida() {
-        return this.porcentajeCumplimiento != 100
+        return this.porcentajeCumplimiento == 100
     }
     
     estaAsignada() {
