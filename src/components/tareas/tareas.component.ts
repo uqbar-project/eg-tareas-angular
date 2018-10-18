@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core'
-import { TareasService } from "../../services/tareas.service"
-import { Tarea } from "../../domain/tarea"
-import { Usuario } from "../../domain/usuario"
-import { Router } from '@angular/router'
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Tarea } from "../../domain/tarea";
+import { TareasService } from "../../services/tareas.service";
 
 @Component({
   selector: 'my-app',
