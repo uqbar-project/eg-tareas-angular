@@ -1,7 +1,7 @@
 import { Tarea } from "../domain/tarea"
 import { Http, Response } from "@angular/http"
 import { Injectable } from "@angular/core"
-import { map } from 'rxjs/operators'
+import { map, catchError } from 'rxjs/operators'
 import { REST_SERVER_URL } from "./configuration"
 import { Observable } from "rxjs"
 
@@ -19,7 +19,9 @@ export class TareasService implements ITareasService {
   constructor(private http: Http) { }
 
   todasLasTareas() {
-    return this.http.get(REST_SERVER_URL + "/tareas").pipe(map(this.convertToTareas))
+    return this.http.get(REST_SERVER_URL + "/tareas").pipe(
+      map(this.convertToTareas)
+    )
   }
 
   getTareaById(id: number) {

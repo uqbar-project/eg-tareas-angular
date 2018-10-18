@@ -23,7 +23,10 @@ export class TareasComponent implements OnInit {
     
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
-      error => this.errors.push(error)
+      error => {
+        console.log("error", error)
+        this.errors.push(error._body)
+      }
     )
   }
 

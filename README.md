@@ -26,13 +26,13 @@ Pueden descargar [la implementación XTRest del backend](https://github.com/uqba
 La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere estos pasos:
 
 ```bash
-$ npm install ng2-bootstrap-modal --save
-$ npm install popper --save
-$ npm install jquery --save
-$ npm install bootstrap --save
-$ npm install @fortawesome/fontawesome-svg-core --save
-$ npm install @fortawesome/free-solid-svg-icons --save
-$ npm install @fortawesome/angular-fontawesome --save
+$ npm install ng2-bootstrap-modal
+$ npm install popper
+$ npm install jquery
+$ npm install bootstrap
+$ npm install @fortawesome/fontawesome-svg-core
+$ npm install @fortawesome/free-solid-svg-icons
+$ npm install @fortawesome/angular-fontawesome
 ```
 
 Es decir, instalaremos bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente. 
@@ -56,7 +56,13 @@ Es necesario incorporar Bootstrap 4 dentro del archivo _package.json_ de la sigu
 
 Dado que desde el front-end vamos a levantar un web server en el puerto 4200 y vamos a acceder al puerto 9000 donde está el server, técnicamente constituyen **dominios diferentes**, por lo que debemos habilitar el intercambio de recursos entre dichos orígenes diferentes, lo que se conoce como **CORS** por sus siglas en inglés (Cross-Origin Resource Sharing). De esa manera podremos hacer consultas y actualizaciones al backend sin que el navegador lo rechace por estar fuera del dominio localhost:4200.
 
-Para hacer esto debemos instalar [el siguiente plugin para Chrome](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en-US), lo que nos permitirá que aparezca a la derecha de la URL un ícono para activarlo o desactivarlo convenientemente.
+Una opción es instalar [el siguiente plugin para Chrome](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en-US), lo que nos permite que aparezca a la derecha de la URL un ícono para activarlo o desactivarlo convenientemente.
+
+Pero otra opción mejor es instalar como dependencia el manejador de CORS:
+
+```bash
+$ npm install cors
+```
 
 
 ## Configuración ruteo
@@ -239,6 +245,16 @@ export class Tarea {
 }
 ```
 
+Otra opción para tomar una tarea como JSON que viene del backend y transformarla en una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento):
+
+```js
+static fromJson(tareaJSON) {
+  const result : Tarea = Object.assign(new Tarea(), tareaJSON)
+  result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
+  return result
+}
+```
+
 ## Servicios
 
 Vamos a disparar pedidos a nuestro server local de XTRest ubicado en el puerto 9000. Pero no queremos repetir el mismo _endpoint_ en todos los lugares, entonces creamos un archivo _configuration.ts_ en el directorio services y exportamos una constante:
@@ -307,7 +323,7 @@ El map se importa de Reactive Javascript, y es una función que dice cómo debem
 
 Este map no es el mismo que el que utiliza pipe, pero su objetivo es similar: transforma una lista de jsons en una lista de tareas.
 
-Recibimos un _response_ como input, y devolvemos la lista de tareas convertida. Esta función se ejecutará solo cuando el backend conteste la lista de tareas, por lo tanto **lo que devuelve el service no es la lista de tareas, sino un observable de una lista de tareas**. En el componente llamamos al service, y a ese observable le definimos un _callback_, una función que sirve como observer. Si la operación termina bien, tendremos la lista de tareas en la variable _tareas_ correspondiente:
+Recibimos un _response_ como input, y devolvemos la lista de tareas convertida. Esta función se ejecutará solo cuando el backend conteste la lista de tareas, por lo tanto **lo que devuelve el service no es la lista de tareas, sino un observable de una lista de tareas**. En el componente llamamos al service, y a ese observable le definimos un _callback_, una función que sirve como observer. Si la operación termina bien, tendremos la lista de tareas en la variable _tareas_ correspondiente. Si hay un error, mostraremos en consola el error completo y en pantalla el mensaje del error que trae el backend:
 
 ```typescript
   ngOnInit() {
@@ -315,11 +331,29 @@ Recibimos un _response_ como input, y devolvemos la lista de tareas convertida. 
     
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
-      error => this.errors.push(error)
+      error => {
+        console.log("error", error)
+        this.errors.push(error._body)
+      }
     )
   }
 ```
 _tareas.component.ts_
+
+(para eso conviene bajarse el proyecto backend y simular un error adrede)
+
+```xtend
+	@Get("/tareas")
+	def Result tareas() {
+		try {
+			if (1 == 1) throw new RuntimeException("Kaboom!")
+			val tareas = RepoTareas.instance.allInstances //tareasPendientes
+			ok(tareas.toJson)
+		} catch (Exception e) {
+			internalServerError(e.message)
+		}
+	}
+```
 
 Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
 
@@ -342,7 +376,7 @@ El lector podrá advertir que el método actualizarTarea no tiene
 - un callback para procesar el resultado (por ejemplo para avisar al usuario que la operación se completó exitosamente)
 - un callback para el tratamiento de los errores
 
-Le dejamos la tarea para que la realice.
+Queda como actividad para el usuario incorporarlo en el componente principal de Angular.
 
 ### UsuarioService
 
@@ -582,7 +616,7 @@ Recordamos que se corren los tests mediante
 $ ng test --sourceMap=false --watch
 ```
 
-Otra opción, si queremos tener acceso al stub y manipularlo, es crear nosotros el stub y luego pasárselo al componente de la siguiente manera:
+Otra opción, si queremos tener acceso al stub y manipularlo, debemos crear nosotros el stub y luego pasárselo al componente de la siguiente manera:
 
 ```typescript
   const stubTareasService = new StubTareasService

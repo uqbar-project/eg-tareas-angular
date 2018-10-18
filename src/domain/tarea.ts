@@ -47,8 +47,11 @@ export class Tarea {
     }
 
     static fromJson(tareaJSON) {
-        return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
-            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)
+        const result : Tarea = Object.assign(new Tarea(), tareaJSON)
+        result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
+        return result
+        /*return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
+            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)*/
     }
 
     toJSON(): any {
