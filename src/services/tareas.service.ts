@@ -1,13 +1,11 @@
-import { Tarea } from "../domain/tarea"
-import { Http, Response } from "@angular/http"
 import { Injectable } from "@angular/core"
-import { map, catchError } from 'rxjs/operators'
+import { Http } from "@angular/http"
+import { Tarea } from "../domain/tarea"
 import { REST_SERVER_URL } from "./configuration"
-import { Observable } from "rxjs"
 
 export interface ITareasService {
-  todasLasTareas(): Observable<any>
-  getTareaById(id: number) : Observable<Tarea>
+  todasLasTareas(): Promise<any>
+  getTareaById(id: number) : Promise<Tarea>
   actualizarTarea(tarea: Tarea): void
 }
 
@@ -18,25 +16,18 @@ export class TareasService implements ITareasService {
 
   constructor(private http: Http) { }
 
-  todasLasTareas() {
-    return this.http.get(REST_SERVER_URL + "/tareas").pipe(
-      map(this.convertToTareas)
-    )
+  async todasLasTareas() {
+    const res = await this.http.get(REST_SERVER_URL + "/tareas").toPromise()
+    return res.json().map(Tarea.fromJson)
   }
 
-  getTareaById(id: number) {
-    return this.http.get(REST_SERVER_URL + "/tareas/" + id).pipe(map(res => this.tareaAsJson(res.json())))
+  async getTareaById(id: number) {
+    const res = await this.http.get(REST_SERVER_URL + "/tareas/" + id).toPromise()
+    return Tarea.fromJson(res.json())
   }
 
-  actualizarTarea(tarea: Tarea) {
-    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON())
+  async actualizarTarea(tarea: Tarea) {
+    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).toPromise()
   }
 
-  private convertToTareas(res: Response) {
-    return res.json().map(tareaJson => Tarea.fromJson(tareaJson))
-  }
-
-  private tareaAsJson(tareaJSON) : Tarea {
-    return Tarea.fromJson(tareaJSON)
-  }
 }

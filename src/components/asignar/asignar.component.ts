@@ -1,10 +1,9 @@
-import { Component, Input } from '@angular/core'
-import { UsuariosService } from "../../services/usuarios.service"
-import { Tarea } from "../../domain/tarea"
-import { Usuario } from "../../domain/usuario"
-import { TareasService } from "../../services/tareas.service"
-import { DialogComponent, DialogService } from "ng2-bootstrap-modal"
-import { ActivatedRoute, Router } from '@angular/router'
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Tarea } from "../../domain/tarea";
+import { Usuario } from "../../domain/usuario";
+import { TareasService } from "../../services/tareas.service";
+import { UsuariosService } from "../../services/usuarios.service";
 
 @Component({
   selector: 'app-asignar',
@@ -38,8 +37,7 @@ export class AsignarComponent {
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
-    const _tarea = await this.tareasService.getTareaById(idTarea).toPromise()
-    this.tarea = _tarea
+    this.tarea = await this.tareasService.getTareaById(idTarea)
     this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea.asignatario))
   }
 
@@ -54,7 +52,7 @@ export class AsignarComponent {
       this.errors = []
       this.validarAsignacion()
       this.tarea.asignarA(this.asignatario)
-      await this.tareasService.actualizarTarea(this.tarea).toPromise()
+      await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
       this.errors.push(e._body)
