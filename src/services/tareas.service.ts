@@ -29,7 +29,7 @@ export class TareasService implements ITareasService {
   }
 
   actualizarTarea(tarea: Tarea) {
-    this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).subscribe()
+    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON())
   }
 
   private convertToTareas(res: Response) {

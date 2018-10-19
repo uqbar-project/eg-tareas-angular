@@ -3,6 +3,10 @@ import { Router } from '@angular/router';
 import { Tarea } from "../../domain/tarea";
 import { TareasService } from "../../services/tareas.service";
 
+function mostrarError(component, error) {
+  console.log("error", error)
+  component.errors.push(error._body)
+}
 @Component({
   selector: 'my-app',
   templateUrl: './tareas.component.html',
@@ -22,16 +26,19 @@ export class TareasComponent implements OnInit {
     
     this.tareasService.todasLasTareas().subscribe(
       data => this.tareas = data,
+      error => mostrarError(this, error)
+      // otra opción mostrarError.bind(this)
+    )
+  }
+
+  public cumplir(tarea: Tarea) {
+    this.tareasService.actualizarTarea(tarea).subscribe(
+      () => { tarea.cumplir() },
       error => {
         console.log("error", error)
         this.errors.push(error._body)
       }
     )
-  }
-
-  public cumplir(tarea: Tarea) {
-    tarea.cumplir()
-    this.tareasService.actualizarTarea(tarea)
   }
 
   public desasignar(tarea: Tarea) {
