@@ -32,8 +32,8 @@ export class TareasComponent implements OnInit {
 
   async cumplir(tarea: Tarea) {
     try {
-      await this.tareasService.actualizarTarea(tarea)
       tarea.cumplir()
+      await this.tareasService.actualizarTarea(tarea)
     } catch (error) {
       mostrarError(this, error)
     }
