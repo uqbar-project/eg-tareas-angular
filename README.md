@@ -295,7 +295,7 @@ Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "htt
 (method) Http.get(url: string, options?: RequestOptionsArgs): Observable<Response>
 ```
 
-Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await)). **No es un pedido sincrónico**, ya que la línea siguiente `res.json().map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
+Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await), o bien [en este sitio](https://alligator.io/js/async-functions/)). **No es un pedido sincrónico**, ya que la línea siguiente `res.json().map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
 
 Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variable res. El método json() nos da una lista de json que luego las transformaremos a tareas con el método estático fromJson() de la clase Tarea. Si hay un error en el server (respuesta distinta de 200), la definición del método como `async` hace que se dispare una excepción...
 
