@@ -3,7 +3,7 @@ export class Tarea {
     constructor(public id?: number, private descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
     contiene(palabra: string): boolean {
-        return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
+        return this.descripcion.includes(palabra) || (this.asignatario && this.asignatario.nombre.includes(palabra))
     }
 
     cumplio(porcentaje: number): boolean {
