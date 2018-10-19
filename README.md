@@ -1,7 +1,7 @@
 
 # Tareas de un equipo de desarrollo
 
-[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-angular.svg?branch=master)](https://travis-ci.org/uqbar-project/eg-tareas-angular)
+[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-angular.svg?branch=asyncAwait)](https://travis-ci.org/uqbar-project/eg-tareas-angular)
 
 ![demo](videos/TareasDemo.gif)
 
