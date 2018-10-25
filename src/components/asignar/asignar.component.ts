@@ -17,7 +17,9 @@ export class AsignarComponent {
   usuariosPosibles = []
   errors = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) {
+  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
+ 
+  async ngOnInit() {
     try {
       this.initialize()
     } catch(error) {
@@ -27,8 +29,6 @@ export class AsignarComponent {
     // Truco para que refresque la pantalla 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
-
-  ngOnInit() { }
 
   async initialize() {
     // Llenamos el combo de usuarios
