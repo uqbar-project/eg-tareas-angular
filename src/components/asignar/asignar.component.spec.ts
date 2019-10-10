@@ -21,7 +21,7 @@ describe('AsignarComponent', async () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
 
-  beforeEach(async(() => {
+  beforeEach((async () => {
     TestBed.configureTestingModule({
       declarations: [
         AsignarComponent,
