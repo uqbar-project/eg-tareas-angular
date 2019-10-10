@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Tarea } from "../../domain/tarea";
-import { Usuario } from "../../domain/usuario";
-import { TareasService } from "../../services/tareas.service";
-import { UsuariosService } from "../../services/usuarios.service";
+import { Component } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { Tarea } from '../../domain/tarea'
+import { Usuario } from '../../domain/usuario'
+import { TareasService } from '../../services/tareas.service'
+import { UsuariosService } from '../../services/usuarios.service'
 
 @Component({
   selector: 'app-asignar',
@@ -18,15 +18,15 @@ export class AsignarComponent {
   errors = []
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
- 
+
   async ngOnInit() {
     try {
       this.initialize()
-    } catch(error) {
+    } catch (error) {
       this.errors.push(error._body)
-    } 
+    }
 
-    // Truco para que refresque la pantalla 
+    // Truco para que refresque la pantalla
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
 
@@ -38,12 +38,12 @@ export class AsignarComponent {
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
     this.tarea = await this.tareasService.getTareaById(idTarea)
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea.asignatario))
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.asignadoA(usuarioPosible))
   }
 
   validarAsignacion() {
     if (this.asignatario == null) {
-      throw { _body: "Debe seleccionar un usuario" }
+      throw { _body: 'Debe seleccionar un usuario' }
     }
   }
 

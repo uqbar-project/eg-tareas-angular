@@ -26,16 +26,16 @@ Pueden descargar [la implementación XTRest del backend](https://github.com/uqba
 La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere estos pasos:
 
 ```bash
-$ npm install ng2-bootstrap-modal
-$ npm install popper
-$ npm install jquery
-$ npm install bootstrap
-$ npm install @fortawesome/fontawesome-svg-core
-$ npm install @fortawesome/free-solid-svg-icons
-$ npm install @fortawesome/angular-fontawesome
+npm install ng2-bootstrap-modal
+npm install popper
+npm install jquery
+npm install bootstrap
+npm install @fortawesome/fontawesome-svg-core
+npm install @fortawesome/free-solid-svg-icons
+npm install @fortawesome/angular-fontawesome
 ```
 
-Es decir, instalaremos bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente. 
+Es decir, instalaremos bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
 
 ## Agregado en package.json
 

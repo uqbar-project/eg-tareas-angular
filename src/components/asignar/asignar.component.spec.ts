@@ -17,13 +17,13 @@ import { TareasService } from '../../services/tareas.service'
 import { StubUsuariosService, StubTareasService, juana } from '../../services/stubs.service'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 
-describe('AsignarComponent', () => {
+describe('AsignarComponent', async () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ 
+      declarations: [
         AsignarComponent,
         routingComponents,
         FilterTareas
@@ -36,17 +36,18 @@ describe('AsignarComponent', () => {
         FontAwesomeModule
       ],
       providers: [UsuariosService, TareasService,
-        {provide: APP_BASE_HREF, useValue : '/' }]
+        { provide: APP_BASE_HREF, useValue: '/' }]
     })
-    .compileComponents()
+      .compileComponents()
 
     TestBed.overrideComponent(AsignarComponent, {
       set: {
         providers: [
-          { provide: ActivatedRoute,
+          {
+            provide: ActivatedRoute,
             useValue: {
               snapshot: {
-                params: { 'id': 1 }  
+                params: { 'id': 1 },
               }
             }
           },
@@ -58,7 +59,7 @@ describe('AsignarComponent', () => {
 
     fixture = TestBed.createComponent(AsignarComponent)
     component = fixture.componentInstance
-
+    await component.initialize()
   }))
 
   it('should create', () => {
@@ -82,7 +83,9 @@ describe('AsignarComponent', () => {
   it('task label', () => {
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
-    expect(resultHtml.querySelector('#tareaDescripcion').textContent).toBe('Tarea 1')
+    fixture.whenStable().then(() => {
+      expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe('Tarea 1')
+    })
   })
 
 })

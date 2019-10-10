@@ -86,18 +86,18 @@ describe('TareasComponent', () => {
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#cumplir_1').click()
     fixture.detectChanges()
-    expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe("100,00")
+    expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe('100,00')
   })
 
   it('unassign first task', async () => {
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#desasignar_1').click()
     fixture.detectChanges()
-    expect(resultHtml.querySelector('#asignatario_1').textContent).toBe("")
+    expect(resultHtml.querySelector('#asignatario_1').textContent).toBe('')
   })
 
   it('searching for second task should have one tr in tasks list', async () => {
-    component.tareaBuscada = "2"
+    component.tareaBuscada = '2'
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
