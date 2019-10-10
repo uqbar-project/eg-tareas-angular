@@ -23,19 +23,7 @@ Pueden descargar [la implementación XTRest del backend](https://github.com/uqba
 
 ## Componentes adicionales
 
-La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere estos pasos:
-
-```bash
-npm install ng2-bootstrap-modal
-npm install popper
-npm install jquery
-npm install bootstrap
-npm install @fortawesome/fontawesome-svg-core
-npm install @fortawesome/free-solid-svg-icons
-npm install @fortawesome/angular-fontawesome
-```
-
-Es decir, instalaremos bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
+La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales que podrás ver en el `package.json`. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
 
 ## Agregado en package.json
 
@@ -61,9 +49,8 @@ Una opción es instalar [el siguiente plugin para Chrome](https://chrome.google.
 Pero otra opción mejor es instalar como dependencia el manejador de CORS:
 
 ```bash
-$ npm install cors
+npm install cors
 ```
-
 
 ## Configuración ruteo
 
@@ -92,7 +79,7 @@ export const routingComponents = [ TareasComponent, AsignarComponent ]
 
 Los routing components se importan en el módulo (archivo _app/app.module.ts_):
 
-```
+```ts
 import { AppRoutingModule, routingComponents } from './app-routing.module'
 
 @NgModule({
@@ -107,13 +94,16 @@ También es necesario que importemos las definiciones de Font Awesome, y esto in
 
 ```typescript
 // Font Awesome para los íconos
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
 import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
 //
-``` 
+
+export class AppModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+  }
+}
+```
 
 Y por último dado que vamos a formatear a dos decimales con coma el % de completitud de una tarea, debemos importar los _locales_ o configuraciones regionales:
 
@@ -126,25 +116,7 @@ registerLocaleData(localeEs)
 //
 ```
 
-El import final del NgModule queda:
-
-```typescript
-@NgModule({
-  declarations: [
-    AppComponent,
-    routingComponents,
-    FilterTareas
-],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    AppRoutingModule,
-    FontAwesomeModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-```
+Además necesitamos importar el módulo HttpClientModule, que nos va a permitir conectarnos al backend.
 
 # Resumen de la arquitectura
 
@@ -172,74 +144,14 @@ Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un s
     "asignadoA": "Juan Contardo",
     "fecha": "02/06/2018"
 }
-``` 
+```
 
 Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework Jackson de XTRest, es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
 
 - en el fromJson() debemos tomar el string y convertirlo a un objeto Usuario cuyo nombre será ese string. Actualizamos la variable asignatario con ese usuario.
 - en el toJson() generamos un Json con un atributo "asignadoA" que contiene el nombre del usuario asignatario
 
-Los atributos de Tarea son privados, a excepción del asignatario ya que lo necesitan otros objetos.
-
-```typescript
-export class Tarea {
-    constructor(public id?: number, private descripcion?: string, private iteracion?: number, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
-
-    contiene(palabra: string): boolean {
-        return this.descripcion.includes(palabra) || this.asignatario.nombre.includes(palabra)
-    }
-
-    cumplio(porcentaje: number): boolean {
-        return this.porcentajeCumplimiento == porcentaje
-    }
-
-    cumplioMenosDe(porcentaje: number): boolean {
-        return this.porcentajeCumplimiento < porcentaje
-    }
-
-    sePuedeCumplir(): boolean {
-        return this.porcentajeCumplimiento < 100 && this.estaAsignada()
-    }
-
-    cumplir() {
-        this.porcentajeCumplimiento = 100
-    }
-
-    desasignar() {
-        this.asignatario = null
-    }
-
-    sePuedeDesasignar() {
-        return this.sePuedeCumplir()
-    }
-    
-    asignarA(asignatario: Usuario) {
-        this.asignatario = asignatario
-    }
-
-    sePuedeAsignar() {
-        return this.estaCumplida()
-    }
-
-    estaCumplida() {
-        return this.porcentajeCumplimiento == 100
-    }
-    
-    estaAsignada() {
-        return this.asignatario != null
-    }
-
-    ...
-
-    toJSON(): any {
-        const result : any = Object.assign({}, this)
-        result.asignatario = null 
-        result.asignadoA = this.asignatario ? this.asignatario.nombre : ''
-        return result
-    }
-
-}
-```
+Los atributos de Tarea son privados, a excepción del asignatario ya que lo necesitan otros objetos. Lo interesante es que **aparecen varias responsabilidades**: saber si una tarea está cumplida, saber si está asignada, cumplirla, asignarla, etc. Podés ver la implementación para más detalles.
 
 Otra opción para tomar una tarea como JSON que viene del backend y transformarla en una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento):
 

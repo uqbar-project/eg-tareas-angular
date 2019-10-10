@@ -6,6 +6,9 @@ export class Tarea {
     constructor(public id?: number, private descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
     static fromJson(tareaJSON): Tarea {
+        // const result: Tarea = Object.assign(new Tarea(), tareaJSON)
+        // result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
+        // return result
         const tarea = new Tarea()
         tarea.id = tareaJSON.id
         tarea.descripcion = tareaJSON.descripcion
@@ -13,7 +16,7 @@ export class Tarea {
         tarea.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
         tarea.fecha = tareaJSON.fecha
         tarea.porcentajeCumplimiento = tareaJSON.porcentajeCumplimiento
-        // return Object.assign(new Tarea(), tareaJSON, { asignatario:  })
+        // return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
         return tarea
     }
 
