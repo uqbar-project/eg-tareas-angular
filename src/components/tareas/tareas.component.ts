@@ -1,20 +1,20 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { Tarea } from "../../domain/tarea"
-import { TareasService } from "../../services/tareas.service"
+import { Tarea } from '../../domain/tarea'
+import { TareasService } from '../../services/tareas.service'
 
 function mostrarError(component, error) {
-  console.log("error", error)
+  console.log('error', error)
   component.errors.push(error._body)
 }
 @Component({
-  selector: 'my-app',
+  selector: 'app-tareas',
   templateUrl: './tareas.component.html',
   providers: [TareasService]
 })
 export class TareasComponent implements OnInit {
 
-  tareaBuscada: string = ''
+  tareaBuscada = ''
   tareas: Array<Tarea> = []
   errors = []
 
@@ -22,7 +22,7 @@ export class TareasComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      // Truco para que refresque la pantalla 
+      // Truco para que refresque la pantalla
       this.router.routeReuseStrategy.shouldReuseRoute = () => false
       this.tareas = await this.tareasService.todasLasTareas()
     } catch (error) {

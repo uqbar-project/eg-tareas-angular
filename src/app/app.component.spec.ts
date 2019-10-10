@@ -1,10 +1,9 @@
-import { TestBed, async } from '@angular/core/testing'
-import { RouterTestingModule } from '@angular/router/testing'
-import { AppComponent } from './app.component'
-import { HttpModule } from '@angular/http'
-import { FormsModule } from '@angular/forms'
 import { CommonModule } from '@angular/common'
+import { async, TestBed } from '@angular/core/testing'
+import { FormsModule } from '@angular/forms'
+import { RouterTestingModule } from '@angular/router/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { AppComponent } from './app.component'
 
 describe('AppComponent', () => {
   beforeEach(async(() => {

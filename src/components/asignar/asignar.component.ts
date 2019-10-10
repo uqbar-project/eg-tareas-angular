@@ -32,8 +32,8 @@ export class AsignarComponent {
 
   async initialize() {
     // Llenamos el combo de usuarios
-    const res = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+    const usuarios = await this.usuariosService.usuariosPosibles()
+    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
@@ -42,7 +42,7 @@ export class AsignarComponent {
   }
 
   validarAsignacion() {
-    if (this.asignatario == null) {
+    if (!this.asignatario) {
       throw { _body: 'Debe seleccionar un usuario' }
     }
   }

@@ -1,21 +1,19 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgModule } from '@angular/core'
-import { BrowserModule } from '@angular/platform-browser'
+import { APP_BASE_HREF } from '@angular/common'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
-import { HttpModule } from '@angular/http'
+import { BrowserModule } from '@angular/platform-browser'
+import { ActivatedRoute } from '@angular/router'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-
 // routing
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
-import { APP_BASE_HREF } from '@angular/common'
-import { ActivatedRoute, Data } from '@angular/router'
-
+import { FilterTareas } from '../../pipes/filterTareas.pipe'
+import { juana, StubTareasService, StubUsuariosService } from '../../services/stubs.service'
+import { TareasService } from '../../services/tareas.service'
+import { UsuariosService } from '../../services/usuarios.service'
 // componentes propios
 import { AsignarComponent } from './asignar.component'
-import { UsuariosService } from '../../services/usuarios.service'
-import { TareasService } from '../../services/tareas.service'
-import { StubUsuariosService, StubTareasService, juana } from '../../services/stubs.service'
-import { FilterTareas } from '../../pipes/filterTareas.pipe'
+
+
 
 describe('AsignarComponent', async () => {
   let component: AsignarComponent
@@ -31,7 +29,6 @@ describe('AsignarComponent', async () => {
       imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
         AppRoutingModule,
         FontAwesomeModule
       ],
@@ -83,9 +80,7 @@ describe('AsignarComponent', async () => {
   it('task label', () => {
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
-    fixture.whenStable().then(() => {
-      expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe('Tarea 1')
-    })
+    expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe('Tarea 1')
   })
 
 })

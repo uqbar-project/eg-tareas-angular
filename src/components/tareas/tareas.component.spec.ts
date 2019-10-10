@@ -1,34 +1,29 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { DebugElement } from '@angular/core'
-
-import { BrowserModule } from '@angular/platform-browser'
-import { NgModule } from '@angular/core'
+//
+/** Registramos el locale ES para formatear números */
+import { APP_BASE_HREF, registerLocaleData } from '@angular/common'
+import localeEs from '@angular/common/locales/es'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
-import { HttpModule } from '@angular/http'
-
+import { BrowserModule } from '@angular/platform-browser'
 // Font Awesome para los íconos
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+import { faCalendarCheck, faTasks, faUserCheck, faUserMinus } from '@fortawesome/free-solid-svg-icons'
 //
-
-/** Registramos el locale ES para formatear números */
-import { registerLocaleData, APP_BASE_HREF } from '@angular/common'
-import localeEs from '@angular/common/locales/es'
-
-registerLocaleData(localeEs)
-//
-
 // routing
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
-
-// componentes propios
-import { TareasComponent } from './tareas.component'
-import { TareasService } from '../../services/tareas.service'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { StubTareasService } from '../../services/stubs.service'
+import { TareasService } from '../../services/tareas.service'
+// componentes propios
+import { TareasComponent } from './tareas.component'
+
+
+
+library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+
+registerLocaleData(localeEs)
+
 
 describe('TareasComponent', () => {
   let component: TareasComponent
@@ -43,7 +38,6 @@ describe('TareasComponent', () => {
       imports: [
         BrowserModule,
         FormsModule,
-        HttpModule,
         AppRoutingModule,
         FontAwesomeModule
       ],

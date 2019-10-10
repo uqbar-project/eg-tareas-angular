@@ -1,16 +1,17 @@
-import { Injectable } from "@angular/core";
-import { Http } from "@angular/http";
-import { REST_SERVER_URL } from "./configuration";
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { REST_SERVER_URL } from './configuration'
+import { Usuario } from 'src/domain/usuario'
 
 @Injectable({
   providedIn: 'root'
 })
-export class UsuariosService{
+export class UsuariosService {
 
-  constructor(private http: Http){}
+  constructor(private http: HttpClient) { }
 
   async usuariosPosibles() {
-    return this.http.get(REST_SERVER_URL + "/usuarios").toPromise()
+    return this.http.get<Usuario[]>(REST_SERVER_URL + '/usuarios').toPromise()
   }
 
 }

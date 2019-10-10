@@ -1,15 +1,20 @@
 import { Usuario } from './usuario'
 
+const CUMPLIDA = 100
+
 export class Tarea {
     constructor(public id?: number, private descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
-    static fromJson(tareaJSON) {
-        const result: Tarea = Object.assign(new Tarea(), tareaJSON)
-        result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
-        return result
-
-        /*return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
-            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)*/
+    static fromJson(tareaJSON): Tarea {
+        const tarea = new Tarea()
+        tarea.id = tareaJSON.id
+        tarea.descripcion = tareaJSON.descripcion
+        tarea.iteracion = tareaJSON.iteracion
+        tarea.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
+        tarea.fecha = tareaJSON.fecha
+        tarea.porcentajeCumplimiento = tareaJSON.porcentajeCumplimiento
+        // return Object.assign(new Tarea(), tareaJSON, { asignatario:  })
+        return tarea
     }
 
     contiene(palabra: string): boolean {
@@ -25,11 +30,11 @@ export class Tarea {
     }
 
     sePuedeCumplir(): boolean {
-        return this.porcentajeCumplimiento < 100 && this.estaAsignada()
+        return this.porcentajeCumplimiento < CUMPLIDA && this.estaAsignada()
     }
 
     cumplir() {
-        this.porcentajeCumplimiento = 100
+        this.porcentajeCumplimiento = CUMPLIDA
     }
 
     desasignar() {
@@ -45,26 +50,27 @@ export class Tarea {
     }
 
     asignadoA(asignatario: Usuario) {
-        return this.asignatario.nombre === asignatario.nombre
+        return this.asignatario && asignatario && this.asignatario.nombre === asignatario.nombre
     }
 
-    sePuedeAsignar() {
+    sePuedeAsignar(): boolean {
         return !this.estaCumplida()
     }
 
-    estaCumplida() {
-        return this.porcentajeCumplimiento === 100
+    estaCumplida(): boolean {
+        return this.porcentajeCumplimiento === CUMPLIDA
     }
 
-    estaAsignada() {
-        return this.asignatario !== null
+    estaAsignada(): boolean {
+        return !!this.asignatario
     }
 
     toJSON(): any {
-        const result: any = Object.assign({}, this)
-        result.asignatario = null
-        result.asignadoA = this.asignatario ? this.asignatario.nombre : ''
-        return result
+        return {
+            ...this,
+            asignatario: null,
+            asignadoA: this.asignatario ? this.asignatario.nombre : ''
+        }
     }
 
 }

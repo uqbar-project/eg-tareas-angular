@@ -5,14 +5,11 @@ import { FormsModule } from '@angular/forms'
 import { AppRoutingModule, routingComponents } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { FilterTareas } from '../pipes/filterTareas.pipe'
-import { HttpModule } from '@angular/http'
+import { HttpClientModule } from '@angular/common/http'
 
 // Font Awesome para los íconos
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
 import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-
-library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
 //
 
 /** Registramos el locale ES para formatear números */
@@ -27,11 +24,11 @@ registerLocaleData(localeEs)
     AppComponent,
     routingComponents,
     FilterTareas
-],
+  ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
+    HttpClientModule,
     AppRoutingModule,
     FontAwesomeModule
   ],
@@ -39,4 +36,8 @@ registerLocaleData(localeEs)
   bootstrap: [AppComponent]
 })
 
-export class AppModule { }
+export class AppModule {
+  constructor(library: FaIconLibrary) {
+    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
+  }
+}

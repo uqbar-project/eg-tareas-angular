@@ -7,11 +7,7 @@ export const juana = new Usuario('Juana Molina')
 export class StubUsuariosService {
 
     async usuariosPosibles() {
-        const usuarios = [juana, new Usuario('John Doe')]
-        return {
-            status: 200,
-            json() { return usuarios }
-        }
+        return [juana, new Usuario('John Doe')]
     }
 }
 

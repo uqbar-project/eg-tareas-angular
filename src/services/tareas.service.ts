@@ -1,11 +1,11 @@
-import { Injectable } from "@angular/core"
-import { Http } from "@angular/http"
-import { Tarea } from "../domain/tarea"
-import { REST_SERVER_URL } from "./configuration"
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Tarea } from '../domain/tarea'
+import { REST_SERVER_URL } from './configuration'
 
 export interface ITareasService {
   todasLasTareas(): Promise<any>
-  getTareaById(id: number) : Promise<Tarea>
+  getTareaById(id: number): Promise<Tarea>
   actualizarTarea(tarea: Tarea): void
 }
 
@@ -14,20 +14,20 @@ export interface ITareasService {
 })
 export class TareasService implements ITareasService {
 
-  constructor(private http: Http) { }
+  constructor(private http: HttpClient) { }
 
   async todasLasTareas() {
-    const res = await this.http.get(REST_SERVER_URL + "/tareas").toPromise()
-    return res.json().map(Tarea.fromJson)
+    const tareas = await this.http.get<Tarea[]>(REST_SERVER_URL + '/tareas').toPromise()
+    return tareas.map((tarea) => Tarea.fromJson(tarea))
   }
 
   async getTareaById(id: number) {
-    const res = await this.http.get(REST_SERVER_URL + "/tareas/" + id).toPromise()
-    return Tarea.fromJson(res.json())
+    const tarea = await this.http.get<Tarea>(REST_SERVER_URL + '/tareas/' + id).toPromise()
+    return Tarea.fromJson(tarea)
   }
 
   async actualizarTarea(tarea: Tarea) {
-    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).toPromise()
+    return this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
   }
 
 }
