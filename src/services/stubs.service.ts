@@ -1,16 +1,17 @@
-import { Usuario } from "../domain/usuario"
-import { Tarea } from "../domain/tarea"
-import { of } from "rxjs"
-import { ITareasService } from "./tareas.service"
+import { Tarea } from "../domain/tarea";
+import { Usuario } from "../domain/usuario";
+import { ITareasService } from "./tareas.service";
 
 export const juana = new Usuario('Juana Molina')
 
 export class StubUsuariosService {
     
-    usuariosPosibles() {
+    async usuariosPosibles() {
         const usuarios = [new Usuario('John Doe'), juana]
-        const fakeHttpResponse = { json() { return usuarios }, status: 200}
-        return Promise.resolve(fakeHttpResponse)
+        return {
+            status: 200,
+            json() { return usuarios } 
+        }
     }
 }
 
@@ -20,13 +21,12 @@ export class StubTareasService implements ITareasService {
         new Tarea(2, "Tarea 2", "Iteracion 1", null, "13/08/2019", 0)
     ]
 
-    todasLasTareas() {
-        return of(this.tareas)
+    async todasLasTareas() {
+        return this.tareas
     }
 
-    getTareaById(id: number) {
-        const tarea = this.tareas.find((tarea) => tarea.id == id)
-        return of(tarea)
+    async getTareaById(id: number) {
+        return this.tareas.find((tarea) => tarea.id == id)
     }
 
     actualizarTarea(tarea: Tarea) {}

@@ -1,7 +1,7 @@
 
 # Tareas de un equipo de desarrollo
 
-[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-angular.svg?branch=master)](https://travis-ci.org/uqbar-project/eg-tareas-angular)
+[![Build Status](https://travis-ci.org/uqbar-project/eg-tareas-angular.svg?branch=asyncAwait)](https://travis-ci.org/uqbar-project/eg-tareas-angular)
 
 ![demo](videos/TareasDemo.gif)
 
@@ -230,10 +230,7 @@ export class Tarea {
         return this.asignatario != null
     }
 
-    static fromJson(tareaJSON) {
-        return new Tarea(tareaJSON.id, tareaJSON.descripcion, tareaJSON.iteracion,
-            Usuario.fromJSON(tareaJSON.asignadoA), tareaJSON.fecha, tareaJSON.porcentajeCumplimiento)
-    }
+    ...
 
     toJSON(): any {
         const result : any = Object.assign({}, this)
@@ -279,12 +276,13 @@ Veamos cómo es la definición de TareasService:
 @Injectable({
   providedIn: 'root'
 })
-export class TareasService {
+export class TareasService implements ITareasService {
 
   constructor(private http: Http) { }
 
-  todasLasTareas() {
-    return this.http.get(REST_SERVER_URL + "/tareas").pipe(map(this.convertToTareas))
+  async todasLasTareas() {
+    const res = await this.http.get(REST_SERVER_URL + "/tareas").toPromise()
+    return res.json().map(Tarea.fromJson)
   }
 ```
 
@@ -297,45 +295,18 @@ Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "htt
 (method) Http.get(url: string, options?: RequestOptionsArgs): Observable<Response>
 ```
 
-Devuelve la "promesa" de que cuando termine la operación recibiremos el resultado, en este caso la lista de Tareas en formato JSON. Para ello estaremos siendo observadores de la respuesta y seremos notificados cuando el server responda.
+Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await), o bien [en este sitio](https://alligator.io/js/async-functions/)). **No es un pedido sincrónico**, ya que la línea siguiente `res.json().map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
 
-Angular 6 utiliza Reactive Javascript (RxJs) para encademnar varias operaciones asincrónicas de una manera simple, mediante la técnica de [**piping**](https://github.com/ReactiveX/rxjs/blob/91088dae1df097be2370c73300ffa11b27fd0100/doc/pipeable-operators.md), similar a la que probablemente conozcas si utilizaste Linux en algún momento:
-
-```bash
-$ ps -fe | grep chrome   # busca los procesos asociados con el navegador Google Chrome
-```
-
-En este caso, el output del primer comando (`ps -fe` que devuelve los procesos activos en el sistema operativo) sirve como input para el segundo comando(`grep chrome` que busca la palabra chrome dentro del _stream_).
-
-Volviendo a la función map dentro del pipe:
+Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variable res. El método json() nos da una lista de json que luego las transformaremos a tareas con el método estático fromJson() de la clase Tarea. Si hay un error en el server (respuesta distinta de 200), la definición del método como `async` hace que se dispare una excepción...
 
 ```typescript
-....pipe(map(this.convertToTareas))
-```
-
-El map se importa de Reactive Javascript, y es una función que dice cómo debemos trabajar la respuesta del server. Veamos cómo se implementa la función convertToTareas dentro del service 
-
-```typescript
-  private convertToTareas(res: Response) {
-    return res.json().map(tareaJson => Tarea.fromJson(tareaJson))
-  }
-```
-
-Este map no es el mismo que el que utiliza pipe, pero su objetivo es similar: transforma una lista de jsons en una lista de tareas.
-
-Recibimos un _response_ como input, y devolvemos la lista de tareas convertida. Esta función se ejecutará solo cuando el backend conteste la lista de tareas, por lo tanto **lo que devuelve el service no es la lista de tareas, sino un observable de una lista de tareas**. En el componente llamamos al service, y a ese observable le definimos un _callback_, una función que sirve como observer. Si la operación termina bien, tendremos la lista de tareas en la variable _tareas_ correspondiente. Si hay un error, mostraremos en consola el error completo y en pantalla el mensaje del error que trae el backend:
-
-```typescript
-  ngOnInit() {
-    ....
-    
-    this.tareasService.todasLasTareas().subscribe(
-      data => this.tareas = data,
-      error => {
-        console.log("error", error)
-        this.errors.push(error._body)
-      }
-    )
+  async ngOnInit() {
+    try {
+      ...
+      this.tareas = await this.tareasService.todasLasTareas()
+    } catch (error) {
+      mostrarError(this, error)
+    }
   }
 ```
 _tareas.component.ts_
@@ -358,25 +329,15 @@ _tareas.component.ts_
 Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
 
 ```typescript
-  getTareaById(id: number) {
-    return this.http.get(REST_SERVER_URL + "/tareas/" + id).pipe(map(res => this.tareaAsJson(res.json())))
+  async getTareaById(id: number) {
+    const res = await this.http.get(REST_SERVER_URL + "/tareas/" + id).toPromise()
+    return Tarea.fromJson(res.json())
   }
 
-  actualizarTarea(tarea: Tarea) {
-    this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).subscribe()
-  }
-
-  private tareaAsJson(tareaJSON) : Tarea {
-    return Tarea.fromJson(tareaJSON)
+  async actualizarTarea(tarea: Tarea) {
+    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).toPromise()
   }
 ```
-
-El lector podrá advertir que el método actualizarTarea no tiene 
-
-- un callback para procesar el resultado (por ejemplo para avisar al usuario que la operación se completó exitosamente)
-- un callback para el tratamiento de los errores
-
-Queda como actividad para el usuario incorporarlo en el componente principal de Angular.
 
 ### UsuarioService
 
@@ -390,10 +351,9 @@ export class UsuariosService{
 
   constructor(private http: Http){}
 
-  usuariosPosibles() {
+  async usuariosPosibles() {
     return this.http.get(REST_SERVER_URL + "/usuarios").toPromise()
   }
-
 }
 ```
 
@@ -407,49 +367,14 @@ La página inicial muestra la lista de tareas:
 
 ![image](images/tareas_vista.png)
 
-La vista html 
+La vista html
 
-- tiene binding bidireccional para sincronizar el valor de búsqueda (variable _tareaBuscada_), 
+- tiene binding bidireccional para sincronizar el valor de búsqueda (variable _tareaBuscada_),
 - también tiene una lista de errores que se visualizan si por ejemplo hay error al llamar al service
 - un ngFor que recorre la lista de tareas que sale de un callback que le pasamos al service (vean la primera expresión lambda que le pasamos al suscribe)
 - respecto a la botonera, tanto el cumplir como el desasignar actualizan el estado de la tarea en forma local y luego disparan un pedido PUT al server para sincronizar el estado...
 - ...y por último la asignación dispara la llamada a una página específica mediante el uso del router
 
-```typescript
-export class TareasComponent implements OnInit {
-
-  tareaBuscada: string = ''
-  tareas: Array<Tarea> = []
-  errors = []
-
-  constructor(private tareasService: TareasService, private router: Router) { }
-
-  ngOnInit() {
-    // Truco para que refresque la pantalla 
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
-    
-    this.tareasService.todasLasTareas().subscribe(
-      data => this.tareas = data,
-      error => this.errors.push(error)
-    )
-  }
-
-  public cumplir(tarea: Tarea) {
-    tarea.cumplir()
-    this.tareasService.actualizarTarea(tarea)
-  }
-
-  public desasignar(tarea: Tarea) {
-    tarea.desasignar()
-    this.tareasService.actualizarTarea(tarea)
-  }
-
-  asignar(tarea: Tarea) {
-    this.router.navigate(['/asignarTarea', tarea.id])
-  }
-
-}
-```
 
 ### Asignación de una persona a una tarea
 
@@ -462,41 +387,51 @@ En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tar
 
 ```typescript
 export class AsignarComponent {
-  tarea$: Tarea
+  tarea: Tarea
   asignatario: Usuario
   usuariosPosibles = []
   errors = []
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) {
-    // Llenamos el combo de usuarios
-    this.usuariosService.usuariosPosibles().then(
-      res => {
-        this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
-        // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
-        this.route.params.subscribe(params => {
-          this.tareasService.getTareaById(params['id']).subscribe(data => {
-            this.tarea$ = data
-            this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea$.asignatario))
-          }
-        )})
-      }
-    ).catch(error => this.errors.push(error))
+    try {
+      this.initialize()
+    } catch(error) {
+      this.errors.push(error._body)
+    } 
 
     // Truco para que refresque la pantalla 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
-  asignar() {
-    this.errors = []
+  async initialize() {
+    // Llenamos el combo de usuarios
+    const res = await this.usuariosService.usuariosPosibles()
+    this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+
+    // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+    const idTarea = this.route.snapshot.params['id']
+    this.tarea = await this.tareasService.getTareaById(idTarea)
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea.asignatario))
+  }
+
+  validarAsignacion() {
     if (this.asignatario == null) {
-      this.errors.push("Debe seleccionar un usuario")
-      return
+      throw { _body: "Debe seleccionar un usuario" }
     }
-    this.tarea$.asignarA(this.asignatario)
-    this.tareasService.actualizarTarea(this.tarea$)
-    this.navegarAHome()
+  }
+
+  async asignar() {
+    try {
+      this.errors = []
+      this.validarAsignacion()
+      this.tarea.asignarA(this.asignatario)
+      await this.tareasService.actualizarTarea(this.tarea)
+      this.navegarAHome()
+    } catch (e) {
+      this.errors.push(e._body)
+    }
   }
 
   navegarAHome() {
@@ -561,13 +496,12 @@ export class StubTareasService implements ITareasService {
         new Tarea(2, "Tarea 2", "Iteracion 1", null, "13/08/2019", 0)
     ]
 
-    todasLasTareas() {
-        return of(this.tareas)
+    async todasLasTareas() {
+        return this.tareas
     }
 
-    getTareaById(id: number) {
-        const tarea = this.tareas.find((tarea) => tarea.id == id)
-        return of(tarea)
+    async getTareaById(id: number) {
+        return this.tareas.find((tarea) => tarea.id == id)
     }
 
     actualizarTarea(tarea: Tarea) {}

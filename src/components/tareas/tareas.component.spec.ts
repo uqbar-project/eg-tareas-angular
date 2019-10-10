@@ -34,7 +34,7 @@ describe('TareasComponent', () => {
   let component: TareasComponent
   let fixture: ComponentFixture<TareasComponent>
 
-  beforeEach(() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [
         FilterTareas,
@@ -62,6 +62,10 @@ describe('TareasComponent', () => {
     })
 
     fixture = TestBed.createComponent(TareasComponent)
+    fixture.detectChanges()
+    await fixture.whenStable()
+    fixture.detectChanges()
+
     component = fixture.componentInstance
   })
 
@@ -69,34 +73,30 @@ describe('TareasComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should show 2 pending tasks', () => {
-    fixture.detectChanges()
+  it('should show 2 pending tasks', async () => {
     expect(2).toBe(component.tareas.length)
   })
 
-  it('first task could be mark as done', () => {
-    fixture.detectChanges()
+  it('first task could be mark as done', async () => {
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelector('#cumplir_1')).toBeTruthy()
   })
 
-  it('mark first task as done', () => {
-    fixture.detectChanges()
+  it('mark first task as done', async () => {
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#cumplir_1').click()
     fixture.detectChanges()
     expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe("100,00")
   })
 
-  it('unassign first task', () => {
-    fixture.detectChanges()
+  it('unassign first task', async () => {
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('#desasignar_1').click()
     fixture.detectChanges()
     expect(resultHtml.querySelector('#asignatario_1').textContent).toBe("")
   })
 
-  it('searching for second task should have one tr in tasks list', () => {
+  it('searching for second task should have one tr in tasks list', async () => {
     component.tareaBuscada = "2"
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement

@@ -1,8 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { Tarea } from "../../domain/tarea";
-import { TareasService } from "../../services/tareas.service";
+import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
+import { Tarea } from "../../domain/tarea"
+import { TareasService } from "../../services/tareas.service"
 
+function mostrarError(component, error) {
+  console.log("error", error)
+  component.errors.push(error._body)
+}
 @Component({
   selector: 'my-app',
   templateUrl: './tareas.component.html',
@@ -16,27 +20,32 @@ export class TareasComponent implements OnInit {
 
   constructor(private tareasService: TareasService, private router: Router) { }
 
-  ngOnInit() {
-    // Truco para que refresque la pantalla 
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
-    
-    this.tareasService.todasLasTareas().subscribe(
-      data => this.tareas = data,
-      error => {
-        console.log("error", error)
-        this.errors.push(error._body)
-      }
-    )
+  async ngOnInit() {
+    try {
+      // Truco para que refresque la pantalla 
+      this.router.routeReuseStrategy.shouldReuseRoute = () => false
+      this.tareas = await this.tareasService.todasLasTareas()
+    } catch (error) {
+      mostrarError(this, error)
+    }
   }
 
-  public cumplir(tarea: Tarea) {
-    tarea.cumplir()
-    this.tareasService.actualizarTarea(tarea)
+  async cumplir(tarea: Tarea) {
+    try {
+      tarea.cumplir()
+      await this.tareasService.actualizarTarea(tarea)
+    } catch (error) {
+      mostrarError(this, error)
+    }
   }
 
-  public desasignar(tarea: Tarea) {
-    tarea.desasignar()
-    this.tareasService.actualizarTarea(tarea)
+  async desasignar(tarea: Tarea) {
+    try {
+      tarea.desasignar()
+      this.tareasService.actualizarTarea(tarea)
+    } catch (error) {
+      mostrarError(this, error)
+    }
   }
 
   asignar(tarea: Tarea) {

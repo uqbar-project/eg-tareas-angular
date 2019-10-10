@@ -1,10 +1,9 @@
-import { Component, Input } from '@angular/core'
-import { UsuariosService } from "../../services/usuarios.service"
-import { Tarea } from "../../domain/tarea"
-import { Usuario } from "../../domain/usuario"
-import { TareasService } from "../../services/tareas.service"
-import { DialogComponent, DialogService } from "ng2-bootstrap-modal"
-import { ActivatedRoute, Router } from '@angular/router'
+import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Tarea } from "../../domain/tarea";
+import { Usuario } from "../../domain/usuario";
+import { TareasService } from "../../services/tareas.service";
+import { UsuariosService } from "../../services/usuarios.service";
 
 @Component({
   selector: 'app-asignar',
@@ -13,41 +12,51 @@ import { ActivatedRoute, Router } from '@angular/router'
   styles: []
 })
 export class AsignarComponent {
-  tarea$: Tarea
+  tarea: Tarea
   asignatario: Usuario
   usuariosPosibles = []
   errors = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) {
-    // Llenamos el combo de usuarios
-    this.usuariosService.usuariosPosibles().then(
-      res => {
-        this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
-        // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
-        this.route.params.subscribe(params => {
-          this.tareasService.getTareaById(params['id']).subscribe(data => {
-            this.tarea$ = data
-            this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea$.asignatario))
-          }
-        )})
-      }
-    ).catch(error => this.errors.push(error))
+  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
+ 
+  async ngOnInit() {
+    try {
+      this.initialize()
+    } catch(error) {
+      this.errors.push(error._body)
+    } 
 
     // Truco para que refresque la pantalla 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
 
-  ngOnInit() { }
+  async initialize() {
+    // Llenamos el combo de usuarios
+    const res = await this.usuariosService.usuariosPosibles()
+    this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
 
-  asignar() {
-    this.errors = []
+    // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+    const idTarea = this.route.snapshot.params['id']
+    this.tarea = await this.tareasService.getTareaById(idTarea)
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea.asignatario))
+  }
+
+  validarAsignacion() {
     if (this.asignatario == null) {
-      this.errors.push("Debe seleccionar un usuario")
-      return
+      throw { _body: "Debe seleccionar un usuario" }
     }
-    this.tarea$.asignarA(this.asignatario)
-    this.tareasService.actualizarTarea(this.tarea$)
-    this.navegarAHome()
+  }
+
+  async asignar() {
+    try {
+      this.errors = []
+      this.validarAsignacion()
+      this.tarea.asignarA(this.asignatario)
+      await this.tareasService.actualizarTarea(this.tarea)
+      this.navegarAHome()
+    } catch (e) {
+      this.errors.push(e._body)
+    }
   }
 
   navegarAHome() {

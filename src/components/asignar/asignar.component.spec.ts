@@ -45,10 +45,8 @@ describe('AsignarComponent', () => {
         providers: [
           { provide: ActivatedRoute,
             useValue: {
-              params: {
-                subscribe: (fn: (value: Data) => void) => fn({
-                  id: 1
-                })
+              snapshot: {
+                params: { 'id': 1 }  
               }
             }
           },
