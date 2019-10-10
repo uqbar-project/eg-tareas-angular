@@ -156,10 +156,8 @@ Los atributos de Tarea son privados, a excepción del asignatario ya que lo nece
 Otra opción para tomar una tarea como JSON que viene del backend y transformarla en una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento):
 
 ```js
-static fromJson(tareaJSON) {
-  const result : Tarea = Object.assign(new Tarea(), tareaJSON)
-  result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
-  return result
+static fromJson(tareaJSON): Tarea {
+    return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
 }
 ```
 

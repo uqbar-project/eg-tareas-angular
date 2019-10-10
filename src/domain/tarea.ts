@@ -6,18 +6,7 @@ export class Tarea {
     constructor(public id?: number, private descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
 
     static fromJson(tareaJSON): Tarea {
-        // const result: Tarea = Object.assign(new Tarea(), tareaJSON)
-        // result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
-        // return result
-        const tarea = new Tarea()
-        tarea.id = tareaJSON.id
-        tarea.descripcion = tareaJSON.descripcion
-        tarea.iteracion = tareaJSON.iteracion
-        tarea.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
-        tarea.fecha = tareaJSON.fecha
-        tarea.porcentajeCumplimiento = tareaJSON.porcentajeCumplimiento
-        // return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
-        return tarea
+        return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
     }
 
     contiene(palabra: string): boolean {
@@ -52,7 +41,7 @@ export class Tarea {
         this.asignatario = asignatario
     }
 
-    asignadoA(asignatario: Usuario) {
+    estaAsignadoA(asignatario: Usuario) {
         return this.asignatario && asignatario && this.asignatario.nombre === asignatario.nombre
     }
 

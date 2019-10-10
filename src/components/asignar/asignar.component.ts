@@ -38,7 +38,7 @@ export class AsignarComponent {
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
     this.tarea = await this.tareasService.getTareaById(idTarea)
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.asignadoA(usuarioPosible))
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
   }
 
   validarAsignacion() {
