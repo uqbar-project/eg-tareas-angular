@@ -187,26 +187,26 @@ Veamos cómo es la definición de TareasService:
 })
 export class TareasService implements ITareasService {
 
-  constructor(private http: Http) { }
+  constructor(private http: HttpClient) { }
 
   async todasLasTareas() {
-    const res = await this.http.get(REST_SERVER_URL + "/tareas").toPromise()
-    return res.json().map(Tarea.fromJson)
+    const tareas = await this.http.get<Tarea[]>(REST_SERVER_URL + '/tareas').toPromise()
+    return tareas.map((tarea) => Tarea.fromJson(tarea))
   }
 ```
 
-- le inyectamos el objeto http que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST. Para eso debemos importar la clase Http de "@angular/http" (vean el código del service para más detalles)
+- le inyectamos el objeto httpClient que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST.
 - **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_, según se explica [en esta página](https://www.uno-de-piera.com/di-angular-6-providedin/). 
 
 Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "http://localhost:9000/tareas". Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
 
 ```javascript 
-(method) Http.get(url: string, options?: RequestOptionsArgs): Observable<Response>
+(method) (method) HttpClient.get<Tarea[]>(url: string, options?: Observable<Tarea[]>
 ```
 
-Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await), o bien [en este sitio](https://alligator.io/js/async-functions/)). **No es un pedido sincrónico**, ya que la línea siguiente `res.json().map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
+Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await), o bien [en este sitio](https://alligator.io/js/async-functions/)). **No es un pedido sincrónico**, ya que la línea siguiente `tareas.map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
 
-Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variable res. El método json() nos da una lista de json que luego las transformaremos a tareas con el método estático fromJson() de la clase Tarea. Si hay un error en el server (respuesta distinta de 200), la definición del método como `async` hace que se dispare una excepción...
+Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variable tareas, que tipan a una lista de tareas, aunque no termina de ser exactamente objetos Tarea. Para eso las transformaremos a tareas con el método estático fromJson() de la clase Tarea. Si hay un error en el server (respuesta distinta de 200), la definición del método como `async` hace que se dispare una excepción...
 
 ```typescript
   async ngOnInit() {
@@ -218,39 +218,40 @@ Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variabl
     }
   }
 ```
-_tareas.component.ts_
+
+`tareas.component.ts`
 
 (para eso conviene bajarse el proyecto backend y simular un error adrede)
 
 ```xtend
-	@Get("/tareas")
-	def Result tareas() {
-		try {
-			if (1 == 1) throw new RuntimeException("Kaboom!")
-			val tareas = RepoTareas.instance.allInstances //tareasPendientes
-			ok(tareas.toJson)
-		} catch (Exception e) {
-			internalServerError(e.message)
-		}
-	}
+@Get("/tareas")
+def Result tareas() {
+  try {
+    if (1 == 1) throw new RuntimeException("Kaboom!")
+    val tareas = RepoTareas.instance.allInstances //tareasPendientes
+    ok(tareas.toJson)
+  } catch (Exception e) {
+    internalServerError(e.message)
+  }
+}
 ```
 
 Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
 
 ```typescript
-  async getTareaById(id: number) {
-    const res = await this.http.get(REST_SERVER_URL + "/tareas/" + id).toPromise()
-    return Tarea.fromJson(res.json())
-  }
+async getTareaById(id: number) {
+  const tarea = await this.http.get<Tarea>(REST_SERVER_URL + '/tareas/' + id).toPromise()
+  return Tarea.fromJson(tarea)
+}
 
-  async actualizarTarea(tarea: Tarea) {
-    return this.http.put(REST_SERVER_URL + "/tareas/" + tarea.id, tarea.toJSON()).toPromise()
-  }
+async actualizarTarea(tarea: Tarea) {
+  return this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
+}
 ```
 
 ### UsuarioService
 
-El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Response>)...
+El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Usuario[]>)...
 
 ```typescript
 @Injectable({
@@ -258,10 +259,10 @@ El service de usuarios sirve para traer la lista de usuarios en el combo de la p
 })
 export class UsuariosService{
 
-  constructor(private http: Http){}
+  constructor(private http: HttpClient) { }
 
   async usuariosPosibles() {
-    return this.http.get(REST_SERVER_URL + "/usuarios").toPromise()
+    return this.http.get<Usuario[]>(REST_SERVER_URL + '/usuarios').toPromise()
   }
 }
 ```
@@ -284,14 +285,13 @@ La vista html
 - respecto a la botonera, tanto el cumplir como el desasignar actualizan el estado de la tarea en forma local y luego disparan un pedido PUT al server para sincronizar el estado...
 - ...y por último la asignación dispara la llamada a una página específica mediante el uso del router
 
-
 ### Asignación de una persona a una tarea
 
 ![image](images/asignar_tarea_vista.png)
 
-En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tarea llamando al TareaService, lo llamamos tarea$ para indicar con el sufijo $ que se trata de un objeto Observable. Eso nos sirve para mostrar información de la tarea que estamos actualizando pero además
+En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tarea llamando al TareaService. Eso nos sirve para mostrar información de la tarea que estamos actualizando pero además
 
-- la lista de usuarios posibles que mostraremos como opciones del combo sale de una llamada al service propio para usuarios, pero en lugar de suscribe utilizamos el método _then()_ propio de las _Promises_ de Javascript
+- la lista de usuarios posibles que mostraremos como opciones del combo sale de una llamada al service propio para usuarios
 - además queremos tener binding contra el elemento seleccionado del combo. Las opciones serían 1) que sea "tarea.asignatario", 2) que sea una referencia que vive dentro del componente de asignación: la variable asignatario. Elegimos la segunda opción porque es más sencillo cancelar sin que haya cambios en el asignatario de la tarea (botón Cancelar). En caso de Aceptar el cambio, aquí sí actualizaremos el asignatario de la tarea dentro de nuestro entorno local y luego haremos un pedido PUT al servidor para sincronizar la información.
 
 ```typescript
@@ -301,33 +301,31 @@ export class AsignarComponent {
   usuariosPosibles = []
   errors = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) {
+  async ngOnInit() {
     try {
       this.initialize()
-    } catch(error) {
-      this.errors.push(error._body)
-    } 
+    } catch (error) {
+      this.errors.push(error.error)
+    }
 
-    // Truco para que refresque la pantalla 
+    // Truco para que refresque la pantalla
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
 
-  ngOnInit() { }
-
   async initialize() {
     // Llenamos el combo de usuarios
-    const res = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = res.json().map(usuarioJson => new Usuario(usuarioJson.nombre))
+    const usuarios = await this.usuariosService.usuariosPosibles()
+    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
     this.tarea = await this.tareasService.getTareaById(idTarea)
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => usuarioPosible.equals(this.tarea.asignatario))
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
   }
 
   validarAsignacion() {
     if (this.asignatario == null) {
-      throw { _body: "Debe seleccionar un usuario" }
+      throw { error: "Debe seleccionar un usuario" }
     }
   }
 
@@ -339,7 +337,7 @@ export class AsignarComponent {
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
-      this.errors.push(e._body)
+      this.errors.push(e.error)
     }
   }
 
@@ -363,7 +361,7 @@ El criterio de filtro delega a su vez en la tarea esa responsabilidad:
 ```typescript
 export class FilterTareas implements PipeTransform {
 
-  transform(tareas: Tarea[], palabra: string): any {
+  transform(tareas: Tarea[], palabra: string): Tarea[] {
     return tareas.filter(tarea => tarea.contiene(palabra))
   }
 
@@ -388,7 +386,7 @@ Queremos mantener la unitariedad de los tests y cierto grado de determinismo que
 
 ```typescript
 export interface ITareasService {
-  todasLasTareas(): Observable<any>
+  todasLasTareas(): Observable<Tarea[]>
   getTareaById(id: number) : Observable<Tarea>
   actualizarTarea(tarea: Tarea): void
 }
@@ -449,14 +447,14 @@ Para eso debemos pisar el servicio a inyectar en el método beforeEach de nuestr
 
 Es importante el orden aquí, si instanciamos el componente primero (la línea 2) ya no será posible modificar el servicio a inyectar y veremos un error al correr nuestros tests:
 
-```
+```bash
 Failed: Cannot override component metadata when the test module has already been instantiated. Make sure you are not using `inject` before `overrideComponent`.
 ```
 
 Recordamos que se corren los tests mediante
 
-```
-$ ng test --sourceMap=false --watch
+```bash
+ng test --sourceMap=false --watch
 ```
 
 Otra opción, si queremos tener acceso al stub y manipularlo, debemos crear nosotros el stub y luego pasárselo al componente de la siguiente manera:

@@ -4,7 +4,7 @@ import { Tarea } from '../domain/tarea'
 import { REST_SERVER_URL } from './configuration'
 
 export interface ITareasService {
-  todasLasTareas(): Promise<any>
+  todasLasTareas(): Promise<Tarea[]>
   getTareaById(id: number): Promise<Tarea>
   actualizarTarea(tarea: Tarea): void
 }

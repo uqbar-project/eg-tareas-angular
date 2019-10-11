@@ -5,12 +5,12 @@ import { TareasService } from '../../services/tareas.service'
 
 function mostrarError(component, error) {
   console.log('error', error)
-  component.errors.push(error._body)
+  component.errors.push(error.error)
 }
 @Component({
   selector: 'app-tareas',
   templateUrl: './tareas.component.html',
-  providers: [TareasService]
+  providers: []
 })
 export class TareasComponent implements OnInit {
 

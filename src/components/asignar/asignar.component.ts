@@ -8,7 +8,7 @@ import { UsuariosService } from '../../services/usuarios.service'
 @Component({
   selector: 'app-asignar',
   templateUrl: './asignar.component.html',
-  providers: [UsuariosService, TareasService],
+  providers: [],
   styles: []
 })
 export class AsignarComponent {
@@ -23,7 +23,7 @@ export class AsignarComponent {
     try {
       this.initialize()
     } catch (error) {
-      this.errors.push(error._body)
+      this.errors.push(error.error)
     }
 
     // Truco para que refresque la pantalla
@@ -43,7 +43,7 @@ export class AsignarComponent {
 
   validarAsignacion() {
     if (!this.asignatario) {
-      throw { _body: 'Debe seleccionar un usuario' }
+      throw { error: 'Debe seleccionar un usuario' }
     }
   }
 
@@ -55,7 +55,7 @@ export class AsignarComponent {
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
-      this.errors.push(e._body)
+      this.errors.push(e.error)
     }
   }
 
