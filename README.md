@@ -491,7 +491,7 @@ Dado que estamos utilizando el framework de routing de Angular, es importante ag
 
 De lo contrario te aparecerá el siguiente mensaje de error al correr los tests:
 
-```
+```bash
 Failed: No base href set. Please provide a value for the APP_BASE_HREF token or add a base element to the document.
 ```
 
@@ -567,7 +567,7 @@ de la siguiente manera:
 
 ```typescript
   it('searching for second task should have one tr in tasks list', () => {
-    component.tareaBuscada = "2"
+    component.tareaBuscada = '2'
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
