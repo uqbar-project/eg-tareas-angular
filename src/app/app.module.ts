@@ -8,10 +8,7 @@ import { FilterTareas } from '../pipes/filterTareas.pipe'
 import { HttpClientModule } from '@angular/common/http'
 
 // Font Awesome para los íconos
-import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
-import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-//
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import '@angular/common/locales/global/es'
 
 
@@ -32,8 +29,4 @@ import '@angular/common/locales/global/es'
   bootstrap: [AppComponent]
 })
 
-export class AppModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
-  }
-}
+export class AppModule { }
