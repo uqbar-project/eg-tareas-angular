@@ -12,12 +12,8 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
 //
 
-/** Registramos el locale ES para formatear números */
-import { registerLocaleData } from '@angular/common'
-import localeEs from '@angular/common/locales/es'
+import '@angular/common/locales/global/es'
 
-registerLocaleData(localeEs)
-//
 
 @NgModule({
   declarations: [
