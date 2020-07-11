@@ -308,8 +308,6 @@ export class AsignarComponent {
       this.errors.push(error.error)
     }
 
-    // Truco para que refresque la pantalla
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
   }
 
   async initialize() {
