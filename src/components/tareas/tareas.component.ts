@@ -10,14 +10,14 @@ function mostrarError(component, error) {
 @Component({
   selector: 'app-tareas',
   templateUrl: './tareas.component.html',
-  providers: []
+  providers: [],
 })
 export class TareasComponent implements OnInit {
   tareaBuscada = ''
   tareas: Array<Tarea> = []
   errors = []
 
-  constructor(private tareasService: TareasService, private router: Router) { }
+  constructor(private tareasService: TareasService, private router: Router) {}
 
   async ngOnInit() {
     try {
@@ -48,5 +48,4 @@ export class TareasComponent implements OnInit {
   asignar(tarea: Tarea) {
     this.router.navigate(['/asignarTarea', tarea.id])
   }
-
 }

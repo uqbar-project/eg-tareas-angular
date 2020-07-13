@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 // Font Awesome para los íconos
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { IconsModule } from "../../app/icons.module";
+import { IconsModule } from '../../app/icons.module'
 //
 // routing
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
@@ -17,9 +17,7 @@ import { TareasService } from '../../services/tareas.service'
 // componentes propios
 import { TareasComponent } from './tareas.component'
 
-
 registerLocaleData(localeEs)
-
 
 describe('TareasComponent', () => {
   let component: TareasComponent
@@ -28,22 +26,14 @@ describe('TareasComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       declarations: [FilterTareas, routingComponents],
-      imports: [
-        BrowserModule,
-        FormsModule,
-        AppRoutingModule,
-        FontAwesomeModule,
-        IconsModule,
-      ],
-      providers: [{ provide: APP_BASE_HREF, useValue: "/" }],
-    }).compileComponents();
+      imports: [BrowserModule, FormsModule, AppRoutingModule, FontAwesomeModule, IconsModule],
+      providers: [{ provide: APP_BASE_HREF, useValue: '/' }],
+    }).compileComponents()
 
     TestBed.overrideComponent(TareasComponent, {
       set: {
-        providers: [
-          { provide: TareasService, useClass: StubTareasService }
-        ]
-      }
+        providers: [{ provide: TareasService, useClass: StubTareasService }],
+      },
     })
 
     fixture = TestBed.createComponent(TareasComponent)
@@ -87,5 +77,4 @@ describe('TareasComponent', () => {
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
   })
-
 })
