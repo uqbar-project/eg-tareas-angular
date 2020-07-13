@@ -39,18 +39,18 @@
               <td nowrap class="col-xs-2">
                 <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
                   aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()" id="cumplir_{{tarea.id}}">
-                  <fa-icon [icon]="faCalendarCheck"></fa-icon>
+                  <fa-icon icon="calendar-check"></fa-icon>
                 </button>
                 &nbsp;
                 <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
                   (click)="asignar(tarea)" *ngIf="tarea.sePuedeAsignar()" aria-label="Asignarme">
-                  <fa-icon [icon]="faUserCheck"></fa-icon>
+                  <fa-icon icon="user-check"></fa-icon>
                 </button>
                 &nbsp;
                 <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger"
                   (click)="desasignar(tarea)" *ngIf="tarea.sePuedeDesasignar()" aria-label="Desasignarme"
                   id="desasignar_{{tarea.id}}">
-                  <fa-icon [icon]="faUserMinus"></fa-icon>
+                  <fa-icon icon="user-minus"></fa-icon>
                 </button>
               </td>
             </tr>

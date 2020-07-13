@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Tarea } from '../../domain/tarea'
 import { TareasService } from '../../services/tareas.service'
-import { faUserCheck, faUserMinus, faCalendarCheck} from "@fortawesome/free-solid-svg-icons";
 
 function mostrarError(component, error) {
   console.log('error', error)
@@ -14,9 +13,6 @@ function mostrarError(component, error) {
   providers: []
 })
 export class TareasComponent implements OnInit {
-  faCalendarCheck = faCalendarCheck
-  faUserCheck = faUserCheck
-  faUserMinus = faUserMinus
   tareaBuscada = ''
   tareas: Array<Tarea> = []
   errors = []

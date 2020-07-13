@@ -7,8 +7,7 @@ import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 // Font Awesome para los íconos
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCalendarCheck, faTasks, faUserCheck, faUserMinus } from '@fortawesome/free-solid-svg-icons'
+import { IconsModule } from "../../app/icons.module";
 //
 // routing
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
@@ -19,9 +18,6 @@ import { TareasService } from '../../services/tareas.service'
 import { TareasComponent } from './tareas.component'
 
 
-
-library.add(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
-
 registerLocaleData(localeEs)
 
 
@@ -31,21 +27,16 @@ describe('TareasComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        FilterTareas,
-        routingComponents
-      ],
+      declarations: [FilterTareas, routingComponents],
       imports: [
         BrowserModule,
         FormsModule,
         AppRoutingModule,
-        FontAwesomeModule
+        FontAwesomeModule,
+        IconsModule,
       ],
-      providers: [
-        { provide: APP_BASE_HREF, useValue: '/' }
-      ]
-    })
-      .compileComponents()
+      providers: [{ provide: APP_BASE_HREF, useValue: "/" }],
+    }).compileComponents();
 
     TestBed.overrideComponent(TareasComponent, {
       set: {

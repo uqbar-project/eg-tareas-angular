@@ -7,26 +7,20 @@ import { AppComponent } from './app.component'
 import { FilterTareas } from '../pipes/filterTareas.pipe'
 import { HttpClientModule } from '@angular/common/http'
 
-// Font Awesome para los íconos
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { IconsModule } from "./icons.module";
 import '@angular/common/locales/global/es'
 
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    routingComponents,
-    FilterTareas
-  ],
+  declarations: [AppComponent, routingComponents, FilterTareas],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
-    FontAwesomeModule
+    IconsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-
-export class AppModule { }
+export class AppModule {}
