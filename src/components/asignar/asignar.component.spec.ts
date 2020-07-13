@@ -13,16 +13,29 @@ import { UsuariosService } from '../../services/usuarios.service'
 // componentes propios
 import { AsignarComponent } from './asignar.component'
 
+
+
 describe('AsignarComponent', async () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
 
-  beforeEach(async () => {
+  beforeEach((async () => {
     TestBed.configureTestingModule({
-      declarations: [AsignarComponent, routingComponents, FilterTareas],
-      imports: [BrowserModule, FormsModule, AppRoutingModule, FontAwesomeModule],
-      providers: [UsuariosService, TareasService, { provide: APP_BASE_HREF, useValue: '/' }],
-    }).compileComponents()
+      declarations: [
+        AsignarComponent,
+        routingComponents,
+        FilterTareas
+      ],
+      imports: [
+        BrowserModule,
+        FormsModule,
+        AppRoutingModule,
+        FontAwesomeModule
+      ],
+      providers: [UsuariosService, TareasService,
+        { provide: APP_BASE_HREF, useValue: '/' }]
+    })
+      .compileComponents()
 
     TestBed.overrideComponent(AsignarComponent, {
       set: {
@@ -31,20 +44,20 @@ describe('AsignarComponent', async () => {
             provide: ActivatedRoute,
             useValue: {
               snapshot: {
-                params: { id: 1 },
-              },
-            },
+                params: { 'id': 1 },
+              }
+            }
           },
           { provide: TareasService, useClass: StubTareasService },
-          { provide: UsuariosService, useClass: StubUsuariosService },
-        ],
-      },
+          { provide: UsuariosService, useClass: StubUsuariosService }
+        ]
+      }
     })
 
     fixture = TestBed.createComponent(AsignarComponent)
     component = fixture.componentInstance
     await component.initialize()
-  })
+  }))
 
   it('should create', () => {
     fixture.detectChanges()
@@ -69,4 +82,5 @@ describe('AsignarComponent', async () => {
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe('Tarea 1')
   })
+
 })

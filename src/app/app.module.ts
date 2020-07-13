@@ -7,12 +7,19 @@ import { AppComponent } from './app.component'
 import { FilterTareas } from '../pipes/filterTareas.pipe'
 import { HttpClientModule } from '@angular/common/http'
 
-import { IconsModule } from './icons.module'
+import { IconsModule } from "./icons.module";
 import '@angular/common/locales/global/es'
+
 
 @NgModule({
   declarations: [AppComponent, routingComponents, FilterTareas],
-  imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule, IconsModule],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpClientModule,
+    AppRoutingModule,
+    IconsModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

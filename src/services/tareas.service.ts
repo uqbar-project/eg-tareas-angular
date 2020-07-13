@@ -10,10 +10,11 @@ export interface ITareasService {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class TareasService implements ITareasService {
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient) { }
 
   async todasLasTareas() {
     const tareas = await this.http.get<Tarea[]>(REST_SERVER_URL + '/tareas').toPromise()
@@ -28,4 +29,5 @@ export class TareasService implements ITareasService {
   async actualizarTarea(tarea: Tarea) {
     return this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
   }
+
 }

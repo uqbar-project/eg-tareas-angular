@@ -1,4 +1,5 @@
 export class Usuario {
+
   nombre: string
 
   static fromJSON(nombre: string): Usuario {
@@ -16,4 +17,5 @@ export class Usuario {
   equals(_otro) {
     return _otro && this.nombre === _otro.nombre
   }
+
 }
