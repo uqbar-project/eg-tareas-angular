@@ -21,10 +21,16 @@ export class TareasComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      this.tareas = await this.tareasService.todasLasTareas()
+      this.tareas = this.ordenarTareasPorId(await this.tareasService.todasLasTareas())
     } catch (error) {
       mostrarError(this, error)
     }
+  }
+
+  ordenarTareasPorId(tareas: Tarea[]) {
+    return tareas.sort(function (tarea, otraTarea) {
+      return tarea.id - otraTarea.id
+    })
   }
 
   async cumplir(tarea: Tarea) {
