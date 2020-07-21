@@ -28,9 +28,7 @@ export class TareasComponent implements OnInit {
   }
 
   ordenarTareasPorId(tareas: Tarea[]) {
-    return tareas.sort(function (tarea, otraTarea) {
-      return tarea.id - otraTarea.id
-    })
+    return tareas.sort((tarea, otraTarea) => tarea.id - otraTarea.id)
   }
 
   async cumplir(tarea: Tarea) {
