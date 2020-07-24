@@ -47,8 +47,7 @@ import '@angular/localize/init';
 
 /** Evergreen browsers require these. **/
 // Used for reflect-metadata in JIT. If you use AOT (and only Angular decorators), you can remove.
-import 'core-js/es/reflect';
-
+import 'core-js/proposals/reflect-metadata'
 
 /**
  * Web Animations `@angular/platform-browser/animations`
