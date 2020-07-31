@@ -12,6 +12,7 @@ import { IconsModule } from "../../app/icons.module";
 // routing
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
+import { OrderTareas } from '../../pipes/orderTareas.pipe'
 import { StubTareasService } from '../../services/stubs.service'
 import { TareasService } from '../../services/tareas.service'
 // componentes propios
@@ -27,7 +28,7 @@ describe('TareasComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [FilterTareas, routingComponents],
+      declarations: [FilterTareas, OrderTareas, routingComponents],
       imports: [
         BrowserModule,
         FormsModule,
