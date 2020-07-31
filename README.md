@@ -9,7 +9,7 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 - **routing** de páginas master / detail de tareas
 - utilización de Bootstrap 4 como framework de CSS + Font Awesome para los íconos
-- desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con Spring Boot)
+- desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con [Spring Boot](https://spring.io/projects/spring-boot))
 - para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service
 - la **separación de concerns** entre las tareas como objeto de dominio, la vista html, el componente que sirve como modelo de vista y el servicio que maneja el origen de los datos
 - el manejo del **asincronismo** para recibir parámetros en la ruta, así como para disparar actualizaciones y consultas hacia el backend
@@ -80,9 +80,7 @@ import { AppRoutingModule, routingComponents } from './app-routing.module'
 
 También es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
 
-Agregamos el módulo IconsModule donde vamos a poner todos los imports de los íconos
-
-Vemos cómo es el import de los íconos, que incluye la llamada a una librería:
+Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una librería:
 
 ```typescript
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
@@ -146,7 +144,7 @@ Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un s
 }
 ```
 
-Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework Jackson, es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
+Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework [Jackson](https://github.com/FasterXML/jackson), es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
 
 - en el fromJson() debemos tomar el string y convertirlo a un objeto Usuario cuyo nombre será ese string. Actualizamos la variable asignatario con ese usuario.
 - en el toJson() generamos un Json con un atributo "asignadoA" que contiene el nombre del usuario asignatario
@@ -198,7 +196,9 @@ export class TareasService implements ITareasService {
 - le inyectamos el objeto httpClient que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST.
 - **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_.
 
-Más información acá: https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb
+Esto y algunas novedades que trajo Angular 9, se explica acá: https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb
+
+Otro post (más largo): https://medium.com/@tomastrajan/total-guide-to-angular-6-dependency-injection-providedin-vs-providers-85b7a347b59f
 
 Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "http://localhost:9000/tareas". Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
 
@@ -283,7 +283,7 @@ La vista html
 
 - tiene binding bidireccional para sincronizar el valor de búsqueda (variable _tareaBuscada_),
 - también tiene una lista de errores que se visualizan si por ejemplo hay error al llamar al service
-- un ngFor que recorre la lista de tareas que sale de un callback que le pasamos al service (vean la primera expresión lambda que le pasamos al suscribe)
+- un ngFor que recorre la lista de tareas que sale de una llamada asincrónica al service: `await this.tareasService.todasLasTareas()`
 - respecto a la botonera, tanto el cumplir como el desasignar actualizan el estado de la tarea en forma local y luego disparan un pedido PUT al server para sincronizar el estado...
 - ...y por último la asignación dispara la llamada a una página específica mediante el uso del router
 
@@ -291,7 +291,7 @@ La vista html
 
 ![image](images/asignar_tarea_vista.png)
 
-En la asignación recibimos el id de la tarea, y la convertimos en un objeto Tarea llamando al TareaService. Eso nos sirve para mostrar información de la tarea que estamos actualizando pero además
+En la asignación recibimos el id de la tarea, y pedimos al backend la tarea con ese id a través del TareaService. Eso nos sirve para mostrar información de la tarea que estamos actualizando pero además
 
 - la lista de usuarios posibles que mostraremos como opciones del combo sale de una llamada al service propio para usuarios
 - además queremos tener binding contra el elemento seleccionado del combo. Las opciones serían 1) que sea "tarea.asignatario", 2) que sea una referencia que vive dentro del componente de asignación: la variable asignatario. Elegimos la segunda opción porque es más sencillo cancelar sin que haya cambios en el asignatario de la tarea (botón Cancelar). En caso de Aceptar el cambio, aquí sí actualizaremos el asignatario de la tarea dentro de nuestro entorno local y luego haremos un pedido PUT al servidor para sincronizar la información.
@@ -353,7 +353,7 @@ export class AsignarComponent {
 La página inicial permite filtrar las tareas:
 
 ```html
-  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas" class="animate-repeat">
 ```
 
 El criterio de filtro delega a su vez en la tarea esa responsabilidad:
@@ -368,7 +368,20 @@ export class FilterTareas implements PipeTransform {
 }
 ```
 
-Además, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
+También tenemos el pipe orderTareas, que ordena las tareas por id:
+
+```typescript
+export class OrderTareas implements PipeTransform {
+
+  transform(tareas: Tarea[]): Tarea[] {
+    return tareas.sort((tarea, otraTarea) => tarea.id - otraTarea.id)
+  }
+
+}
+
+```
+
+Por último, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
 
 ```html
   <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
@@ -386,8 +399,8 @@ Queremos mantener la unitariedad de los tests y cierto grado de determinismo que
 
 ```typescript
 export interface ITareasService {
-  todasLasTareas(): Observable<Tarea[]>
-  getTareaById(id: number) : Observable<Tarea>
+  todasLasTareas(): Promise<Tarea[]>
+  getTareaById(id: number) : Promise<Tarea>
   actualizarTarea(tarea: Tarea): void
 }
 ```
@@ -415,7 +428,7 @@ export class StubTareasService implements ITareasService {
 }
 ```
 
-Fíjense que el método _todasLasTareas()_ no puede devolver una lista de tareas, sino un Observable de una lista de tareas. Para lograr eso utilizamos el método of() de rxjs, que convierte un valor fijo en un observable.
+Fíjense que el método _todasLasTareas()_ no devuelve una lista de tareas, sino una Promise de una lista de tareas.
 
 - la clase TareasService implementará la nueva interfaz (archivo _tareas.service.ts_)
 
@@ -560,7 +573,7 @@ A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento
 Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar las clases "animate-repeat" que tienen nuestros tr en la vista _tareas.component.html_:
 
 ```html
-  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas" class="animate-repeat">
 ```
 
 de la siguiente manera:
