@@ -9,7 +9,7 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 - **routing** de páginas master / detail de tareas
 - utilización de Bootstrap 4 como framework de CSS + Font Awesome para los íconos
-- desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con XTRest)
+- desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con Spring Boot)
 - para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service
 - la **separación de concerns** entre las tareas como objeto de dominio, la vista html, el componente que sirve como modelo de vista y el servicio que maneja el origen de los datos
 - el manejo del **asincronismo** para recibir parámetros en la ruta, así como para disparar actualizaciones y consultas hacia el backend
@@ -19,7 +19,7 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 ## Levantar el backend
 
-Pueden descargar [la implementación XTRest del backend](https://github.com/uqbar-project/eg-tareas-xtrest). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
+Pueden descargar [la implementación Spring Boot del backend](https://github.com/uqbar-project/eg-tareas-springboot). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
 
 ## Componentes adicionales
 
@@ -27,7 +27,7 @@ La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-
 
 ## Agregado en package.json
 
-Es necesario incorporar Bootstrap 4 dentro del archivo _package.json_ de la siguiente manera:
+Es necesario incorporar Bootstrap 4 dentro del archivo _angular.json_ de la siguiente manera:
 
 ```json
     "styles": [
@@ -38,18 +38,6 @@ Es necesario incorporar Bootstrap 4 dentro del archivo _package.json_ de la sigu
         "./node_modules/jquery/dist/jquery.slim.min.js",
         "./node_modules/bootstrap/dist/js/bootstrap.min.js"
     ]
-```
-
-## Configuración Browser para evitar CORS
-
-Dado que desde el front-end vamos a levantar un web server en el puerto 4200 y vamos a acceder al puerto 9000 donde está el server, técnicamente constituyen **dominios diferentes**, por lo que debemos habilitar el intercambio de recursos entre dichos orígenes diferentes, lo que se conoce como **CORS** por sus siglas en inglés (Cross-Origin Resource Sharing). De esa manera podremos hacer consultas y actualizaciones al backend sin que el navegador lo rechace por estar fuera del dominio localhost:4200.
-
-Una opción es instalar [el siguiente plugin para Chrome](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi?hl=en-US), lo que nos permite que aparezca a la derecha de la URL un ícono para activarlo o desactivarlo convenientemente.
-
-Pero otra opción mejor es instalar como dependencia el manejador de CORS:
-
-```bash
-npm install cors
 ```
 
 ## Configuración ruteo
@@ -90,30 +78,42 @@ import { AppRoutingModule, routingComponents } from './app-routing.module'
 ],
 ```
 
-También es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). Vemos entonces cómo es el import de los íconos, que incluye la llamada a una librería:
+También es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
+
+Agregamos el módulo IconsModule donde vamos a poner todos los imports de los íconos
+
+Vemos cómo es el import de los íconos, que incluye la llamada a una librería:
 
 ```typescript
-// Font Awesome para los íconos
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
 import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-//
 
-export class AppModule {
+export class IconsModule {
   constructor(library: FaIconLibrary) {
     library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
   }
 }
+
 ```
 
-Y por último dado que vamos a formatear a dos decimales con coma el % de completitud de una tarea, debemos importar los _locales_ o configuraciones regionales:
+Importamos esté modulo en _app.module.ts_ :
 
 ```typescript
-/** Registramos el locale ES para formatear números */
-import { registerLocaleData } from '@angular/common'
-import localeEs from '@angular/common/locales/es'
+import { IconsModule } from "./icons.module";
 
-registerLocaleData(localeEs)
-//
+@NgModule({
+   imports: [
+    ...
+    IconsModule,
+  ],
+}
+
+```
+
+Por último dado que vamos a formatear a dos decimales con coma el % de completitud de una tarea, debemos importar los _locales_ o configuraciones regionales:
+
+```typescript
+import '@angular/common/locales/global/es'
 ```
 
 Además necesitamos importar el módulo HttpClientModule, que nos va a permitir conectarnos al backend.
@@ -146,12 +146,12 @@ Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un s
 }
 ```
 
-Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework Jackson de XTRest, es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
+Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los campos devueltos coinciden con los nombres y tipos definidos para la clase Tarea. En cuanto al atributo **new** que es inyectado por el framework Jackson, es descartado ya que el atributo id es el que se utiliza para saber si el objeto fue agregado a la colección del backend. Por último tenemos el campo **asignadoA**, que es un String vs. Tarea.asignatario que en el frontend apunta a un objeto Usuario. Entonces debemos adaptar este _gap_ de la siguiente manera:
 
 - en el fromJson() debemos tomar el string y convertirlo a un objeto Usuario cuyo nombre será ese string. Actualizamos la variable asignatario con ese usuario.
 - en el toJson() generamos un Json con un atributo "asignadoA" que contiene el nombre del usuario asignatario
 
-Los atributos de Tarea son privados, a excepción del asignatario ya que lo necesitan otros objetos. Lo interesante es que **aparecen varias responsabilidades**: saber si una tarea está cumplida, saber si está asignada, cumplirla, asignarla, etc. Podés ver la implementación para más detalles.
+Lo interesante es que **aparecen varias responsabilidades**: saber si una tarea está cumplida, saber si está asignada, cumplirla, asignarla, etc. Podés ver la implementación para más detalles.
 
 Otra opción para tomar una tarea como JSON que viene del backend y transformarla en una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento):
 
@@ -163,7 +163,7 @@ static fromJson(tareaJSON): Tarea {
 
 ## Servicios
 
-Vamos a disparar pedidos a nuestro server local de XTRest ubicado en el puerto 9000. Pero no queremos repetir el mismo _endpoint_ en todos los lugares, entonces creamos un archivo _configuration.ts_ en el directorio services y exportamos una constante:
+Vamos a disparar pedidos a nuestro server local de Spring Boot ubicado en el puerto 9000. Pero no queremos repetir el mismo _endpoint_ en todos los lugares, entonces creamos un archivo _configuration.ts_ en el directorio services y exportamos una constante:
 
 ```typescript
 export const REST_SERVER_URL = 'http://localhost:9000'
@@ -196,7 +196,9 @@ export class TareasService implements ITareasService {
 ```
 
 - le inyectamos el objeto httpClient que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST.
-- **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_, según se explica [en esta página](https://www.uno-de-piera.com/di-angular-6-providedin/). 
+- **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_.
+
+Más información acá: https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb
 
 Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "http://localhost:9000/tareas". Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
 
@@ -224,16 +226,16 @@ Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variabl
 (para eso conviene bajarse el proyecto backend y simular un error adrede)
 
 ```xtend
-@Get("/tareas")
-def Result tareas() {
-  try {
-    if (1 == 1) throw new RuntimeException("Kaboom!")
-    val tareas = RepoTareas.instance.allInstances //tareasPendientes
-    ok(tareas.toJson)
-  } catch (Exception e) {
-    internalServerError(e.message)
-  }
-}
+@GetMapping(value="/tareas")
+	def tareas() {
+		try {
+      if (1 == 1) throw new RuntimeException("Kaboom!")
+			val tareas = RepoTareas.instance.allInstances
+			ResponseEntity.ok(mapper.writeValueAsString(tareas))
+		} catch (Exception e) {
+			ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.message)
+		}
+	}
 ```
 
 Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
