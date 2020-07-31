@@ -23,7 +23,7 @@
               <th>% cumplido</th>
               <th>Acciones</th>
             </tr>
-            <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada" class="animate-repeat">
+            <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas" class="animate-repeat">
               <td class="col-xs-4">{{tarea.descripcion}}</td>
               <td class="col-xs-2">{{tarea.iteracion}}</td>
               <td class="col-xs-3" id="asignatario_{{tarea.id}}">{{tarea.asignatario?.nombre}}</td>

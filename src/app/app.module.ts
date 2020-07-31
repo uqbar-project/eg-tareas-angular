@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms'
 import { AppRoutingModule, routingComponents } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { FilterTareas } from '../pipes/filterTareas.pipe'
+import { OrderTareas } from '../pipes/orderTareas.pipe'
 import { HttpClientModule } from '@angular/common/http'
 
 import { IconsModule } from "./icons.module";
@@ -12,7 +13,7 @@ import '@angular/common/locales/global/es'
 
 
 @NgModule({
-  declarations: [AppComponent, routingComponents, FilterTareas],
+  declarations: [AppComponent, routingComponents, FilterTareas, OrderTareas],
   imports: [
     BrowserModule,
     FormsModule,
