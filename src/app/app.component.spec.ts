@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common'
 import { async, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { IconsModule } from "./icons.module"
 import { AppComponent } from './app.component'
 
 describe('AppComponent', () => {
@@ -12,7 +12,7 @@ describe('AppComponent', () => {
         RouterTestingModule,
         FormsModule,
         CommonModule,
-        FontAwesomeModule
+        IconsModule
       ],
       declarations: [
         AppComponent

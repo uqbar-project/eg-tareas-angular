@@ -5,39 +5,23 @@ import { FormsModule } from '@angular/forms'
 import { AppRoutingModule, routingComponents } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { FilterTareas } from '../pipes/filterTareas.pipe'
+import { OrderTareas } from '../pipes/orderTareas.pipe'
 import { HttpClientModule } from '@angular/common/http'
 
-// Font Awesome para los íconos
-import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
-import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-//
+import { IconsModule } from "./icons.module";
+import '@angular/common/locales/global/es'
 
-/** Registramos el locale ES para formatear números */
-import { registerLocaleData } from '@angular/common'
-import localeEs from '@angular/common/locales/es'
-
-registerLocaleData(localeEs)
-//
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    routingComponents,
-    FilterTareas
-  ],
+  declarations: [AppComponent, routingComponents, FilterTareas, OrderTareas],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
-    FontAwesomeModule
+    IconsModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-
-export class AppModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
-  }
-}
+export class AppModule {}

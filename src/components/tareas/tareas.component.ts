@@ -13,7 +13,6 @@ function mostrarError(component, error) {
   providers: []
 })
 export class TareasComponent implements OnInit {
-
   tareaBuscada = ''
   tareas: Array<Tarea> = []
   errors = []
@@ -22,8 +21,6 @@ export class TareasComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      // Truco para que refresque la pantalla
-      this.router.routeReuseStrategy.shouldReuseRoute = () => false
       this.tareas = await this.tareasService.todasLasTareas()
     } catch (error) {
       mostrarError(this, error)
