@@ -87,7 +87,7 @@ describe('TareasComponent', () => {
     component.tareaBuscada = '2'
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
-    expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
+    expect(resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length).toBe(1)
   })
 
 })
