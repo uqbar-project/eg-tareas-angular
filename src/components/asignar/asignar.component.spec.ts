@@ -4,15 +4,16 @@ import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { ActivatedRoute } from '@angular/router'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-// routing
+
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { juana, StubTareasService, StubUsuariosService } from '../../services/stubs.service'
 import { TareasService } from '../../services/tareas.service'
 import { UsuariosService } from '../../services/usuarios.service'
-// componentes propios
 import { AsignarComponent } from './asignar.component'
 
+// routing
+// componentes propios
 
 
 describe('AsignarComponent', async () => {
@@ -72,7 +73,7 @@ describe('AsignarComponent', async () => {
   it('task unassigment', () => {
     component.asignatario = null
     const resultHtml = fixture.debugElement.nativeElement
-    resultHtml.querySelector('#guardar').click()
+    resultHtml.querySelector('[data-testid="guardar"]').click()
     fixture.detectChanges()
     expect(component.asignatario).toBeFalsy()
   })

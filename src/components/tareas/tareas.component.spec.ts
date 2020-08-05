@@ -5,19 +5,20 @@ import localeEs from '@angular/common/locales/es'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
-// Font Awesome para los íconos
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { IconsModule } from "../../app/icons.module";
-//
-// routing
+
 import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
+import { IconsModule } from '../../app/icons.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { OrderTareas } from '../../pipes/orderTareas.pipe'
 import { StubTareasService } from '../../services/stubs.service'
 import { TareasService } from '../../services/tareas.service'
-// componentes propios
 import { TareasComponent } from './tareas.component'
 
+// Font Awesome para los íconos
+//
+// routing
+// componentes propios
 
 registerLocaleData(localeEs)
 
@@ -36,8 +37,8 @@ describe('TareasComponent', () => {
         FontAwesomeModule,
         IconsModule,
       ],
-      providers: [{ provide: APP_BASE_HREF, useValue: "/" }],
-    }).compileComponents();
+      providers: [{ provide: APP_BASE_HREF, useValue: '/' }],
+    }).compileComponents()
 
     TestBed.overrideComponent(TareasComponent, {
       set: {

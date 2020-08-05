@@ -1,21 +1,14 @@
 export class Usuario {
 
-  nombre: string
-
   static fromJSON(nombre: string): Usuario {
-    if (!nombre) {
-      return null
-    }
-    return new Usuario(nombre)
+    return nombre ? new Usuario(nombre) : null
   }
 
-  constructor(_nombre: string) {
-    this.nombre = _nombre
-  }
+  constructor(public nombre: string) { }
 
   // Lo necesitamos para mostrar el valor seleccionado en el combo
-  equals(_otro) {
-    return _otro && this.nombre === _otro.nombre
+  equals(otro) {
+    return otro && this.nombre === otro.nombre
   }
 
 }
