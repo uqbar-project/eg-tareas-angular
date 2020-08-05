@@ -124,10 +124,10 @@ Además necesitamos importar el módulo HttpClientModule, que nos va a permitir 
 
 La tarea es un objeto de dominio al que podemos
 
-- asignarle una persona para que la realice
+- asignarle una persona
 - determinar si se puede asignar, esto ocurre mientras no esté cumplida
-- desasignarle la persona actual
-- saber si se puede cumplir una tarea o desasignarle una persona, siempre que tenga una persona asignada y no esté cumplida
+- remover la asignación de la persona actual
+- saber si se puede cumplir o remover su asignación, siempre que tenga una persona asignada y no esté cumplida
 - marcarla como cumplida
 
 Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un simple JSON. Pero además como vamos a recibir una Tarea desde el backend que sí es un JSON, vamos a incorporarle dos servicios: la exportación de un objeto Tarea a su correspondiente JSON y la importación de un JSON para crear un objeto tarea. El primero se implementa con un método de instancia toJSON(), el segundo requiere crear una tarea, por lo que el método fromJSON() es **estático**. El JSON del server tiene esta estructura:
@@ -149,13 +149,26 @@ Para el caso de id, descripcion, iteracion, porcentajeCumplimiento y fecha, los 
 - en el fromJson() debemos tomar el string y convertirlo a un objeto Usuario cuyo nombre será ese string. Actualizamos la variable asignatario con ese usuario.
 - en el toJson() generamos un Json con un atributo "asignadoA" que contiene el nombre del usuario asignatario
 
-Lo interesante es que **aparecen varias responsabilidades**: saber si una tarea está cumplida, saber si está asignada, cumplirla, asignarla, etc. Podés ver la implementación para más detalles.
+Lo interesante es que **aparecen varias responsabilidades** que justifican de sobra la creación del objeto de dominio Tarea. Podés ver la implementación para más detalles.
 
-Otra opción para tomar una tarea como JSON que viene del backend y transformarla en una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento):
+La primera opción para implementar el método `fromJson` puede ser construir una tarea, y configurar a mano el nuevo objeto con lo que viene del backend:
 
 ```js
 static fromJson(tareaJSON): Tarea {
-    return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
+  const result = new Tarea()
+  result.id = tareaJSON.id
+  result.descripcion = tareaJSON.descripcion
+  result.asignatario = Usuario.fromJSON(tareaJSON.asignadoA)
+  ...
+  return result
+}
+```
+
+Otra opción para construir una tarea como objeto de dominio con responsabilidades, es utilizar la técnica Object.assign, que pasa la información del segundo parámetro al primero (es una operación que tiene efecto colateral sobre el primer argumento). Es una opción más simple y vamos a preferirla a la hora de implementar nuestra solución:
+
+```js
+static fromJson(tareaJSON): Tarea {
+  return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
 }
 ```
 
@@ -206,7 +219,7 @@ Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "htt
 (method) (method) HttpClient.get<Tarea[]>(url: string, options?: Observable<Tarea[]>
 ```
 
-Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [este material sobre el uso de promises con async/await](https://javascript.info/async-await), o bien [en este sitio](https://alligator.io/js/async-functions/)). **No es un pedido sincrónico**, ya que la línea siguiente `tareas.map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas.
+Devuelve un "observable" que luego transformamos a "promesa" de una respuesta por parte del servidor. La instrucción `await` transforma ese pedido asincrónico en formato sincrónico (esto lo podemos hacer solo dentro de un método o función `async`, para más detalles te recomendamos leer [la explicación de promises y async/await de la materia](https://github.com/uqbar-project/eg-promises-electrodomesticos-ts)). **No es un pedido sincrónico**, ya que la línea siguiente `tareas.map...` no se ejecutará hasta tanto el servidor no devuelva la lista de tareas (se pausa esperando la respuesta).
 
 Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variable tareas, que tipan a una lista de tareas, aunque no termina de ser exactamente objetos Tarea. Para eso las transformaremos a tareas con el método estático fromJson() de la clase Tarea. Si hay un error en el server (respuesta distinta de 200), la definición del método como `async` hace que se dispare una excepción...
 
@@ -253,7 +266,7 @@ async actualizarTarea(tarea: Tarea) {
 
 ### UsuarioService
 
-El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto http para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Usuario[]>)...
+El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto `http` para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Usuario[]>)...
 
 ```typescript
 @Injectable({
@@ -378,7 +391,6 @@ export class OrderTareas implements PipeTransform {
   }
 
 }
-
 ```
 
 Por último, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
@@ -411,24 +423,24 @@ export interface ITareasService {
 export const juana = new Usuario('Juana Molina')
 
 export class StubTareasService implements ITareasService {
-    tareas = [
-        new Tarea(1, "Tarea 1", "Iteracion 1", juana, "10/05/2019", 50), 
-        new Tarea(2, "Tarea 2", "Iteracion 1", null, "13/08/2019", 0)
-    ]
+  tareas = [
+    new Tarea(1, 'Tarea 1', 'Iteracion 1', juana, '10/05/2019', 50),
+    new Tarea(2, 'Tarea 2', 'Iteracion 1', null, '13/08/2019', 0)
+  ]
 
-    async todasLasTareas() {
-        return this.tareas
-    }
+  async todasLasTareas() {
+    return this.tareas
+  }
 
-    async getTareaById(id: number) {
-        return this.tareas.find((tarea) => tarea.id == id)
-    }
+  async getTareaById(id: number) {
+    return this.tareas.find((tarea) => tarea.id === id)
+  }
 
-    actualizarTarea(tarea: Tarea) {}
+  actualizarTarea(tarea: Tarea) { }
 }
 ```
 
-Fíjense que el método _todasLasTareas()_ no devuelve una lista de tareas, sino una Promise de una lista de tareas.
+Fíjense que el método _todasLasTareas()_ no devuelve una lista de tareas, sino una Promise de una lista de tareas (determinado por el mecanismo `async`).
 
 - la clase TareasService implementará la nueva interfaz (archivo _tareas.service.ts_)
 
@@ -441,7 +453,7 @@ No es estrictamente necesario que stub y tarea implementen la misma interfaz, po
 Ahora sí, en nuestro archivo de test tenemos que inyectarle al constructor del componente el stub del service:
 
 ```typescript
-  constructor(private tareasService: TareasService, private router: Router) { }
+constructor(private tareasService: TareasService, private router: Router) { }
 ```
 
 Para eso debemos pisar el servicio a inyectar en el método beforeEach de nuestro test, de la siguiente manera:
@@ -568,12 +580,17 @@ A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento
 <span class="text-xs-right" id="porcentaje_{{tarea.id}}">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
 ```
 
+Recordemos que siempre que podamos vamos a tratar de utilizar el atributo `data-testid` para seleccionar los elementos HTML que nos interesa manipular en cada test. En este caso, dado que generamos identificadores dinámicamente, debemos utilizar el `id` ya que el motor de Angular pisa los `data` que incluyan código en javascript con expresiones propias del framework.
+
 ### Búsqueda de tareas
 
-Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar las clases "animate-repeat" que tienen nuestros tr en la vista _tareas.component.html_:
+Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar todos los elementos con data-testid "fila-tarea" que tienen nuestros tr en la vista _tareas.component.html_:
 
 ```html
-  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas" class="animate-repeat">
+<tr 
+  data-testid="fila-tarea"
+  *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas"
+  class="animate-repeat">
 ```
 
 de la siguiente manera:
@@ -583,10 +600,10 @@ de la siguiente manera:
     component.tareaBuscada = '2'
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
-    expect(resultHtml.querySelectorAll('.animate-repeat').length).toBe(1)
+    expect(resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length).toBe(1)
   })
 ```
 
-Aquí utilizamos querySelectorAll() que devuelve la lista de elementos html que cumplen nuestro criterio de búsqueda, esperando que solo haya una tarea.
+Aquí utilizamos querySelectorAll() que devuelve la lista de elementos html que cumplen nuestro criterio de búsqueda.
 
 Dejamos al lector que siga revisando los otros tests, que tienen características similares.
