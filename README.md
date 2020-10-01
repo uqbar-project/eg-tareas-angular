@@ -446,7 +446,7 @@ Fíjense que el método _todasLasTareas()_ no devuelve una lista de tareas, sino
 export class TareasService implements ITareasService {
 ```
 
-No es estrictamente necesario que stub y tarea implementen la misma interfaz, porque internamente Javascript no tiene chequeo estricto de tipos, pero didácticamente nos sirve como ejemplo de uso de interfaz de ES6 y nos permite ser más explícito en la definición de tipos, así que como primer acercamiento nos es útil. En la práctica ustedes pueden obviar este paso para no hacerlo tan burocrático.
+No es estrictamente necesario que stub y tarea implementen la misma interfaz, pero didácticamente nos sirve como ejemplo de uso de interfaz de Typescript y nos permite ser más explícito en la definición de tipos, así que como primer acercamiento nos es útil. En la práctica ustedes pueden obviar este paso para no hacerlo tan burocrático.
 
 Ahora sí, en nuestro archivo de test tenemos que inyectarle al constructor del componente el stub del service:
 
@@ -496,28 +496,6 @@ Otra opción, si queremos tener acceso al stub y manipularlo, debemos crear noso
 
 La referencia stubTareasService la podemos crear dentro del beforeEach o bien puede ser una variable de instancia dentro del test.
 
-## Otras configuraciones
-
-Dado que estamos utilizando el framework de routing de Angular, es importante agregar la configuración de nuestra ruta por defecto dentro de los providers del componente que genera el TestBed:
-
-```typescript
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ... ],
-      imports: [ ... ],
-      providers: [
-       { provide: APP_BASE_HREF, useValue: '/' }
-      ]
-    })
-    ...
-``` 
-
-De lo contrario te aparecerá el siguiente mensaje de error al correr los tests:
-
-```bash
-Failed: No base href set. Please provide a value for the APP_BASE_HREF token or add a base element to the document.
-```
-
 ## Tests
 
 ### Stub service bien inyectado
@@ -525,7 +503,7 @@ Failed: No base href set. Please provide a value for the APP_BASE_HREF token or 
 Veamos los tests más interesantes: este prueba que el stub service fue inyectado correctamente
 
 ```typescript
-  it('should show 2 pending tasks', () => {
+  it('should initially show 2 pending tasks', () => {
     expect(2).toBe(component.tareas.length)
   })
 ```
@@ -537,20 +515,22 @@ Dado que el stub genera dos tareas, el componente debe tenerlas en su variable t
 El segundo test prueba que una tarea que no está cumplida y está asignada puede marcarse como cumplida:
 
 ```typescript
-  it('first task could be mark as done', () => {
+  it('first task can be marked as done', async () => {
     const resultHtml = fixture.debugElement.nativeElement
-    expect(resultHtml.querySelector('#cumplir_1')).toBeTruthy()
+    expect(resultHtml.querySelector('[data-testid="cumplir_1"]')).toBeTruthy()
   })
 ```
 
-En la vista agregamos un identificador para el botón cumplir de cada tarea, que consiste en el string "cumplir_" concatenado con el identificador de la tarea:
+En la vista agregamos un `attr.data-testid` para el botón cumplir de cada tarea, que consiste en el string "cumplir_" concatenado con el identificador de la tarea:
 
 ```html
-  <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)" aria-label="Cumplir"
-    *ngIf="tarea.sePuedeCumplir()" id="cumplir_{{tarea.id}}">
+<button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+  aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()" [attr.data-testid]="'cumplir_' + tarea.id">
+  <fa-icon icon="calendar-check"></fa-icon>
+</button>
 ```
 
-Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag con id "cumplir_1" dentro del HTML que genera el componente.
+Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag cuyo atributo `data-testid` sea "cumplir_1" dentro del HTML que genera el componente.
 
 Dejamos [aquí](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) el link para entender las búsquedas que soporta querySelector.
 
@@ -561,24 +541,23 @@ Dejamos [aquí](https://developer.mozilla.org/es/docs/Web/API/Document/querySele
 - hacemos click sobre el botón cumplir
 - esto debería mostrar el porcentaje de cumplimiento de dicha tarea con 100
 
-Bueno, no exactamente 100, sino "100,00" porque le aplicamos un filter. Aquí vemos que el testeo que estamos haciendo involucra no es tan unitario, sino más bien end-to-end, ya que se prueba componente, objeto de dominio (que es quien cumple la tarea), el pipe de Angular que customizamos a dos decimales y con coma decimal y la vista html:
+Bueno, no exactamente 100, sino "100,00" porque le aplicamos un filter. Aquí vemos que el testeo que estamos haciendo involucra no es tan unitario, sino más bien de integración, ya que se prueba componente de vista, objeto de dominio (que es quien cumple la tarea), el pipe de Angular que customizamos a dos decimales y con coma decimal y la vista html:
 
 ```typescript
-  it('mark first task as done', () => {
-    const resultHtml = fixture.debugElement.nativeElement
-    resultHtml.querySelector('#cumplir_1').click()
-    fixture.detectChanges()
-    expect(resultHtml.querySelector('#porcentaje_1').textContent).toBe("100,00")
-  })
+it('when a task is done, it has 100% of completion', async () => {
+  const resultHtml = fixture.debugElement.nativeElement
+  resultHtml.querySelector('[data-testid="cumplir_1"]').click()
+  fixture.detectChanges()
+  expect(resultHtml.querySelector('[data-testid="porcentaje_1"]').textContent).toBe('100,00')
+})
 ```
 
 A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento dentro de la tabla:
 
 ```html
-<span class="text-xs-right" id="porcentaje_{{tarea.id}}">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+<span class="text-xs-right"
+  [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
 ```
-
-Recordemos que siempre que podamos vamos a tratar de utilizar el atributo `data-testid` para seleccionar los elementos HTML que nos interesa manipular en cada test. En este caso, dado que generamos identificadores dinámicamente, debemos utilizar el `id` ya que el motor de Angular pisa los `data` que incluyan código en javascript con expresiones propias del framework.
 
 ### Búsqueda de tareas
 
