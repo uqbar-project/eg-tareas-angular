@@ -25,5 +25,5 @@ export class StubTareasService implements ITareasService {
     return this.tareas.find((tarea) => tarea.id === id)
   }
 
-  actualizarTarea(tarea: Tarea) { }
+  async actualizarTarea(tarea: Tarea) { }
 }

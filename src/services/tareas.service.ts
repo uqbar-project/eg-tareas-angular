@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+
 import { Tarea } from '../domain/tarea'
 import { REST_SERVER_URL } from './configuration'
 
 export interface ITareasService {
   todasLasTareas(): Promise<Tarea[]>
   getTareaById(id: number): Promise<Tarea>
-  actualizarTarea(tarea: Tarea): void
+  actualizarTarea(tarea: Tarea): Promise<void>
 }
 
 @Injectable({
@@ -27,7 +28,9 @@ export class TareasService implements ITareasService {
   }
 
   async actualizarTarea(tarea: Tarea) {
-    return this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
+    // no tiene efecto ubicar aquí un await, porque no hay línea siguiente, 
+    // pero ojo porque si agregamos otra línea que depende de la actualización, necesita el await
+    await this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
   }
 
 }
