@@ -80,7 +80,7 @@ import { AppRoutingModule, routingComponents } from './app-routing.module'
 
 También es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
 
-Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una librería:
+Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una biblioteca:
 
 ```typescript
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
@@ -209,7 +209,7 @@ export class TareasService implements ITareasService {
 - le inyectamos el objeto httpClient que es quien nos permite hacer pedidos GET, POST, PUT y DELETE siguiendo las convenciones REST.
 - **@Injectable**: indica que nuestro service participa de la inyección de dependencias, y cualquiera que en su constructor escriba "tareasService" recibirá un objeto TareasService que además tendrá inyectado un objeto http (por ejemplo _tareas.component.ts_). La configuración providedIn: 'root' indica que el service _Singleton_ será inyectado por el NgModule sin necesidad de explícitamente definirlo en el archivo _app.module.ts_.
 
-Esto y algunas novedades que trajo Angular 9, se explica acá: https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb
+Esto y algunas novedades que trajo Angular 9, se explican acá: https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb
 
 Otro post (más largo): https://medium.com/@tomastrajan/total-guide-to-angular-6-dependency-injection-providedin-vs-providers-85b7a347b59f
 
@@ -239,16 +239,12 @@ Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variabl
 (para eso conviene bajarse el proyecto backend y simular un error adrede)
 
 ```xtend
-@GetMapping(value="/tareas")
-	def tareas() {
-		try {
-      if (1 == 1) throw new RuntimeException("Kaboom!")
-			val tareas = RepoTareas.instance.allInstances
-			ResponseEntity.ok(mapper.writeValueAsString(tareas))
-		} catch (Exception e) {
-			ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.message)
-		}
-	}
+  @GetMapping(value="/tareas")
+  def tareas() {
+    if (1 == 1) throw new RuntimeException("Kaboom!")
+    val tareas = RepoTareas.instance.allInstances
+    ResponseEntity.ok(mapper.writeValueAsString(tareas))
+  }
 ```
 
 Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
