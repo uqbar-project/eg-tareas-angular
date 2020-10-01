@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
+
 import { Tarea } from '../../domain/tarea'
 import { TareasService } from '../../services/tareas.service'
 
 function mostrarError(component, error) {
   console.log('error', error)
-  component.errors.push(error.error)
+  component.errors.push(error.message || error.error)
 }
 @Component({
   selector: 'app-tareas',
