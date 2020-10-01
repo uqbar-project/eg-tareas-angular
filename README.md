@@ -256,7 +256,9 @@ async getTareaById(id: number) {
 }
 
 async actualizarTarea(tarea: Tarea) {
-  return this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
+  // no tiene efecto ubicar aquí un await, porque no hay línea siguiente, 
+  // pero ojo porque si agregamos otra línea que depende de la actualización, necesita el await
+  await this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).toPromise()
 }
 ```
 
@@ -409,7 +411,7 @@ Queremos mantener la unitariedad de los tests y cierto grado de determinismo que
 export interface ITareasService {
   todasLasTareas(): Promise<Tarea[]>
   getTareaById(id: number) : Promise<Tarea>
-  actualizarTarea(tarea: Tarea): void
+  actualizarTarea(tarea: Tarea): Promise<void>
 }
 ```
 
@@ -432,7 +434,7 @@ export class StubTareasService implements ITareasService {
     return this.tareas.find((tarea) => tarea.id === id)
   }
 
-  actualizarTarea(tarea: Tarea) { }
+  async actualizarTarea(tarea: Tarea) { }
 }
 ```
 
