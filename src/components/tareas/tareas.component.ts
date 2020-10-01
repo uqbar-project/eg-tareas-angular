@@ -5,9 +5,10 @@ import { Tarea } from '../../domain/tarea'
 import { TareasService } from '../../services/tareas.service'
 
 function mostrarError(component, error) {
-  console.log('error', error)
-  component.errors.push(error.message || error.error)
+  const errorMessage = (error.status === 0) ? 'No hay conexión con el backend, revise si el servidor remoto está levantado.' : error.error
+  component.errors.push(errorMessage)
 }
+
 @Component({
   selector: 'app-tareas',
   templateUrl: './tareas.component.html',
