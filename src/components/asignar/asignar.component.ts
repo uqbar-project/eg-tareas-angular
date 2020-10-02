@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+
 import { Tarea } from '../../domain/tarea'
 import { Usuario } from '../../domain/usuario'
 import { TareasService } from '../../services/tareas.service'

@@ -42,7 +42,7 @@ export class Tarea {
     }
 
     estaAsignadoA(asignatario: Usuario) {
-        return this.asignatario && asignatario && this.asignatario.nombre === asignatario.nombre
+        return this.asignatario && this.asignatario.equals(asignatario)
     }
 
     sePuedeAsignar(): boolean {

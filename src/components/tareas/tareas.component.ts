@@ -34,6 +34,7 @@ export class TareasComponent implements OnInit {
       tarea.cumplir()
       await this.tareasService.actualizarTarea(tarea)
     } catch (error) {
+      this.tareas = await this.tareasService.todasLasTareas()
       mostrarError(this, error)
     }
   }
@@ -41,8 +42,9 @@ export class TareasComponent implements OnInit {
   async desasignar(tarea: Tarea) {
     try {
       tarea.desasignar()
-      this.tareasService.actualizarTarea(tarea)
+      await this.tareasService.actualizarTarea(tarea)
     } catch (error) {
+      this.tareas = await this.tareasService.todasLasTareas()
       mostrarError(this, error)
     }
   }
