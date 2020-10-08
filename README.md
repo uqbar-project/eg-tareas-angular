@@ -446,7 +446,7 @@ Fíjense que el método _todasLasTareas()_ no devuelve una lista de tareas, sino
 export class TareasService implements ITareasService {
 ```
 
-No es estrictamente necesario que stub y tarea implementen la misma interfaz, pero didácticamente nos sirve como ejemplo de uso de interfaz de Typescript y nos permite ser más explícito en la definición de tipos, así que como primer acercamiento nos es útil. En la práctica ustedes pueden obviar este paso para no hacerlo tan burocrático.
+No es estrictamente necesario definir la interfaz `ITareasService`, pero didácticamente nos sirve como ejemplo de uso de interfaz de Typescript y nos permite ser más explícito en la definición de tipos, así que como primer acercamiento nos es útil. En la práctica ustedes pueden obviar este paso para no hacerlo tan burocrático.
 
 Ahora sí, en nuestro archivo de test tenemos que inyectarle al constructor del componente el stub del service:
 
@@ -465,19 +465,15 @@ Para eso debemos pisar el servicio a inyectar en el método beforeEach de nuestr
     }
   })
   
-  fixture = TestBed.createComponent(TareasComponent)          // línea 2
+  fixture = TestBed.createComponent(TareasComponent)         // línea 2
 ```
 
-Es importante el orden aquí, si instanciamos el componente primero (la línea 2) ya no será posible modificar el servicio a inyectar y veremos un error al correr nuestros tests:
-
-```bash
-Failed: Cannot override component metadata when the test module has already been instantiated. Make sure you are not using `inject` before `overrideComponent`.
-```
+Es importante el orden aquí, si instanciamos el componente primero (la línea 2) ya no será posible modificar el servicio a inyectar y veremos un error al correr nuestros tests.
 
 Recordamos que se corren los tests mediante
 
 ```bash
-ng test --sourceMap=false --watch
+ng test
 ```
 
 Otra opción, si queremos tener acceso al stub y manipularlo, debemos crear nosotros el stub y luego pasárselo al componente de la siguiente manera:

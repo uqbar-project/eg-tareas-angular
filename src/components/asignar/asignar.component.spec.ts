@@ -1,4 +1,3 @@
-import { APP_BASE_HREF } from '@angular/common'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
@@ -33,8 +32,10 @@ describe('AsignarComponent', async () => {
         AppRoutingModule,
         FontAwesomeModule
       ],
-      providers: [UsuariosService, TareasService,
-        { provide: APP_BASE_HREF, useValue: '/' }]
+      providers: [
+        UsuariosService,
+        TareasService,
+      ]
     })
       .compileComponents()
 
