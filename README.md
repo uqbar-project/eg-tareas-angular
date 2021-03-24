@@ -316,9 +316,9 @@ export class AsignarComponent {
 
   async ngOnInit() {
     try {
-      this.initialize()
+      await this.initialize()
     } catch (error) {
-      this.errors.push(error.error)
+      mostrarError(this, error)
     }
 
   }
@@ -348,7 +348,7 @@ export class AsignarComponent {
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
-      this.errors.push(e.error)
+      mostrarError(this, e)
     }
   }
 
