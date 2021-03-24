@@ -5,6 +5,7 @@ import { Tarea } from '../../domain/tarea'
 import { Usuario } from '../../domain/usuario'
 import { TareasService } from '../../services/tareas.service'
 import { UsuariosService } from '../../services/usuarios.service'
+import { mostrarError } from '../tareas/tareas.component'
 
 @Component({
   selector: 'app-asignar',
@@ -22,9 +23,9 @@ export class AsignarComponent {
 
   async ngOnInit() {
     try {
-      this.initialize()
+      await this.initialize()
     } catch (error) {
-      this.errors.push(error.error)
+      mostrarError(this, error)
     }
   }
 
@@ -41,7 +42,7 @@ export class AsignarComponent {
 
   validarAsignacion() {
     if (!this.asignatario) {
-      throw { error: 'Debe seleccionar un usuario' }
+      throw { message: 'Debe seleccionar un usuario' }
     }
   }
 
@@ -53,7 +54,7 @@ export class AsignarComponent {
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
-      this.errors.push(e.error)
+      mostrarError(this, e)
     }
   }
 

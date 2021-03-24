@@ -4,8 +4,8 @@ import { Router } from '@angular/router'
 import { Tarea } from '../../domain/tarea'
 import { TareasService } from '../../services/tareas.service'
 
-function mostrarError(component, error) {
-  const errorMessage = (error.status === 0) ? 'No hay conexión con el backend, revise si el servidor remoto está levantado.' : error.error
+export function mostrarError(component, error) {
+  const errorMessage = (error.status === 0) ? 'No hay conexión con el backend, revise si el servidor remoto está levantado.' : error.error ? error.error.message : error.message
   component.errors.push(errorMessage)
 }
 
