@@ -1,0 +1,40 @@
+name: Build
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests & linter
+        run: |
+          npm ci
+          npm run test:prod
+          npm run lint
+      - name: Coverage badge
+        uses: demyanets/angular-coverage-badges-action@v1
+        with:
+          coverage-summary-path: coverage/eg-tareas-angular/coverage-summary.json
+          github_token: ${{ secrets.GITHUB_TOKEN }}

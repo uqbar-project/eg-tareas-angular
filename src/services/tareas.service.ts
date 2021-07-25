@@ -1,3 +1,4 @@
+import { TareaJSON } from './../domain/tarea'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 
@@ -6,7 +7,7 @@ import { REST_SERVER_URL } from './configuration'
 
 export interface ITareasService {
   todasLasTareas(): Promise<Tarea[]>
-  getTareaById(id: number): Promise<Tarea>
+  getTareaById(id: number): Promise<Tarea | undefined>
   actualizarTarea(tarea: Tarea): Promise<void>
 }
 
@@ -18,13 +19,13 @@ export class TareasService implements ITareasService {
   constructor(private http: HttpClient) { }
 
   async todasLasTareas() {
-    const tareas = await this.http.get<Tarea[]>(REST_SERVER_URL + '/tareas').toPromise()
-    return tareas.map((tarea) => Tarea.fromJson(tarea))
+    const tareas = await this.http.get<TareaJSON[]>(REST_SERVER_URL + '/tareas').toPromise()
+    return tareas.map((tareaJSON) => Tarea.fromJson(tareaJSON))
   }
 
   async getTareaById(id: number) {
-    const tarea = await this.http.get<Tarea>(REST_SERVER_URL + '/tareas/' + id).toPromise()
-    return Tarea.fromJson(tarea)
+    const tareaJSON = await this.http.get<TareaJSON>(REST_SERVER_URL + '/tareas/' + id).toPromise()
+    return tareaJSON ? Tarea.fromJson(tareaJSON) : undefined
   }
 
   async actualizarTarea(tarea: Tarea) {

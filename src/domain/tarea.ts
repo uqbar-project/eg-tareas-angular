@@ -2,15 +2,23 @@ import { Usuario } from './usuario'
 
 const CUMPLIDA = 100
 
+export type TareaJSON = {
+    id?: number,
+    descripcion: string,
+    iteracion: string,
+    asignadoA: string,
+    fecha?: string,
+    porcentajeCumplimiento: number
+}
 export class Tarea {
-    constructor(public id?: number, public descripcion?: string, private iteracion?: string, public asignatario?: Usuario, private fecha?: string, private porcentajeCumplimiento?: number) { }
+    constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario: Usuario | null = null, public fecha?: string, public porcentajeCumplimiento: number = 0) { }
 
-    static fromJson(tareaJSON): Tarea {
+    static fromJson(tareaJSON: TareaJSON): Tarea {
         return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
     }
 
     contiene(palabra: string): boolean {
-        return this.descripcion.includes(palabra) || (this.asignatario && this.asignatario.nombre.includes(palabra))
+        return (this.descripcion || '').includes(palabra) || (!!this.asignatario && (this.asignatario.nombre || '').includes(palabra))
     }
 
     cumplio(porcentaje: number): boolean {
@@ -37,7 +45,7 @@ export class Tarea {
         return this.sePuedeCumplir()
     }
 
-    asignarA(asignatario: Usuario) {
+    asignarA(asignatario: Usuario | null) {
         this.asignatario = asignatario
     }
 
@@ -57,12 +65,18 @@ export class Tarea {
         return !!this.asignatario
     }
 
-    toJSON(): any {
+    toJSON(): TareaJSON {
         return {
-            ...this,
-            asignatario: null,
-            asignadoA: this.asignatario ? this.asignatario.nombre : ''
+            id: this.id,
+            descripcion: this.descripcion,
+            iteracion: this.iteracion,
+            fecha: this.fecha,
+            porcentajeCumplimiento: this.porcentajeCumplimiento,
+            asignadoA: !!this.asignatario ? this.asignatario.nombre : ''
         }
     }
 
+    key(): number {
+        return this.id || 0
+    }
 }

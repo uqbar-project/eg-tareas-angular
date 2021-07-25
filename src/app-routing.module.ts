@@ -1,7 +1,7 @@
+import { AsignarComponent } from './components/asignar/asignar.component'
+import { TareasComponent } from './components/tareas/tareas.component'
 import { NgModule } from '@angular/core'
 import { Routes, RouterModule } from '@angular/router'
-import { TareasComponent } from '../components/tareas/tareas.component'
-import { AsignarComponent } from '../components/asignar/asignar.component'
 
 const routes: Routes = [
   { path: '', redirectTo: '/tareas', pathMatch: 'full' },

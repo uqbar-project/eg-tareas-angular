@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 
-import { AppRoutingModule, routingComponents } from '../../app/app-routing.module'
+import { AppRoutingModule, routingComponents } from './../../app-routing.module'
 import { IconsModule } from '../../app/icons.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { OrderTareas } from '../../pipes/orderTareas.pipe'

@@ -1,4 +1,4 @@
-import { PipeTransform, Pipe, Injectable } from '@angular/core'
+import { PipeTransform, Pipe } from '@angular/core'
 import { Tarea } from '../domain/tarea'
 
 @Pipe({

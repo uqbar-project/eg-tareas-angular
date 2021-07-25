@@ -14,10 +14,10 @@ import { mostrarError } from '../tareas/tareas.component'
   styles: []
 })
 export class AsignarComponent {
-  tarea: Tarea
-  asignatario: Usuario
-  usuariosPosibles = []
-  errors = []
+  tarea!: Tarea
+  asignatario?: Usuario
+  usuariosPosibles: Usuario[] = []
+  errors: string[] = []
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
 
@@ -36,7 +36,11 @@ export class AsignarComponent {
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
-    this.tarea = await this.tareasService.getTareaById(idTarea)
+    const tarea = await this.tareasService.getTareaById(idTarea)
+    if (!tarea) {
+      this.navegarAHome()
+    }
+    this.tarea = tarea as Tarea
     this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
   }
 
@@ -50,7 +54,7 @@ export class AsignarComponent {
     try {
       this.errors = []
       this.validarAsignacion()
-      this.tarea.asignarA(this.asignatario)
+      this.tarea.asignarA(this.asignatario || null)
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {

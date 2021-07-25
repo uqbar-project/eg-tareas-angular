@@ -25,5 +25,6 @@ export class StubTareasService implements ITareasService {
     return this.tareas.find((tarea) => tarea.id === id)
   }
 
+  // eslint-disable-next-line
   async actualizarTarea(tarea: Tarea) { }
 }
