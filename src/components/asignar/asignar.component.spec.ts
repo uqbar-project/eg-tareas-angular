@@ -1,4 +1,3 @@
-import { AppRoutingModule, routingComponents } from './../../app-routing.module'
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
@@ -11,6 +10,7 @@ import { TareasService } from '../../services/tareas.service'
 import { UsuariosService } from '../../services/usuarios.service'
 import { AsignarComponent } from './asignar.component'
 import { Tarea } from 'src/domain/tarea'
+import { AppRoutingModule, routingComponents } from 'src/app/app-routing.module'
 
 // routing
 // componentes propios
