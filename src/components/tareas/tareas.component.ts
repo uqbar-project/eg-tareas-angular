@@ -13,6 +13,7 @@ export function mostrarError(component: any, error: any): void {
 @Component({
   selector: 'app-tareas',
   templateUrl: './tareas.component.html',
+  styleUrls: ['./tareas.component.css'],
   providers: []
 })
 export class TareasComponent implements OnInit {
