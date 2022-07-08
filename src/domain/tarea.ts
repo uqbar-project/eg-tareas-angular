@@ -6,7 +6,7 @@ export type TareaJSON = {
     id?: number,
     descripcion: string,
     iteracion: string,
-    asignadoA: string,
+    asignadoA: string | null,
     fecha?: string,
     porcentajeCumplimiento: number
 }
@@ -14,7 +14,7 @@ export class Tarea {
     constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario: Usuario | null = null, public fecha?: string, public porcentajeCumplimiento: number = 0) { }
 
     static fromJson(tareaJSON: TareaJSON): Tarea {
-        return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
+        return Object.assign(new Tarea(), tareaJSON, { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : null })
     }
 
     contiene(palabra: string): boolean {
@@ -72,7 +72,7 @@ export class Tarea {
             iteracion: this.iteracion,
             fecha: this.fecha,
             porcentajeCumplimiento: this.porcentajeCumplimiento,
-            asignadoA: !!this.asignatario ? this.asignatario.nombre : ''
+            asignadoA: !!this.asignatario ? this.asignatario.nombre : null
         }
     }
 

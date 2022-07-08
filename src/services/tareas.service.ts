@@ -34,7 +34,7 @@ export class TareasService implements ITareasService {
   async actualizarTarea(tarea: Tarea) {
     // no tiene efecto ubicar aquí un await, porque no hay línea siguiente, 
     // pero ojo porque si agregamos otra línea que depende de la actualización, necesita el await
-    await this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
+    await this.http.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()).subscribe()
   }
 
 }

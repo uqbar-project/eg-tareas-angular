@@ -58,6 +58,7 @@ export class AsignarComponent {
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {
+      console.info(e)
       mostrarError(this, e)
     }
   }
