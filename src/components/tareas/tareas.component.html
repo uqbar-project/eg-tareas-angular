@@ -7,7 +7,9 @@
         <form role="form">
           <div class="form-group">
             <label for="tareaBuscada">Buscar</label>
-            <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control" id="tareaBuscada" name="tareaBuscada"
+            <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control" 
+              id="tareaBuscada" name="tareaBuscada"
+              data-testid="tareaBuscada"
               placeholder="Tarea o Asignado">
           </div>
         </form>
@@ -23,9 +25,9 @@
               <th>% cumplido</th>
               <th>Acciones</th>
             </tr>
-            <tr data-testid="fila-tarea" *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas"
+            <tr data-testid="fila-tarea" *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas; index as i"
               class="animate-repeat">
-              <td class="col-xs-4">{{tarea.descripcion}}</td>
+              <td class="col-xs-4" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
               <td class="col-xs-2">{{tarea.iteracion}}</td>
               <td class="col-xs-3" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
               <td class="col-xs-2">{{tarea.fecha}}</td>
