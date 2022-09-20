@@ -10,7 +10,7 @@ import { OrderTareas } from '../pipes/orderTareas.pipe'
 import { AppRoutingModule, routingComponents } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { IconsModule } from './icons.module'
-import { ValidationFieldComponent } from './../components/validationField/validationField.component';
+import { ValidationFieldComponent } from './../components/validationField/validationField.component'
 import { AngularMyDatePickerModule } from 'angular-mydatepicker'
 
 @NgModule({
