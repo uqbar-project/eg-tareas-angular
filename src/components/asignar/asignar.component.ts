@@ -54,7 +54,7 @@ export class AsignarComponent {
     try {
       this.errors = []
       this.validarAsignacion()
-      this.tarea.asignarA(this.asignatario || null)
+      this.tarea.asignarA(this.asignatario)
       await this.tareasService.actualizarTarea(this.tarea)
       this.navegarAHome()
     } catch (e) {

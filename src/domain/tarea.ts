@@ -6,19 +6,26 @@ export type TareaJSON = {
     id?: number,
     descripcion: string,
     iteracion: string,
-    asignadoA: string | null,
+    asignadoA?: string,
     fecha?: string,
     porcentajeCumplimiento: number
 }
+
+export class ValidationMessage {
+    constructor(public field: string, public message: string) {}
+}
+
 export class Tarea {
-    constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario: Usuario | null = null, public fecha?: string, public porcentajeCumplimiento: number = 0) { }
+    errors: ValidationMessage[] = []
+
+    constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario?: Usuario, public fecha?: string, public porcentajeCumplimiento: number = 0) { }
 
     static fromJson(tareaJSON: TareaJSON): Tarea {
         return Object.assign(new Tarea(), tareaJSON, { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : null })
     }
 
     contiene(palabra: string): boolean {
-        return (this.descripcion || '').includes(palabra) || (!!this.asignatario && (this.asignatario.nombre || '').includes(palabra))
+        return (this.descripcion.toUpperCase() || '').includes(palabra.toUpperCase()) || (!!this.asignatario && (this.asignatario.nombre.toUpperCase() || '').includes(palabra.toUpperCase()))
     }
 
     cumplio(porcentaje: number): boolean {
@@ -38,14 +45,14 @@ export class Tarea {
     }
 
     desasignar() {
-        this.asignatario = null
+        this.asignatario = undefined
     }
 
     sePuedeDesasignar() {
         return this.sePuedeCumplir()
     }
 
-    asignarA(asignatario: Usuario | null) {
+    asignarA(asignatario?: Usuario) {
         this.asignatario = asignatario
     }
 
@@ -72,11 +79,46 @@ export class Tarea {
             iteracion: this.iteracion,
             fecha: this.fecha,
             porcentajeCumplimiento: this.porcentajeCumplimiento,
-            asignadoA: !!this.asignatario ? this.asignatario.nombre : null
+            asignadoA: this.asignatario?.nombre,
         }
     }
 
     key(): number {
         return this.id || 0
+    }
+
+    invalid(): boolean {
+      return this.errors.length > 0
+    }
+
+    hasErrors(field: string): boolean {
+      return this.errors.some((_) => _.field == field)
+    }
+  
+    errorsFrom(field: string) {
+      return this.errors.filter((_) => _.field == field).map((_) => _.message).join(". ")
+    }
+
+    addError(field: string, message: string) {
+      this.errors.push(new ValidationMessage(field, message))
+    }
+
+    validar() {
+      this.errors = []
+      if (!this.descripcion) {
+        this.addError('descripcion', 'Debe ingresar descripción')
+      }
+      if (!this.iteracion) {
+        this.addError('iteracion', 'Debe ingresar iteración')
+      }
+      if (!this.fecha) {
+        this.addError('fecha', 'Debe ingresar fecha')
+      }
+      if (this.porcentajeCumplimiento < 0) {
+        this.addError('porcentajeCumplimiento', 'El porcentaje debe ser positivo')
+      }
+      if (this.porcentajeCumplimiento > 100) {
+        this.addError('porcentajeCumplimiento', 'El porcentaje no puede ser superior a 100')
+      }
     }
 }

@@ -1,0 +1,25 @@
+label {
+  display: block;
+  margin: 0.2em 0;
+}
+
+.form-group {
+  margin: 1em 0;
+}
+
+.form-control {
+  width: 90%;
+  height: 2.3em;
+}
+
+.form-control--small {
+  width: 10em;
+  height: 2.3em;
+}
+
+.fila {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}

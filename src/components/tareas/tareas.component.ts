@@ -51,6 +51,10 @@ export class TareasComponent implements OnInit {
     }
   }
 
+  crearNuevaTarea() {
+    this.router.navigateByUrl('/nuevaTarea')
+  }
+
   asignar(tarea: Tarea) {
     this.router.navigate(['/asignarTarea', tarea.id])
   }

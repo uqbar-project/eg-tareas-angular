@@ -2,3 +2,8 @@
 * {
   font-family: 'Inter', sans-serif;
 }
+
+.fila {
+  display: flex;
+  flex-direction: row;
+}

@@ -6,11 +6,17 @@
       <div class="filtro">
         <form role="form">
           <div class="form-group">
-            <label for="tareaBuscada">Buscar</label>
-            <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control" 
-              id="tareaBuscada" name="tareaBuscada"
-              data-testid="tareaBuscada"
-              placeholder="Tarea o Asignado">
+            <div class="fila">
+              <button type="button" title="Crear una nueva tarea" class="btn btn-info nuevaTarea"
+              (click)="crearNuevaTarea()" aria-label="Crear nueva tarea"
+              data-testid="nueva-tarea">Crear nueva tarea
+              </button>
+              
+              <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control" 
+                id="tareaBuscada" name="tareaBuscada"
+                data-testid="tareaBuscada"
+                placeholder="Buscar Tarea o Persona Asignada">
+            </div>
           </div>
         </form>
       </div>
@@ -18,8 +24,8 @@
         <table class="table table-striped table-hover table-condensed example-animate-container">
           <tbody>
             <tr>
-              <th>Descripci&oacute;n</th>
-              <th>Iteraci&oacute;n</th>
+              <th>Descripción</th>
+              <th>Iteración</th>
               <th>Asignado a</th>
               <th>Fecha</th>
               <th>% cumplido</th>
