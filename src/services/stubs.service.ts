@@ -14,7 +14,7 @@ export class StubUsuariosService {
 export class StubTareasService implements ITareasService {
   tareas = [
     new Tarea(1, 'Tarea 1', 'Iteracion 1', juana, '10/05/2019', 50),
-    new Tarea(2, 'Tarea 2', 'Iteracion 1', null, '13/08/2019', 0)
+    new Tarea(2, 'Tarea 2', 'Iteracion 1', undefined, '13/08/2019', 0)
   ]
 
   async todasLasTareas() {
@@ -27,4 +27,9 @@ export class StubTareasService implements ITareasService {
 
   // eslint-disable-next-line
   async actualizarTarea(tarea: Tarea) { }
+
+  // eslint-disable-next-line
+  async crearTarea(tarea: Tarea) {
+    console.info('stub - crearTarea')
+  }
 }

@@ -20,7 +20,7 @@
         <div class="form-group">
           <label for="cumplimiento">Fecha</label>
           <div class="fila">
-            <input class="form-control" name="fechaApuesta" data-testid="fechaApuesta" placeholder="Fecha de inicio de la tarea"
+            <input class="form-control" name="fecha" data-testid="fecha" placeholder="Fecha de inicio de la tarea"
               angular-mydatepicker #dp="angular-mydatepicker" [options]="opcionesFecha"
               (dateChanged)="fechaSeleccionada($event)" required />
             <button type="button" class="btn btn-primary" (click)="dp.toggleCalendar()">
