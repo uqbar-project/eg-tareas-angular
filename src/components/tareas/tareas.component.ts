@@ -21,7 +21,7 @@ export class TareasComponent implements OnInit {
   tareas: Array<Tarea> = []
   errors = []
 
-  constructor(private tareasService: TareasService, private router: Router) { }
+  constructor(public tareasService: TareasService, private router: Router) { }
 
   async ngOnInit() {
     try {

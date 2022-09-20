@@ -59,6 +59,7 @@ describe('NuevaTareaComponent', () => {
     expect(component).toBeTruthy()
   })
   it('should create a new task', async () => {
+    // Arrange
     await sendInput('descripcion', 'Aprender Angular')
     await sendInput('iteracion', 'Iteracion 1')
     component.asignatario = new Usuario('Nahuel Palumbo')
@@ -70,11 +71,29 @@ describe('NuevaTareaComponent', () => {
       isRange: false,
     })
     await sendInput('porcentaje-cumplimiento', '20')
+
+    // Act
     getByTestId('guardar').click()
     fixture.detectChanges()
     await fixture.whenStable()
+    
+    // Assert
     const route = routerSpy.navigateByUrl.calls.first().args[0]
     expect(route).toBe('/')
+  })
+
+  it('an invalid task cannot be created', async () => {
+    await sendInput('porcentaje-cumplimiento', '101')
+    getByTestId('guardar').click()
+    fixture.detectChanges()
+    await fixture.whenStable()
+    expect(routerSpy.navigateByUrl).toHaveBeenCalledTimes(0)
+    expect(component.tarea.hasErrors).toBeTruthy()
+    expect(component.tarea.errors.length).toBe(4)
+    validateErrorField('descripcion')
+    validateErrorField('iteracion')
+    validateErrorField('fecha')
+    validateErrorField('porcentajeCumplimiento')
   })
 
   function getByTestId(testId: string) {
@@ -88,5 +107,9 @@ describe('NuevaTareaComponent', () => {
     inputElement.dispatchEvent(new Event('input'))
     fixture.detectChanges()
     return fixture.whenStable()
+  }
+
+  function validateErrorField(field: string) {
+    expect(getByTestId(`error-message-${field}`).innerHTML).toBeTruthy()
   }
 })

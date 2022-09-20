@@ -52,7 +52,8 @@
                 </button>
                 &nbsp;
                 <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
-                  (click)="asignar(tarea)" *ngIf="tarea.sePuedeAsignar()" aria-label="Asignarme">
+                  (click)="asignar(tarea)" *ngIf="tarea.sePuedeAsignar()" aria-label="Asignarme"
+                  [attr.data-testid]="'asignar_' + tarea.id">
                   <fa-icon icon="user-check"></fa-icon>
                 </button>
                 &nbsp;
@@ -66,7 +67,7 @@
           </tbody>
         </table>
       </div>
-      <div class="alert alert-danger animate-repeat" *ngFor="let error of errors">{{error}}</div>
+      <div class="alert alert-danger animate-repeat" data-testid="error-message" *ngFor="let error of errors">{{error}}</div>
     </div>
   </div>
 </div>
