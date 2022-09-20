@@ -1,46 +1,114 @@
-  <div class="container">
-    <h4>Crear nueva tarea</h4>
-      <form name="asignarTareaForm" role="form">
-        <div class="form-group">
-          <label for="descripcion">Descripción</label>
-          <input type="text" name="descripcion" class="form-control" [(ngModel)]="tarea.descripcion" data-testid="descripcion" placeholder="Descripción de la tarea">
-          <validation-field [tarea]="tarea" [field]="'descripcion'"></validation-field>
-        </div>
-        <div class="form-group">
-          <label for="iteracion">Iteración</label>
-          <input type="text" class="form-control" name="iteracion" [(ngModel)]="tarea.iteracion" data-testid="iteracion" placeholder="Nombre del release o iteración">
-          <validation-field [tarea]="tarea" [field]="'iteracion'"></validation-field>
-        </div>
-        <div class="form-group">
-          <label for="asignatario">Asignado a</label>
-          <select data-testid="asignatario" name="asignatario" class="form-control" [(ngModel)]="asignatario">
-            <option *ngFor="let usuario of usuariosPosibles" [ngValue]="usuario">{{usuario.nombre}}</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="cumplimiento">Fecha</label>
-          <div class="fila">
-            <input class="form-control" name="fecha" data-testid="fecha" placeholder="Fecha de inicio de la tarea"
-              angular-mydatepicker #dp="angular-mydatepicker" [options]="opcionesFecha"
-              (dateChanged)="fechaSeleccionada($event)" required />
-            <button type="button" class="btn btn-primary" (click)="dp.toggleCalendar()">
-              <fa-icon [icon]="faCalendar"></fa-icon>
-            </button>
-          </div>
-          <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
-        </div>
-        <div class="form-group">
-          <label for="cumplimiento">% Cumplimiento</label>
-          <input type="number" class="form-control form-control--small" name="cumplimiento" [(ngModel)]="tarea.porcentajeCumplimiento" data-testid="porcentaje-cumplimiento" placeholder="Porcentaje de cumplimiento (0 a 100%)">
-          <validation-field [tarea]="tarea" [field]="'porcentajeCumplimiento'"></validation-field>
-        </div>
-        <div class="example-animate-container" style="padding-top:10px">
-          <div class="alert alert-danger animate-repeat" *ngFor="let error of errors">{{error}}</div>
-        </div>
-      </form>
-
+<div class="container">
+  <h4>Crear nueva tarea</h4>
+  <form name="asignarTareaForm" role="form">
     <div class="form-group">
-      <button type="button" class="btn btn-primary" data-testid="guardar" (click)="guardar()">Guardar</button>
-      <button type="button" class="btn btn-default" data-testid="cerrar" (click)="navegarAHome()">Cancelar</button>
+      <label for="descripcion">Descripción</label>
+      <input
+        type="text"
+        name="descripcion"
+        class="form-control"
+        [(ngModel)]="tarea.descripcion"
+        data-testid="descripcion"
+        placeholder="Descripción de la tarea"
+      />
+      <validation-field
+        [tarea]="tarea"
+        [field]="'descripcion'"
+      ></validation-field>
     </div>
+    <div class="form-group">
+      <label for="iteracion">Iteración</label>
+      <input
+        type="text"
+        class="form-control"
+        name="iteracion"
+        [(ngModel)]="tarea.iteracion"
+        data-testid="iteracion"
+        placeholder="Nombre del release o iteración"
+      />
+      <validation-field
+        [tarea]="tarea"
+        [field]="'iteracion'"
+      ></validation-field>
+    </div>
+    <div class="form-group">
+      <label for="asignatario">Asignado a</label>
+      <select
+        data-testid="asignatario"
+        name="asignatario"
+        class="form-control"
+        [(ngModel)]="asignatario"
+      >
+        <option *ngFor="let usuario of usuariosPosibles" [ngValue]="usuario">
+          {{ usuario.nombre }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="cumplimiento">Fecha</label>
+      <div class="fila">
+        <input
+          class="form-control"
+          name="fecha"
+          data-testid="fecha"
+          placeholder="Fecha de inicio de la tarea"
+          angular-mydatepicker
+          #dp="angular-mydatepicker"
+          [options]="opcionesFecha"
+          (dateChanged)="fechaSeleccionada($event)"
+          required
+        />
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="dp.toggleCalendar()"
+        >
+          <fa-icon [icon]="faCalendar"></fa-icon>
+        </button>
+      </div>
+      <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
+    </div>
+    <div class="form-group">
+      <label for="cumplimiento">% Cumplimiento</label>
+      <input
+        type="number"
+        class="form-control form-control--small"
+        name="cumplimiento"
+        [(ngModel)]="tarea.porcentajeCumplimiento"
+        data-testid="porcentaje-cumplimiento"
+        placeholder="Porcentaje de cumplimiento (0 a 100%)"
+      />
+      <validation-field
+        [tarea]="tarea"
+        [field]="'porcentajeCumplimiento'"
+      ></validation-field>
+    </div>
+    <div class="example-animate-container" style="padding-top: 10px">
+      <div
+        class="alert alert-danger animate-repeat"
+        *ngFor="let error of errors"
+      >
+        {{ error }}
+      </div>
+    </div>
+  </form>
+
+  <div class="form-group">
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-testid="guardar"
+      (click)="guardar()"
+    >
+      Guardar
+    </button>
+    <button
+      type="button"
+      class="btn btn-default"
+      data-testid="cerrar"
+      (click)="navegarAHome()"
+    >
+      Cancelar
+    </button>
+  </div>
 </div>

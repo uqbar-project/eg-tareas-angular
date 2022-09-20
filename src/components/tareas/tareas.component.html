@@ -37,12 +37,12 @@
               <td class="col-xs-2">{{tarea.iteracion}}</td>
               <td class="col-xs-3" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
               <td class="col-xs-2">{{tarea.fecha}}</td>
-              <td class="col-xs-1 text-right" [ngClass]="{'table-danger': tarea.cumplio(0),
+              <td class="col-xs-1 text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
               'table-warning': tarea.cumplioMenosDe(50),
               'table-info': tarea.cumplioMenosDe(100),
               'table-success': tarea.cumplio(100)}">
-                <span class="text-xs-right"
-                  [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+                <span
+                  [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}</span>
               </td>
 
               <td nowrap class="col-xs-2">
