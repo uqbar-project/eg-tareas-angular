@@ -46,7 +46,7 @@
               </td>
 
               <td nowrap class="col-xs-2">
-                <button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+                <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
                   aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()" [attr.data-testid]="'cumplir_' + tarea.id">
                   <fa-icon icon="calendar-check"></fa-icon>
                 </button>
