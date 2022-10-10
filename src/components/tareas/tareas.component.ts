@@ -6,9 +6,26 @@ import { TareasService } from '../../services/tareas.service'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mostrarError(component: any, error: any): void {
-  const errorMessage = (error.status === 0) ? 'No hay conexión con el backend, revise si el servidor remoto está levantado.' : error.error ? error.error.message : error.message
+  const originalError = error.error ?? error
+  let errorMessage = originalError.message
+  if (error.status === 0) {
+    errorMessage = 'No hay conexión con el backend, revise si el servidor remoto está levantado.'
+  } else if (error.status === 500) {
+    errorMessage = 'Hubo un error al realizar la operación. Consulte al administrador del sistema.'
+    console.error(error)
+  }
   component.errors.push(errorMessage)
+  // setTimeout(() => {
+  //   component.errors.length = 0
+  // }, 3000)
 }
+
+const errorHandler = (component: TareasComponent) => ({
+    error: async (error: Error) => {
+      component.tareas = await component.tareasService.todasLasTareas()
+      mostrarError(component, error)
+    }
+})
 
 @Component({
   selector: 'app-tareas',
@@ -24,31 +41,25 @@ export class TareasComponent implements OnInit {
   constructor(public tareasService: TareasService, private router: Router) { }
 
   async ngOnInit() {
+    await this.obtenerTodasLasTareas()
+  }
+
+  async actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
     try {
-      this.tareas = await this.tareasService.todasLasTareas()
+      callbackActualizacion(tarea)
+      await this.tareasService.actualizarTarea(tarea).subscribe(errorHandler(this))
     } catch (error) {
       mostrarError(this, error)
+      await this.obtenerTodasLasTareas()
     }
   }
 
   async cumplir(tarea: Tarea) {
-    try {
-      tarea.cumplir()
-      await this.tareasService.actualizarTarea(tarea)
-    } catch (error) {
-      this.tareas = await this.tareasService.todasLasTareas()
-      mostrarError(this, error)
-    }
+    await this.actualizarTarea((tarea: Tarea) => { tarea.cumplir() }, tarea)
   }
 
   async desasignar(tarea: Tarea) {
-    try {
-      tarea.desasignar()
-      await this.tareasService.actualizarTarea(tarea)
-    } catch (error) {
-      this.tareas = await this.tareasService.todasLasTareas()
-      mostrarError(this, error)
-    }
+    await this.actualizarTarea((tarea: Tarea) => { tarea.desasignar() }, tarea)
   }
 
   crearNuevaTarea() {
@@ -57,6 +68,14 @@ export class TareasComponent implements OnInit {
 
   asignar(tarea: Tarea) {
     this.router.navigate(['/asignarTarea', tarea.id])
+  }
+
+  async obtenerTodasLasTareas() {
+    try {
+      this.tareas = await this.tareasService.todasLasTareas()
+    } catch (error) {
+      mostrarError(this, error)
+    }
   }
 
 }

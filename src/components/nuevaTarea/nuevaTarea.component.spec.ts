@@ -1,16 +1,15 @@
-import { ValidationFieldComponent } from './../validationField/validationField.component'
-import { AngularMyDatePickerModule } from 'angular-mydatepicker'
-import { Router } from '@angular/router'
-import { TareasService } from './../../services/tareas.service'
-import { UsuariosService } from './../../services/usuarios.service'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
-import { StubTareasService, StubUsuariosService } from './../../services/stubs.service'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
-import { NuevaTareaComponent } from './nuevaTarea.component'
+import { Router } from '@angular/router'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { AngularMyDatePickerModule } from 'angular-mydatepicker'
 import { Usuario } from 'src/domain/usuario'
+import { httpClientSpy } from 'src/services/httpClientSpy'
+
+import { ValidationFieldComponent } from './../validationField/validationField.component'
+import { NuevaTareaComponent } from './nuevaTarea.component'
 
 describe('NuevaTareaComponent', () => {
   let component: NuevaTareaComponent
@@ -30,23 +29,15 @@ describe('NuevaTareaComponent', () => {
         BrowserModule,
         FormsModule,
         FontAwesomeModule,
+        HttpClientModule,
       ],
       providers: [
-        UsuariosService,
-        TareasService,
+        { provide: HttpClient, useValue: httpClientSpy },
+        { provide: Router, useValue: routerSpy },
       ]
     })
     .compileComponents()
 
-    TestBed.overrideComponent(NuevaTareaComponent, {
-      set: {
-        providers: [
-          { provide: TareasService, useClass: StubTareasService },
-          { provide: UsuariosService, useClass: StubUsuariosService },
-          { provide: Router, useValue: routerSpy }
-        ]
-      }
-    })
   })
 
   beforeEach(async () => {

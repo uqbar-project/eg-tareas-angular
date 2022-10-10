@@ -1,6 +1,5 @@
-//
-/** Registramos el locale ES para formatear números */
 import { registerLocaleData } from '@angular/common'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
 import localeEs from '@angular/common/locales/es'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
@@ -8,14 +7,15 @@ import { BrowserModule } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { AppRoutingModule, routingComponents } from 'src/app/app-routing.module'
+import { httpClientSpy } from 'src/services/httpClientSpy'
 
 import { IconsModule } from '../../app/icons.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { OrderTareas } from '../../pipes/orderTareas.pipe'
-import { StubTareasService } from '../../services/stubs.service'
-import { TareasService } from '../../services/tareas.service'
 import { TareasComponent } from './tareas.component'
 
+//
+/** Registramos el locale ES para formatear números */
 // Font Awesome para los íconos
 //
 // routing
@@ -28,7 +28,7 @@ describe('TareasComponent', () => {
   let component: TareasComponent
   let fixture: ComponentFixture<TareasComponent>
   let routerSpy: jasmine.SpyObj<Router>
-
+  
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
 
@@ -44,14 +44,18 @@ describe('TareasComponent', () => {
         AppRoutingModule,
         FontAwesomeModule,
         IconsModule,
+        // Super importante -> para poder mockear el service hay que importar el módulo HttpClient
+        HttpClientModule,
       ],
+      providers: [
+        { provide: HttpClient, useValue: httpClientSpy, }
+      ]
     }).compileComponents()
 
     TestBed.overrideComponent(TareasComponent, {
       set: {
         providers: [
-          { provide: TareasService, useClass: StubTareasService },
-          { provide: Router, useValue: routerSpy }
+          { provide: Router, useValue: routerSpy, },
         ]
       }
     })
@@ -70,6 +74,7 @@ describe('TareasComponent', () => {
   })
 
   it('should initially show 2 pending tasks', () => {
+    console.info(component.tareasService.todasLasTareas())
     expect(2).toBe(component.tareas.length)
   })
 
@@ -90,7 +95,7 @@ describe('TareasComponent', () => {
   })
 
   it('searching for second task should have one tr in tasks list', () => {
-    component.tareaBuscada = '2'
+    component.tareaBuscada = 'e2e'
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
     expect(resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length).toBe(1)
