@@ -1,11 +1,11 @@
 import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
+import { mostrarError } from 'src/util/errorHandler'
 
 import { Tarea } from '../../domain/tarea'
 import { Usuario } from '../../domain/usuario'
 import { TareasService } from '../../services/tareas.service'
 import { UsuariosService } from '../../services/usuarios.service'
-import { mostrarError } from '../tareas/tareas.component'
 
 @Component({
   selector: 'app-asignar',
@@ -51,16 +51,16 @@ export class AsignarComponent {
   }
 
   async asignar() {
-    try {
-      this.errors = []
-      this.validarAsignacion()
-      this.tarea.asignarA(this.asignatario)
-      await this.tareasService.actualizarTarea(this.tarea)
-      this.navegarAHome()
-    } catch (e) {
-      console.info(e)
-      mostrarError(this, e)
-    }
+    this.errors = []
+    this.validarAsignacion()
+    this.tarea.asignarA(this.asignatario)
+    this.tareasService.actualizarTarea(this.tarea).subscribe({
+      next: () => { this.navegarAHome() },
+      error: (error: Error) => {
+        console.error(error)
+        mostrarError(this, error)
+      }
+    })
   }
 
   navegarAHome() {

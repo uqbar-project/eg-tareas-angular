@@ -1,4 +1,3 @@
-import { mostrarError } from './../tareas/tareas.component'
 import { Router } from '@angular/router'
 import { TareasService } from './../../services/tareas.service'
 import { UsuariosService } from './../../services/usuarios.service'
@@ -8,6 +7,7 @@ import { Component } from '@angular/core'
 import { IAngularMyDpOptions, IMyDateModel } from 'angular-mydatepicker'
 import { faCalendar } from '@fortawesome/free-solid-svg-icons'
 import { format } from 'date-fns'
+import { mostrarError } from 'src/util/errorHandler'
 
 @Component({
   selector: 'app-nuevaTarea',

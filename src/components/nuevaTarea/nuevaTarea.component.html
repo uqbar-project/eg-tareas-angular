@@ -9,6 +9,7 @@
         class="form-control"
         [(ngModel)]="tarea.descripcion"
         data-testid="descripcion"
+        autocomplete="off"
         placeholder="Descripción de la tarea"
       />
       <validation-field
@@ -24,6 +25,7 @@
         name="iteracion"
         [(ngModel)]="tarea.iteracion"
         data-testid="iteracion"
+        autocomplete="off"
         placeholder="Nombre del release o iteración"
       />
       <validation-field
@@ -55,6 +57,7 @@
           angular-mydatepicker
           #dp="angular-mydatepicker"
           [options]="opcionesFecha"
+          autocomplete="off"
           (dateChanged)="fechaSeleccionada($event)"
           required
         />

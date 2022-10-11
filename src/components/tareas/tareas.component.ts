@@ -1,30 +1,16 @@
 import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
+import { mostrarError } from 'src/util/errorHandler'
 
 import { Tarea } from '../../domain/tarea'
 import { TareasService } from '../../services/tareas.service'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function mostrarError(component: any, error: any): void {
-  const originalError = error.error ?? error
-  let errorMessage = originalError.message
-  if (error.status === 0) {
-    errorMessage = 'No hay conexión con el backend, revise si el servidor remoto está levantado.'
-  } else if (error.status === 500) {
-    errorMessage = 'Hubo un error al realizar la operación. Consulte al administrador del sistema.'
-    console.error(error)
-  }
-  component.errors.push(errorMessage)
-  // setTimeout(() => {
-  //   component.errors.length = 0
-  // }, 3000)
-}
 
-const errorHandler = (component: TareasComponent) => ({
-    error: async (error: Error) => {
-      component.tareas = await component.tareasService.todasLasTareas()
-      mostrarError(component, error)
-    }
+export const errorHandler = (component: TareasComponent) => ({
+  error: async (error: Error) => {
+    component.tareas = await component.tareasService.todasLasTareas()
+    mostrarError(component, error)
+  }
 })
 
 @Component({
@@ -44,14 +30,9 @@ export class TareasComponent implements OnInit {
     await this.obtenerTodasLasTareas()
   }
 
-  async actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
-    try {
-      callbackActualizacion(tarea)
-      await this.tareasService.actualizarTarea(tarea).subscribe(errorHandler(this))
-    } catch (error) {
-      mostrarError(this, error)
-      await this.obtenerTodasLasTareas()
-    }
+  actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
+    callbackActualizacion(tarea)
+    this.tareasService.actualizarTarea(tarea).subscribe(errorHandler(this))
   }
 
   async cumplir(tarea: Tarea) {

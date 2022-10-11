@@ -1,11 +1,12 @@
 import { registerLocaleData } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import localeEs from '@angular/common/locales/es'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { throwError } from 'rxjs'
 import { AppRoutingModule, routingComponents } from 'src/app/app-routing.module'
 import { httpClientSpy } from 'src/services/httpClientSpy'
 
@@ -74,7 +75,6 @@ describe('TareasComponent', () => {
   })
 
   it('should initially show 2 pending tasks', () => {
-    console.info(component.tareasService.todasLasTareas())
     expect(2).toBe(component.tareas.length)
   })
 
@@ -101,29 +101,29 @@ describe('TareasComponent', () => {
     expect(resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length).toBe(1)
   })
 
-  it('unassign - should catch error gracefully', async () => {
-    spyOn(component.tareasService , 'actualizarTarea').and.callFake(() => {
-      throw new Error('Fake error')
-    })
+  it('unassign - should catch error gracefully', fakeAsync(() => {
+    spyOn(component.tareasService, 'actualizarTarea').and.callFake(
+      () => throwError(() => new Error('Fake Error'))
+    )
     getByTestId('desasignar_1').click()
+    tick(1000)
     fixture.detectChanges()
-    await fixture.whenStable()
-    // es necesario hacer este paso adicional para poder validar los errores
-    fixture.detectChanges()
-    expect(getByTestId('error-message').innerHTML).not.toBeFalsy()
-  })
+    
+    expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
+    // Importante para que no falle con "Error: 1 timer(s) still in the queue"
+    tick(2000)
+  }))
 
-  it('finish - should catch error gracefully', async () => {
-    spyOn(component.tareasService , 'actualizarTarea').and.callFake(() => {
-      throw new Error('Fake error')
-    })
+  it('finish - should catch error gracefully', fakeAsync(() => {
+    spyOn(component.tareasService, 'actualizarTarea').and.callFake(
+      () => throwError(() => new Error('Fake Error'))
+    )
     getByTestId('cumplir_1').click()
+    tick(1000)
     fixture.detectChanges()
-    await fixture.whenStable()
-    // es necesario hacer este paso adicional para poder validar los errores
-    fixture.detectChanges()
-    expect(getByTestId('error-message').innerHTML).not.toBeFalsy()
-  })
+    expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
+    tick(2000)
+  }))
 
   it('create new task should navigate', async () => {
     getByTestId('nueva-tarea').click()

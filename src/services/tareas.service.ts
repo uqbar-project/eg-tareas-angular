@@ -25,9 +25,7 @@ export class TareasService {
   }
 
   actualizarTarea(tarea: Tarea) {
-    // no tiene efecto ubicar aquí un await, porque no hay línea siguiente, 
-    // pero ojo porque si agregamos otra línea que depende de la actualización, necesita el await
-    return this.httpClient.put(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
+    return this.httpClient.put<TareaJSON>(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
   }
 
   async crearTarea(tarea: Tarea) {
