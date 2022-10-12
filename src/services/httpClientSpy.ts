@@ -4,7 +4,6 @@ import { Usuario } from 'src/domain/usuario'
 import { REST_SERVER_URL } from './configuration'
 
 export const httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'put', 'post'])
-
 export const usuarioAsignatario = new Usuario('Gabriel Pérez')
 export const tareaPrincipal = new Tarea(1, 'Testear httpClient con stubs', 'Iteración 1', usuarioAsignatario, '02/05/2020', 50)
 

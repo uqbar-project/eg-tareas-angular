@@ -85,7 +85,13 @@ describe('TareasComponent', () => {
   it('when a task is done, it has 100% of completion', () => {
     getByTestId('cumplir_1').click()
     fixture.detectChanges()
+    // Chequeamos que el objeto de dominio tarea responde correctamente,
+    // pero también el binding entre componente y vista
     expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
+    // https://daveceddia.com/jasmine-2-spy-cheat-sheet/
+    // Chequeamos que se haya enviado la información correctamente al backend
+    const tareaActualizada = httpClientSpy.put.calls.mostRecent().args[1]
+    expect(tareaActualizada.porcentajeCumplimiento).toBe(100)
   })
 
   it('unassign first task', async () => {
