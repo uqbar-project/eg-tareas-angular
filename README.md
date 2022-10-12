@@ -574,6 +574,16 @@ A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento
   [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
 ```
 
+Y el último detalle, queremos chequear que al backend le enviamos una tarea con el 100% de cumplimiento:
+
+```ts
+  it('when a task is done, it has 100% of completion', () => {
+    ...
+    const tareaActualizada = httpClientSpy.put.calls.mostRecent().args[1]
+    expect(tareaActualizada.porcentajeCumplimiento).toBe(100)
+  })
+```
+
 ### Búsqueda de tareas
 
 Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar todos los elementos con data-testid "fila-tarea" que tienen nuestros tr en la vista _tareas.component.html_:
