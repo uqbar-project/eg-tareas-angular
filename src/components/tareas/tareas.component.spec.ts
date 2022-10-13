@@ -1,7 +1,7 @@
 import { registerLocaleData } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
 import localeEs from '@angular/common/locales/es'
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing'
+import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { Router } from '@angular/router'
@@ -108,6 +108,7 @@ describe('TareasComponent', () => {
   })
 
   it('unassign - should catch error gracefully', fakeAsync(() => {
+    // En lugar de callFake podemos usar returnValue como se muestra abajo
     spyOn(component.tareasService, 'actualizarTarea').and.callFake(
       () => throwError(() => new Error('Fake Error'))
     )
@@ -117,18 +118,20 @@ describe('TareasComponent', () => {
     
     expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
     // Importante para que no falle con "Error: 1 timer(s) still in the queue"
-    tick(2000)
+    // tick(2000)
+    // o mejor...
+    flush()
   }))
 
   it('finish - should catch error gracefully', fakeAsync(() => {
-    spyOn(component.tareasService, 'actualizarTarea').and.callFake(
-      () => throwError(() => new Error('Fake Error'))
+    spyOn(component.tareasService, 'actualizarTarea').and.returnValue(
+      throwError(() => new Error('Fake Error'))
     )
     getByTestId('cumplir_1').click()
     tick(1000)
     fixture.detectChanges()
     expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-    tick(2000)
+    flush()
   }))
 
   it('create new task should navigate', async () => {
@@ -145,8 +148,13 @@ describe('TareasComponent', () => {
     
     fixture.detectChanges()
 
-    const route = routerSpy.navigate.calls.first().args[0]
-    expect(route).toEqual(['/asignarTarea', 2])
+    // const route = routerSpy.navigate.calls.first().args[0]
+    // expect(route).toEqual(['/asignarTarea', 2])
+  
+    // Con destructuring
+    const [ url, tareaId ] = routerSpy.navigate.calls.first().args[0]
+    expect(url).toBe('/asignarTarea')
+    expect(tareaId).toBe(2)
   })
 
   function getByTestId(testId: string) {

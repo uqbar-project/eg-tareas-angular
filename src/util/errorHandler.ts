@@ -11,5 +11,5 @@ export function mostrarError(component: any, error: any): void {
   component.errors.push(errorMessage)
   setTimeout(() => {
     component.errors.length = 0
-  }, 3000)
+  }, 5000)
 }
