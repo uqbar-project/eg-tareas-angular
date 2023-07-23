@@ -29,17 +29,11 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' },
-        { type: 'json-summary' } 
+        { type: 'text-summary' }
       ]
     },
     reporters: ['progress', 'kjhtml'],
-    port: 9876,
-    colors: true,
-    logLevel: config.LOG_INFO,
-    autoWatch: true,
     browsers: ['Chrome'],
-    singleRun: false,
     restartOnFileChange: true
-  })
-}
+  });
+};

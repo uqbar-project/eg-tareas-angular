@@ -49,25 +49,8 @@
     <div class="form-group">
       <label for="cumplimiento">Fecha</label>
       <div class="fila">
-        <input
-          class="form-control"
-          name="fecha"
-          data-testid="fecha"
-          placeholder="Fecha de inicio de la tarea"
-          angular-mydatepicker
-          #dp="angular-mydatepicker"
-          [options]="opcionesFecha"
-          autocomplete="off"
-          (dateChanged)="fechaSeleccionada($event)"
-          required
-        />
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="dp.toggleCalendar()"
-        >
-          <fa-icon [icon]="faCalendar"></fa-icon>
-        </button>
+        <dp-date-picker autocomplete="off" data-testid="fecha" name="fecha" [config]="opcionesFecha" (onSelect)="fechaSeleccionada($event)"
+    name="fechaApuesta" data-testid="fechaApuesta" placeholder="Fecha de inicio de la tarea" required></dp-date-picker>
       </div>
       <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
     </div>

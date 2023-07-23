@@ -11,7 +11,7 @@ import { AppRoutingModule, routingComponents } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { IconsModule } from './icons.module'
 import { ValidationFieldComponent } from './../components/validationField/validationField.component'
-import { AngularMyDatePickerModule } from 'angular-mydatepicker'
+import { DpDatePickerModule } from 'ng2-date-picker'
 
 @NgModule({
   declarations: [
@@ -22,12 +22,12 @@ import { AngularMyDatePickerModule } from 'angular-mydatepicker'
     ValidationFieldComponent,
   ],
   imports: [
-    AngularMyDatePickerModule,
     AppRoutingModule,
     BrowserModule,
     FormsModule,
     HttpClientModule,
     IconsModule,
+    DpDatePickerModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

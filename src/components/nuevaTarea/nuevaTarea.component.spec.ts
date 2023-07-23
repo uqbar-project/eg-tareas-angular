@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { AngularMyDatePickerModule } from 'angular-mydatepicker'
 import { Usuario } from 'src/domain/usuario'
 import { httpClientSpy } from 'src/services/httpClientSpy'
 
 import { ValidationFieldComponent } from './../validationField/validationField.component'
 import { NuevaTareaComponent } from './nuevaTarea.component'
+import { DpDatePickerModule, ISelectionEvent } from 'ng2-date-picker'
 
 describe('NuevaTareaComponent', () => {
   let component: NuevaTareaComponent
@@ -25,11 +25,11 @@ describe('NuevaTareaComponent', () => {
         ValidationFieldComponent,
       ],
       imports: [
-        AngularMyDatePickerModule,
         BrowserModule,
         FormsModule,
         FontAwesomeModule,
         HttpClientModule,
+        DpDatePickerModule,
       ],
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
@@ -54,13 +54,9 @@ describe('NuevaTareaComponent', () => {
     await sendInput('descripcion', 'Aprender Angular')
     await sendInput('iteracion', 'Iteracion 1')
     component.asignatario = new Usuario('Nahuel Palumbo')
-    await sendInput('fecha', '20/02/2020')
     component.fechaSeleccionada({
-      singleDate: {
-        jsDate: new Date(),
-      },
-      isRange: false,
-    })
+      date: new Date()
+    } as unknown as ISelectionEvent)
     await sendInput('porcentaje-cumplimiento', '20')
 
     // Act

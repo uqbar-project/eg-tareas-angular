@@ -7,3 +7,18 @@
   display: flex;
   flex-direction: row;
 }
+
+.dp-calendar-nav-left, .dp-calendar-nav-right {
+  border: 0;
+  background-color: white;
+}
+
+/* Customizaciones para el date picker */
+.dp-calendar-weekday, .dp-calendar-day {
+  width: 10em;
+}
+
+.dp-input-container > input {
+  border-color: var(--bs-border-color);
+  border-style: 1px solid;
+}

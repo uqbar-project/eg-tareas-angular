@@ -36,7 +36,7 @@
               <td class="col-xs-4" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
               <td class="col-xs-2">{{tarea.iteracion}}</td>
               <td class="col-xs-3" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
-              <td class="col-xs-2">{{tarea.fecha}}</td>
+              <td class="col-xs-2">{{tarea.fechaString()}}</td>
               <td class="col-xs-1 text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
               'table-warning': tarea.cumplioMenosDe(50),
               'table-info': tarea.cumplioMenosDe(100),

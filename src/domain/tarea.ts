@@ -1,4 +1,7 @@
+import { Dayjs } from 'dayjs'
 import { Usuario } from './usuario'
+import { FORMATO_FECHA } from 'src/services/configuration'
+import * as dayjs from 'dayjs'
 
 const CUMPLIDA = 100
 
@@ -18,10 +21,13 @@ export class ValidationMessage {
 export class Tarea {
     errors: ValidationMessage[] = []
 
-    constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario?: Usuario, public fecha?: string, public porcentajeCumplimiento: number = 0) { }
+    constructor(public id?: number, public descripcion: string = '', public iteracion: string = '', public asignatario?: Usuario, public fecha?: Dayjs, public porcentajeCumplimiento: number = 0) { }
 
     static fromJson(tareaJSON: TareaJSON): Tarea {
-        return Object.assign(new Tarea(), tareaJSON, { asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : undefined })
+        return Object.assign(new Tarea(), tareaJSON, { 
+          asignatario: tareaJSON.asignadoA ? Usuario.fromJSON(tareaJSON.asignadoA) : undefined,
+          fecha: dayjs(tareaJSON.fecha, FORMATO_FECHA)
+        })
     }
 
     contiene(palabra: string): boolean {
@@ -77,10 +83,14 @@ export class Tarea {
             id: this.id,
             descripcion: this.descripcion,
             iteracion: this.iteracion,
-            fecha: this.fecha,
+            fecha: this.fechaString(),
             porcentajeCumplimiento: this.porcentajeCumplimiento,
             asignadoA: this.asignatario?.nombre,
         }
+    }
+
+    fechaString(): string | undefined {
+      return this.fecha?.format(FORMATO_FECHA)
     }
 
     key(): number {

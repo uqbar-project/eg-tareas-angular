@@ -1,0 +1,14 @@
+.title {
+  padding: 1em 0;
+  font-size: 1.8em;
+  font-weight: bold;
+  color: rgb(87, 84, 84);
+}
+
+.modal-dialog {
+  padding: 0 5em;
+}
+
+.modal-footer {
+  padding: 3em 0;
+}
