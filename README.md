@@ -20,7 +20,7 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 ## Levantar el backend
 
-Pueden descargar [la implementación Spring Boot del backend](https://github.com/uqbar-project/eg-tareas-springboot). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
+Pueden descargar [la implementación Spring Boot del backend](https://github.com/uqbar-project/eg-tareas-springboot-kotlin). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
 
 ## Componentes adicionales
 
