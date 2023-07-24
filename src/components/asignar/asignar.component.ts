@@ -11,7 +11,7 @@ import { UsuariosService } from '../../services/usuarios.service'
   selector: 'app-asignar',
   templateUrl: './asignar.component.html',
   providers: [],
-  styles: []
+  styleUrls: ['./asignar.component.css']
 })
 export class AsignarComponent {
   tarea!: Tarea

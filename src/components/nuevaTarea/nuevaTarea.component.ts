@@ -4,10 +4,11 @@ import { UsuariosService } from './../../services/usuarios.service'
 import { Usuario } from 'src/domain/usuario'
 import { Tarea } from 'src/domain/tarea'
 import { Component } from '@angular/core'
-import { IAngularMyDpOptions, IMyDateModel } from 'angular-mydatepicker'
 import { faCalendar } from '@fortawesome/free-solid-svg-icons'
-import { format } from 'date-fns'
 import { mostrarError } from 'src/util/errorHandler'
+import { IDatePickerConfig, ISelectionEvent } from 'ng2-date-picker'
+import * as dayjs from 'dayjs'
+import { FORMATO_FECHA } from 'src/services/configuration'
 
 @Component({
   selector: 'app-nuevaTarea',
@@ -21,7 +22,8 @@ export class NuevaTareaComponent {
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
   faCalendar = faCalendar
-  opcionesFecha!: IAngularMyDpOptions
+  opcionesFecha!: IDatePickerConfig
+
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
 
@@ -39,8 +41,7 @@ export class NuevaTareaComponent {
     this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
 
     this.opcionesFecha = {
-      dateFormat: 'dd/mm/yyyy',
-      dateRange: false,
+      format: FORMATO_FECHA,
     }
 
     this.asignatario = undefined
@@ -64,9 +65,10 @@ export class NuevaTareaComponent {
     this.router.navigateByUrl('/')
   }
 
-  fechaSeleccionada(event: IMyDateModel): void {
-    if (event.singleDate && event.singleDate.jsDate) {
-      this.tarea.fecha = format(event.singleDate.jsDate, 'dd/MM/yyyy')
+  fechaSeleccionada(event: ISelectionEvent) {
+    if (event.date) {
+      this.tarea.fecha = dayjs(event.date)
     }
   }
+
 }
