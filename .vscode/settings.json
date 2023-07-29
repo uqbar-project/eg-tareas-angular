@@ -1,23 +1,26 @@
 {
-  "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+    "[javascript]": {
+      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+      "editor.formatOnPaste": false, // required 
+      "editor.formatOnType": false, // required
+      "editor.formatOnSave": true, // optional 
+      "editor.formatOnSaveMode": "file", // required to format on save
     },
-    "editor.formatOnSave": false
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+    "[typescript]": {
+      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+      "editor.formatOnPaste": false, // required 
+      "editor.formatOnType": false, // required
+      "editor.formatOnSave": true, // optional 
+      "editor.formatOnSaveMode": "file", // required to format on save
     },
-    "editor.formatOnSave": false
-  },
-  "[json]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": true
+    "[json]": {
+      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+      "editor.formatOnPaste": false, // required 
+      "editor.formatOnType": false, // required
+      "editor.formatOnSave": true, // optional 
+      "editor.formatOnSaveMode": "file", // required to format on save
     },
-    "editor.formatOnSave": false
-  }
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true
+    }
 }
