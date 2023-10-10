@@ -4,7 +4,7 @@
       <h4 class="modal-title">Asignar Tarea</h4>
     </div>
     <div class="modal-body">
-      <div class="title" data-testid="tareaDescripcion">{{tarea.descripcion}}</div>
+      <div class="title" data-testid="tareaDescripcion">{{tarea ? tarea.descripcion : ""}}</div>
 
       <form name="asignarTareaForm" role="form">
         <fieldset>
