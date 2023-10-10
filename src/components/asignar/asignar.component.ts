@@ -46,13 +46,21 @@ export class AsignarComponent {
 
   validarAsignacion() {
     if (!this.asignatario) {
-      throw { message: 'Debe seleccionar un usuario' }
+      throw new Error('Debe seleccionar un usuario')
     }
   }
 
   async asignar() {
     this.errors = []
-    this.validarAsignacion()
+    try {
+      this.validarAsignacion()
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error("Error validando asignación: " + error.message)
+      }
+      mostrarError(this, error)
+      return
+    }
     this.tarea.asignarA(this.asignatario)
     this.tareasService.actualizarTarea(this.tarea).subscribe({
       next: () => { this.navegarAHome() },
