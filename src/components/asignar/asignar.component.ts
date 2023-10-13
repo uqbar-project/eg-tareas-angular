@@ -2,10 +2,10 @@ import { Component } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { mostrarError } from 'src/util/errorHandler'
 
-import { Tarea } from '../../domain/tarea'
-import { Usuario } from '../../domain/usuario'
-import { TareasService } from '../../services/tareas.service'
-import { UsuariosService } from '../../services/usuarios.service'
+import { Tarea } from 'src/domain/tarea'
+import { Usuario } from 'src/domain/usuario'
+import { TareasService } from 'src/services/tareas.service'
+import { UsuariosService } from 'src/services/usuarios.service'
 
 @Component({
   selector: 'app-asignar',
@@ -19,7 +19,12 @@ export class AsignarComponent {
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   async ngOnInit() {
     try {
@@ -32,7 +37,9 @@ export class AsignarComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    this.usuariosPosibles = usuarios.map(
+      (usuarioJson) => new Usuario(usuarioJson.nombre)
+    )
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
@@ -41,7 +48,9 @@ export class AsignarComponent {
       this.navegarAHome()
     }
     this.tarea = tarea as Tarea
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
+    this.asignatario = this.usuariosPosibles.find((usuarioPosible) =>
+      this.tarea.estaAsignadoA(usuarioPosible)
+    )
   }
 
   validarAsignacion() {
@@ -56,14 +65,16 @@ export class AsignarComponent {
       this.validarAsignacion()
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Error validando asignación: " + error.message)
+        console.error('Error validando asignación: ' + error.message)
       }
       mostrarError(this, error)
       return
     }
     this.tarea.asignarA(this.asignatario)
     this.tareasService.actualizarTarea(this.tarea).subscribe({
-      next: () => { this.navegarAHome() },
+      next: () => {
+        this.navegarAHome()
+      },
       error: (error: Error) => {
         console.error(error)
         mostrarError(this, error)
@@ -74,5 +85,4 @@ export class AsignarComponent {
   navegarAHome() {
     this.router.navigate(['/tareas'])
   }
-
 }

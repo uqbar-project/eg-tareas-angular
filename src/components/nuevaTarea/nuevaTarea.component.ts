@@ -1,6 +1,6 @@
 import { Router } from '@angular/router'
-import { TareasService } from './../../services/tareas.service'
-import { UsuariosService } from './../../services/usuarios.service'
+import { TareasService } from 'src/services/tareas.service'
+import { UsuariosService } from 'src/services/usuarios.service'
 import { Usuario } from 'src/domain/usuario'
 import { Tarea } from 'src/domain/tarea'
 import { Component } from '@angular/core'
@@ -16,7 +16,6 @@ import { FORMATO_FECHA } from 'src/services/configuration'
   styleUrls: ['./nuevaTarea.component.css']
 })
 export class NuevaTareaComponent {
-
   tarea: Tarea = new Tarea()
   asignatario?: Usuario
   usuariosPosibles: Usuario[] = []
@@ -24,8 +23,11 @@ export class NuevaTareaComponent {
   faCalendar = faCalendar
   opcionesFecha!: IDatePickerConfig
 
-
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     try {
@@ -38,10 +40,12 @@ export class NuevaTareaComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    this.usuariosPosibles = usuarios.map(
+      (usuarioJson) => new Usuario(usuarioJson.nombre)
+    )
 
     this.opcionesFecha = {
-      format: FORMATO_FECHA,
+      format: FORMATO_FECHA
     }
 
     this.asignatario = undefined
@@ -70,5 +74,4 @@ export class NuevaTareaComponent {
       this.tarea.fecha = dayjs(event.date)
     }
   }
-
 }

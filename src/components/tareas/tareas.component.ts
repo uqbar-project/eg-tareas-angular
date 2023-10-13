@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { mostrarError } from 'src/util/errorHandler'
 
-import { Tarea } from '../../domain/tarea'
-import { TareasService } from '../../services/tareas.service'
+import { Tarea } from 'src/domain/tarea'
+import { TareasService } from 'src/services/tareas.service'
 
 
 export const errorHandler = (component: TareasComponent) => ({
