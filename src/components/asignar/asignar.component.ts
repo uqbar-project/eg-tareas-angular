@@ -64,9 +64,6 @@ export class AsignarComponent {
     try {
       this.validarAsignacion()
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error validando asignación: ' + error.message)
-      }
       mostrarError(this, error)
       return
     }
