@@ -14,6 +14,10 @@ import { IconsModule } from '../../app/icons.module'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { OrderTareas } from '../../pipes/orderTareas.pipe'
 import { TareasComponent } from './tareas.component'
+import { UsuariosService } from 'src/services/usuarios.service'
+import { TareasService } from 'src/services/tareas.service'
+import { TareasMockService } from 'src/services/tareas.mock.service'
+import { UsuariosMockService } from 'src/services/ususarios.mock.service'
 
 //
 /** Registramos el locale ES para formatear números */
@@ -57,6 +61,8 @@ describe('TareasComponent', () => {
       set: {
         providers: [
           { provide: Router, useValue: routerSpy, },
+          { provide: UsuariosService, useClass: UsuariosMockService},
+          { provide: TareasService, useClass: TareasMockService}
         ]
       }
     })

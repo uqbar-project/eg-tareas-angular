@@ -10,6 +10,10 @@ import { httpClientSpy } from 'src/services/httpClientSpy'
 import { ValidationFieldComponent } from './../validationField/validationField.component'
 import { NuevaTareaComponent } from './nuevaTarea.component'
 import { DpDatePickerModule, ISelectionEvent } from 'ng2-date-picker'
+import { UsuariosService } from 'src/services/usuarios.service'
+import { UsuariosMockService } from 'src/services/ususarios.mock.service'
+import { TareasService } from 'src/services/tareas.service'
+import { TareasMockService } from 'src/services/tareas.mock.service'
 
 describe('NuevaTareaComponent', () => {
   let component: NuevaTareaComponent
@@ -34,6 +38,8 @@ describe('NuevaTareaComponent', () => {
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: UsuariosService, useClass: UsuariosMockService},
+        { provide: TareasService, useClass: TareasMockService}
       ]
     })
     .compileComponents()

@@ -11,6 +11,10 @@ import { httpClientSpy, tareaPrincipal } from 'src/services/httpClientSpy'
 import { FilterTareas } from '../../pipes/filterTareas.pipe'
 import { usuarioAsignatario } from './../../services/httpClientSpy'
 import { AsignarComponent } from './asignar.component'
+import { UsuariosService } from 'src/services/usuarios.service'
+import { UsuariosMockService } from 'src/services/ususarios.mock.service'
+import { TareasMockService } from 'src/services/tareas.mock.service'
+import { TareasService } from 'src/services/tareas.service'
 
 const updatedTaskId = 1
 
@@ -46,6 +50,8 @@ describe('AsignarComponent', async () => {
           }
         },
         { provide: Router, useValue: routerSpy },
+        { provide: UsuariosService, useClass: UsuariosMockService},
+        { provide: TareasService, useClass: TareasMockService}
       ]
     })
       .compileComponents()
