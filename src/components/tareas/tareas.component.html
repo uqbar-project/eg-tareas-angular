@@ -11,8 +11,8 @@
               (click)="crearNuevaTarea()" aria-label="Crear nueva tarea"
               data-testid="nueva-tarea">Crear nueva tarea
               </button>
-              
-              <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control" 
+
+              <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control"
                 id="tareaBuscada" name="tareaBuscada"
                 data-testid="tareaBuscada"
                 placeholder="Buscar Tarea o Persona Asignada">
@@ -34,9 +34,9 @@
             <tr data-testid="fila-tarea" *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas; index as i"
               class="animate-repeat">
               <td class="col-xs-4" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
-              <td class="col-xs-2">{{tarea.iteracion}}</td>
+              <td class="col-xs-2" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
               <td class="col-xs-3" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
-              <td class="col-xs-2">{{tarea.fechaString()}}</td>
+              <td class="col-xs-2" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
               <td class="col-xs-1 text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
               'table-warning': tarea.cumplioMenosDe(50),
               'table-info': tarea.cumplioMenosDe(100),
