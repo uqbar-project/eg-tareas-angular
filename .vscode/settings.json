@@ -21,6 +21,6 @@
       "editor.formatOnSaveMode": "file", // required to format on save
     },
     "editor.codeActionsOnSave": {
-      "source.fixAll": true
+      "source.fixAll": "explicit"
     }
 }

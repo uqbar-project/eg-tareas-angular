@@ -11,11 +11,15 @@
           <div class="form-group">
             <label for="asignatario">Asignado a</label>
             <select data-testid="asignatario" name="asignatario" class="form-control" [(ngModel)]="asignatario">
-              <option *ngFor="let usuario of usuariosPosibles" [ngValue]="usuario">{{usuario.nombre}}</option>
+              @for (usuario of usuariosPosibles; track usuario) {
+                <option [ngValue]="usuario">{{usuario.nombre}}</option>
+              }
             </select>
           </div>
           <div class="example-animate-container" style="padding-top:10px">
-            <div class="alert alert-danger animate-repeat" *ngFor="let error of errors">{{error}}</div>
+            @for (error of errors; track error) {
+              <div class="alert alert-danger animate-repeat">{{error}}</div>
+            }
           </div>
         </fieldset>
       </form>

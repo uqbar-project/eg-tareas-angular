@@ -1,29 +1,27 @@
-import { Router } from '@angular/router'
-import { TareasService } from './../../services/tareas.service'
-import { UsuariosService } from './../../services/usuarios.service'
-import { Usuario } from 'src/domain/usuario'
-import { Tarea } from 'src/domain/tarea'
 import { Component } from '@angular/core'
-import { faCalendar } from '@fortawesome/free-solid-svg-icons'
-import { mostrarError } from 'src/util/errorHandler'
-import { IDatePickerConfig, ISelectionEvent } from 'ng2-date-picker'
-import * as dayjs from 'dayjs'
-import { FORMATO_FECHA } from 'src/services/configuration'
+import { FormsModule } from '@angular/forms'
+import { Router } from '@angular/router'
+import { ValidationFieldComponent } from 'app/validation-field/validation-field.component'
+import { Tarea } from 'domain/tarea'
+import { Usuario } from 'domain/usuario'
+import { TareasService } from 'services/tareas.service'
+import { UsuariosService } from 'services/usuarios.service'
+import { mostrarError } from 'util/errorHandler'
+import dayjs from 'dayjs'
 
 @Component({
-  selector: 'app-nuevaTarea',
-  templateUrl: './nuevaTarea.component.html',
-  styleUrls: ['./nuevaTarea.component.css']
+  selector: 'app-nueva-tarea',
+  standalone: true,
+  imports: [FormsModule, ValidationFieldComponent],
+  templateUrl: './nueva-tarea.component.html',
+  styleUrl: './nueva-tarea.component.css'
 })
 export class NuevaTareaComponent {
-
   tarea: Tarea = new Tarea()
   asignatario?: Usuario
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
-  faCalendar = faCalendar
-  opcionesFecha!: IDatePickerConfig
-
+  fecha = new Date()
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
 
@@ -39,16 +37,12 @@ export class NuevaTareaComponent {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
     this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
-
-    this.opcionesFecha = {
-      format: FORMATO_FECHA,
-    }
-
     this.asignatario = undefined
   }
 
   async guardar() {
     try {
+      this.tarea.fecha = dayjs(this.fecha)
       this.tarea.validar()
       if (this.tarea.invalid()) {
         return
@@ -63,12 +57,6 @@ export class NuevaTareaComponent {
 
   navegarAHome() {
     this.router.navigateByUrl('/')
-  }
-
-  fechaSeleccionada(event: ISelectionEvent) {
-    if (event.date) {
-      this.tarea.fecha = dayjs(event.date)
-    }
   }
 
 }

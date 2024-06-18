@@ -1,10 +1,12 @@
-import { Tarea } from 'src/domain/tarea'
 import { Component, Input } from '@angular/core'
+import { Tarea } from 'domain/tarea'
 
 @Component({
   selector: 'validation-field',
-  templateUrl: './validationField.component.html',
-  styleUrls: ['./validationField.component.css']
+  standalone: true,
+  imports: [],
+  templateUrl: './validation-field.component.html',
+  styleUrl: './validation-field.component.css'
 })
 export class ValidationFieldComponent {
   @Input() tarea!: Tarea

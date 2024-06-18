@@ -1,0 +1,7 @@
+@if (tarea.hasErrors(field)) {
+  <div class="md-form">
+    <div [attr.data-testid]="'error-message-' + field" class="validation alert alert-danger message">
+      {{tarea.errorsFrom(field)}}
+    </div>
+  </div>
+}

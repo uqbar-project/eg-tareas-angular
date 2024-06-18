@@ -11,7 +11,8 @@
               (click)="crearNuevaTarea()" aria-label="Crear nueva tarea"
               data-testid="nueva-tarea">Crear nueva tarea
               </button>
-
+            </div>
+            <div class="fila">
               <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control"
                 id="tareaBuscada" name="tareaBuscada"
                 data-testid="tareaBuscada"
@@ -25,19 +26,25 @@
           <tbody>
             <tr>
               <th>Descripción</th>
-              <th>Iteración</th>
-              <th>Asignado a</th>
-              <th>Fecha</th>
-              <th>% cumplido</th>
+              <th class="desktop">Iteración</th>
+              <th class="desktop">Asignado a</th>
+              <th class="desktop">Fecha</th>
+              <th class="desktop">% cumplido</th>
               <th>Acciones</th>
             </tr>
             <tr data-testid="fila-tarea" *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas; index as i"
               class="animate-repeat">
-              <td class="col-xs-4" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
-              <td class="col-xs-2" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
-              <td class="col-xs-3" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
-              <td class="col-xs-2" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
-              <td class="col-xs-1 text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
+              <td class="col-lg-12 mobile">
+                <div>
+                  {{tarea.descripcion}}<br>
+                  {{tarea.asignatario ? ' - ' + tarea.asignatario.nombre : ''}} - % {{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}
+                </div>
+              </td>
+              <td class="col-xs-4 desktop" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
+              <td class="col-xs-2 desktop" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
+              <td class="col-xs-3 desktop" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
+              <td class="col-xs-2 desktop" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
+              <td class="col-xs-1 desktop text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
               'table-warning': tarea.cumplioMenosDe(50),
               'table-info': tarea.cumplioMenosDe(100),
               'table-success': tarea.cumplio(100)}">

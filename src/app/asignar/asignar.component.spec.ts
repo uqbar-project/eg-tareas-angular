@@ -1,40 +1,22 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { HttpClient, HttpClientModule } from '@angular/common/http'
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing'
-import { FormsModule } from '@angular/forms'
-import { BrowserModule } from '@angular/platform-browser'
-import { ActivatedRoute, Router } from '@angular/router'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { AppRoutingModule, routingComponents } from 'src/app/app-routing.module'
-import { httpClientSpy, tareaPrincipal } from 'src/services/httpClientSpy'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { FilterTareas } from '../../pipes/filterTareas.pipe'
-import { usuarioAsignatario } from './../../services/httpClientSpy'
 import { AsignarComponent } from './asignar.component'
+import { ActivatedRoute, Router } from '@angular/router'
+import { HttpClient } from '@angular/common/http'
+import { httpClientSpy, tareaPrincipal, usuarioAsignatario } from 'services/httpClientSpy'
 
 const updatedTaskId = 1
 
-describe('AsignarComponent', async () => {
+describe('AsignarComponent', () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
   let routerSpy: jasmine.SpyObj<Router>
 
-  beforeEach((async () => {
+  beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate'])
 
-    TestBed.configureTestingModule({
-      declarations: [
-        AsignarComponent,
-        routingComponents,
-        FilterTareas
-      ],
-      imports: [
-        BrowserModule,
-        FormsModule,
-        AppRoutingModule,
-        FontAwesomeModule,
-        HttpClientModule,
-      ],
+    await TestBed.configureTestingModule({
+      imports: [AsignarComponent],
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
         {
@@ -47,21 +29,21 @@ describe('AsignarComponent', async () => {
         },
         { provide: Router, useValue: routerSpy },
       ]
+
     })
-      .compileComponents()
+    .compileComponents()
 
     fixture = TestBed.createComponent(AsignarComponent)
     component = fixture.componentInstance
     await component.initialize()
-  }))
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    fixture.detectChanges()
     expect(component).toBeTruthy()
   })
 
   it('should show task assigned used first', () => {
-    fixture.detectChanges()
     expect(component.asignatario).toEqual(usuarioAsignatario)
   })
 
@@ -79,34 +61,32 @@ describe('AsignarComponent', async () => {
     expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe(tareaPrincipal.descripcion)
   })
 
-  it('assignment should take effect', (async () => {
+  it('assignment should take effect', () => {
     const compiled = fixture.debugElement.nativeElement
     const nuevoAsignatario = component.usuariosPosibles[0]
     component.asignatario = nuevoAsignatario
     compiled.querySelector('[data-testid="guardar"]').click()
-    await fixture.whenStable()
-
+    
     // Queremos saber que en algún momento se haya pedido al backend que se asigne a otro usuarie
-    const tareaDesasignada = { ...tareaPrincipal.toJSON(), asignadoA: nuevoAsignatario.nombre }
-    expect(httpClientSpy.put).toHaveBeenCalledWith(`http://localhost:9000/tareas/${tareaPrincipal.id}`, tareaDesasignada)
-  }))
+    const tareaAsignada = { ...tareaPrincipal.toJSON(), asignadoA: nuevoAsignatario.nombre }
+    expect(httpClientSpy.put).toHaveBeenCalledWith(`http://localhost:9000/tareas/${tareaPrincipal.id}`, tareaAsignada)
+  })
 
-  it('should navigate back to home when form submitted', fakeAsync(() => {
+  it('should navigate back to home when form submitted', async () => {
     const compiled = fixture.debugElement.nativeElement
     compiled.querySelector('[data-testid="guardar"]').click()
-    fixture.whenStable().then(() => {
-      const [route] = routerSpy.navigate.calls.first().args[0]
-      expect(route).toBe('/tareas')
-    })
-  }))
+    await fixture.whenStable()
+    
+    const [route] = routerSpy.navigate.calls.first().args[0]
+    expect(route).toBe('/tareas')
+  })
 
-  it('should navigate back to home when close clicked', fakeAsync(() => {
+  it('should navigate back to home when close clicked', async () => {
     const compiled = fixture.debugElement.nativeElement
     compiled.querySelector('[data-testid="cerrar"]').click()
-    fixture.whenStable().then(() => {
-      const [route] = routerSpy.navigate.calls.first().args[0]
-      expect(route).toBe('/tareas')
-    })
-  }))
+    await fixture.whenStable()
+    const [route] = routerSpy.navigate.calls.first().args[0]
+    expect(route).toBe('/tareas')
+  })
 
 })
