@@ -32,7 +32,7 @@ export class TareasComponent implements OnInit {
     try {
       await this.tareasService.actualizarTarea(tarea)
     } catch (e) {
-      errorHandler(this)
+      await errorHandler(this, e as unknown as Error)
     }
   }
 
@@ -61,9 +61,9 @@ export class TareasComponent implements OnInit {
   }
 }
 
-export const errorHandler = (component: TareasComponent) => ({
-  error: async (error: Error) => {
+export const errorHandler = async (component: TareasComponent, error: Error) => {
+  try {
     component.tareas = await component.tareasService.todasLasTareas()
-    mostrarError(component, error)
-  }
-})
+  } catch (e) {}
+  mostrarError(component, error)
+}

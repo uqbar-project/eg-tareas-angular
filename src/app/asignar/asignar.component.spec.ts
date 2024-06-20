@@ -3,7 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { AsignarComponent } from './asignar.component'
 import { ActivatedRoute, Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
-import { httpClientSpy, tareaPrincipal, usuarioAsignatario } from 'services/httpClientSpy'
+import {
+  getHttpClientSpy,
+  tareaPrincipal,
+  usuarioAsignatario
+} from 'services/httpClientSpy'
 
 const updatedTaskId = 1
 
@@ -11,9 +15,11 @@ describe('AsignarComponent', () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
   let routerSpy: jasmine.SpyObj<Router>
+  let httpClientSpy: jasmine.SpyObj<HttpClient>
 
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate'])
+    httpClientSpy = getHttpClientSpy()
 
     await TestBed.configureTestingModule({
       imports: [AsignarComponent],
@@ -23,15 +29,13 @@ describe('AsignarComponent', () => {
           provide: ActivatedRoute,
           useValue: {
             snapshot: {
-              params: { 'id': updatedTaskId },
+              params: { id: updatedTaskId }
             }
           }
         },
-        { provide: Router, useValue: routerSpy },
+        { provide: Router, useValue: routerSpy }
       ]
-
-    })
-    .compileComponents()
+    }).compileComponents()
 
     fixture = TestBed.createComponent(AsignarComponent)
     component = fixture.componentInstance
@@ -58,7 +62,9 @@ describe('AsignarComponent', () => {
   it('task label', () => {
     fixture.detectChanges()
     const resultHtml = fixture.debugElement.nativeElement
-    expect(resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent).toBe(tareaPrincipal.descripcion)
+    expect(
+      resultHtml.querySelector('[data-testid=tareaDescripcion]').textContent
+    ).toBe(tareaPrincipal.descripcion)
   })
 
   it('assignment should take effect', () => {
@@ -66,17 +72,23 @@ describe('AsignarComponent', () => {
     const nuevoAsignatario = component.usuariosPosibles[0]
     component.asignatario = nuevoAsignatario
     compiled.querySelector('[data-testid="guardar"]').click()
-    
+
     // Queremos saber que en algún momento se haya pedido al backend que se asigne a otro usuarie
-    const tareaAsignada = { ...tareaPrincipal.toJSON(), asignadoA: nuevoAsignatario.nombre }
-    expect(httpClientSpy.put).toHaveBeenCalledWith(`http://localhost:9000/tareas/${tareaPrincipal.id}`, tareaAsignada)
+    const tareaAsignada = {
+      ...tareaPrincipal.toJSON(),
+      asignadoA: nuevoAsignatario.nombre
+    }
+    expect(httpClientSpy.put).toHaveBeenCalledWith(
+      `http://localhost:9000/tareas/${tareaPrincipal.id}`,
+      tareaAsignada
+    )
   })
 
   it('should navigate back to home when form submitted', async () => {
     const compiled = fixture.debugElement.nativeElement
     compiled.querySelector('[data-testid="guardar"]').click()
     await fixture.whenStable()
-    
+
     const [route] = routerSpy.navigate.calls.first().args[0]
     expect(route).toBe('/tareas')
   })
@@ -88,5 +100,4 @@ describe('AsignarComponent', () => {
     const [route] = routerSpy.navigate.calls.first().args[0]
     expect(route).toBe('/tareas')
   })
-
 })

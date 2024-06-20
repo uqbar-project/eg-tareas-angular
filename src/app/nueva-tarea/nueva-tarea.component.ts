@@ -7,7 +7,6 @@ import { Usuario } from 'domain/usuario'
 import { TareasService } from 'services/tareas.service'
 import { UsuariosService } from 'services/usuarios.service'
 import { mostrarError } from 'util/errorHandler'
-import dayjs from 'dayjs'
 
 @Component({
   selector: 'app-nueva-tarea',
@@ -21,7 +20,6 @@ export class NuevaTareaComponent {
   asignatario?: Usuario
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
-  fecha = new Date()
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
 
@@ -42,7 +40,6 @@ export class NuevaTareaComponent {
 
   async guardar() {
     try {
-      this.tarea.fecha = dayjs(this.fecha)
       this.tarea.validar()
       if (this.tarea.invalid()) {
         return
