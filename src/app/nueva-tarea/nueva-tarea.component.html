@@ -41,16 +41,18 @@
         class="form-control"
         [(ngModel)]="asignatario"
       >
-        <option *ngFor="let usuario of usuariosPosibles" [ngValue]="usuario">
+      @for (usuario of usuariosPosibles; track usuario) {
+        <option [ngValue]="usuario">
           {{ usuario.nombre }}
         </option>
+      }
       </select>
     </div>
     <div class="form-group">
       <label for="cumplimiento">Fecha</label>
       <div class="fila">
-        <dp-date-picker autocomplete="off" data-testid="fecha" name="fecha" [config]="opcionesFecha" (onSelect)="fechaSeleccionada($event)"
-    name="fechaApuesta" data-testid="fechaApuesta" placeholder="Fecha de inicio de la tarea" required></dp-date-picker>
+        <input type="date" autocomplete="off" data-testid="fecha" name="fecha" class="form-control" [(ngModel)]="tarea.fecha"
+    name="fechaApuesta" data-testid="fecha" placeholder="Fecha de inicio de la tarea" required>
       </div>
       <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
     </div>
@@ -70,12 +72,11 @@
       ></validation-field>
     </div>
     <div class="example-animate-container" style="padding-top: 10px">
-      <div
-        class="alert alert-danger animate-repeat"
-        *ngFor="let error of errors"
-      >
-        {{ error }}
-      </div>
+      @for (error of errors ; track error) {
+        <div class="alert alert-danger animate-repeat">
+          {{ error }}
+        </div>
+      }
     </div>
   </form>
 
@@ -84,16 +85,14 @@
       type="button"
       class="btn btn-primary"
       data-testid="guardar"
-      (click)="guardar()"
-    >
+      (click)="guardar()">
       Guardar
     </button>
     <button
       type="button"
       class="btn btn-default"
       data-testid="cerrar"
-      (click)="navegarAHome()"
-    >
+      (click)="navegarAHome()">
       Cancelar
     </button>
   </div>

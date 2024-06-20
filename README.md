@@ -24,11 +24,15 @@ Pueden descargar [la implementación Spring Boot del backend](https://github.com
 
 ## Componentes adicionales
 
-La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales que podrás ver en el `package.json`. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
+La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
 
-## Agregado en package.json
+```bash
+npm i @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons bootstrap
+```
 
-Es necesario incorporar Bootstrap 4 dentro del archivo _angular.json_ de la siguiente manera:
+## Configuración angular.json
+
+Es necesario incorporar Bootstrap dentro del archivo _angular.json_ de la siguiente manera:
 
 ```json
     "styles": [
@@ -36,7 +40,6 @@ Es necesario incorporar Bootstrap 4 dentro del archivo _angular.json_ de la sigu
         "./node_modules/bootstrap/dist/css/bootstrap.min.css"
     ],
     "scripts": [
-        "./node_modules/jquery/dist/jquery.slim.min.js",
         "./node_modules/bootstrap/dist/js/bootstrap.min.js"
     ]
 ```

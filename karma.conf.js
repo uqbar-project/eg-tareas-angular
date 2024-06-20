@@ -29,12 +29,11 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' },
-        { type: 'json-summary' }
+        { type: 'lcov' }
       ]
     },
     reporters: ['progress', 'kjhtml'],
     browsers: ['Chrome'],
     restartOnFileChange: true
-  });
-};
+  })
+}

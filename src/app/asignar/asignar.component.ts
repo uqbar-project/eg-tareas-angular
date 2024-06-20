@@ -1,17 +1,18 @@
 import { Component } from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
-import { mostrarError } from 'src/util/errorHandler'
-
-import { Tarea } from '../../domain/tarea'
-import { Usuario } from '../../domain/usuario'
-import { TareasService } from '../../services/tareas.service'
-import { UsuariosService } from '../../services/usuarios.service'
+import { Tarea } from 'domain/tarea'
+import { Usuario } from 'domain/usuario'
+import { TareasService } from 'services/tareas.service'
+import { UsuariosService } from 'services/usuarios.service'
+import { mostrarError } from 'util/errorHandler'
 
 @Component({
   selector: 'app-asignar',
+  standalone: true,
+  imports: [FormsModule],
   templateUrl: './asignar.component.html',
-  providers: [],
-  styleUrls: ['./asignar.component.css']
+  styleUrl: './asignar.component.css'
 })
 export class AsignarComponent {
   tarea!: Tarea
@@ -59,13 +60,13 @@ export class AsignarComponent {
       return
     }
     this.tarea.asignarA(this.asignatario)
-    this.tareasService.actualizarTarea(this.tarea).subscribe({
-      next: () => { this.navegarAHome() },
-      error: (error: Error) => {
-        console.error(error)
-        mostrarError(this, error)
-      }
-    })
+    try {
+      await this.tareasService.actualizarTarea(this.tarea)
+      this.navegarAHome()
+    } catch (error: unknown) {
+      console.error(error)
+      mostrarError(this, error)
+    }
   }
 
   navegarAHome() {

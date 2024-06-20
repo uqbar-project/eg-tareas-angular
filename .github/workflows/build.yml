@@ -13,10 +13,10 @@ jobs:
         node-version: [20.x]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Cache node modules
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -24,7 +24,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -33,8 +33,7 @@ jobs:
           npm ci
           npm run test:prod
           npm run lint
-      - name: Coverage badge
-        uses: demyanets/angular-coverage-badges-action@v1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          coverage-summary-path: coverage/eg-tareas-angular/coverage-summary.json
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,0 +1,33 @@
+.filtro {
+  margin-bottom: 1em;
+}
+
+.nuevaTarea {
+  width: 20%;
+}
+
+.fila {
+  margin-top: 1em;
+}
+
+.mobile {
+  display: none;
+}
+
+/* .desktop {
+  display: inherit;
+} */
+
+@media (max-width: 450px) {
+  .nuevaTarea {
+    width: 100%;
+  }
+
+  .mobile {
+    display: inherit;
+  }
+
+  .desktop {
+    display: none;
+  }
+}

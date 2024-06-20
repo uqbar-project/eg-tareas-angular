@@ -1,8 +1,9 @@
 import { PipeTransform, Pipe } from '@angular/core'
-import { Tarea } from '../domain/tarea'
+import { Tarea } from 'domain/tarea'
 
 @Pipe({
-  name: 'filterTareas'
+  name: 'filterTareas',
+  standalone: true,
 })
 export class FilterTareas implements PipeTransform {
 

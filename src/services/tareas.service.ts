@@ -25,7 +25,7 @@ export class TareasService {
   }
 
   actualizarTarea(tarea: Tarea) {
-    return this.httpClient.put<TareaJSON>(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
+    return lastValueFrom(this.httpClient.put<TareaJSON>(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON()))
   }
 
   async crearTarea(tarea: Tarea) {

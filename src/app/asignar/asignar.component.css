@@ -12,3 +12,11 @@
 .modal-footer {
   padding: 3em 0;
 }
+
+@media (max-width: 450px) {
+
+  .modal-dialog {
+    padding: 0 0.5em;
+  }
+  
+}

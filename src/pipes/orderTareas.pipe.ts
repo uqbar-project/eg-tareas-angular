@@ -1,8 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { Tarea } from 'src/domain/tarea'
+import { Tarea } from 'domain/tarea'
 
 @Pipe({
-  name: 'orderTareas'
+  name: 'orderTareas',
+  standalone: true,
 })
 export class OrderTareas implements PipeTransform {
 
