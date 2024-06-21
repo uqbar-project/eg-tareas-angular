@@ -20,6 +20,7 @@ export class NuevaTareaComponent {
   asignatario?: Usuario
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
+  fecha = ''
 
   constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
 
@@ -40,6 +41,9 @@ export class NuevaTareaComponent {
 
   async guardar() {
     try {
+      if (this.fecha) {
+        this.tarea.fecha = new Date(Date.parse(this.fecha))
+      }
       this.tarea.validar()
       if (this.tarea.invalid()) {
         return

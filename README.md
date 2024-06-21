@@ -2,7 +2,7 @@
 
 # Tareas de un equipo de desarrollo
 
-[![Build](https://github.com/uqbar-project/eg-tareas-angular/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-angular/actions/workflows/build.yml) ![Coverage](./badges/eg-tareas-angular/coverage.svg?test=2)
+[![Build](https://github.com/uqbar-project/eg-tareas-angular/actions/workflows/build.yml/badge.svg)](https://github.com/uqbar-project/eg-tareas-angular/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-tareas-angular/graph/badge.svg?token=0BAJTi6FpK)](https://codecov.io/gh/uqbar-project/eg-tareas-angular)
 
 ![demo](videos/demo.gif)
 

@@ -38,6 +38,8 @@ describe('NuevaTareaComponent', () => {
     await sendInput('descripcion', 'Aprender Angular')
     await sendInput('iteracion', 'Iteracion 1')
     // TODO: lograr que funcione para input type date y drop down
+    // puede ser que tenga que ver con el evento de HTML
+    // await sendInput('fecha', '02/22/2020')
     component.tarea.fecha = new Date()
     component.asignatario = new Usuario('Nahuel Palumbo')
     await sendInput('porcentaje-cumplimiento', '20')
@@ -71,7 +73,7 @@ describe('NuevaTareaComponent', () => {
     return resultHtml.querySelector(`[data-testid="${testId}"`)
   }
 
-  async function sendInput(testId: string, text: string | Date) {
+  async function sendInput(testId: string, text: string) {
     const inputElement = getByTestId(testId)
     inputElement.value = text
     inputElement.dispatchEvent(new Event('input'))

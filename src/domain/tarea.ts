@@ -1,6 +1,6 @@
-import { format, parse } from 'date-fns'
 import { Usuario } from './usuario'
 import { FORMATO_FECHA } from 'services/configuration'
+import { DateTime } from 'luxon'
 
 const CUMPLIDA = 100
 
@@ -38,7 +38,7 @@ export class Tarea {
         ? Usuario.fromJSON(tareaJSON.asignadoA)
         : undefined,
       fecha: tareaJSON.fecha
-        ? parse(tareaJSON.fecha, FORMATO_FECHA, new Date())
+        ? DateTime.fromFormat(tareaJSON.fecha, FORMATO_FECHA).toJSDate()
         : undefined
     })
   }
@@ -108,8 +108,13 @@ export class Tarea {
     }
   }
 
+  // Ojo, es importante convertir la fecha 
+  // 1. de JS a Luxon
+  // 2. luego cambiarle el timezone a UTC, para que no le reste la distancia al meridiano de Greenwich
+  //    (en Argentina le resta 3 horas y pasa a ser el día anterior)
+  // 3. y luego sí formatearlo a lo que el backend espera
   fechaString(): string | undefined {
-    return this.fecha ? format(this.fecha, FORMATO_FECHA) : ''
+    return !this.fecha ? '' : DateTime.fromJSDate(this.fecha).toUTC().toFormat(FORMATO_FECHA)
   }
 
   key(): number {
