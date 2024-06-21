@@ -8,12 +8,11 @@
 
 Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y permite mostrar una aplicación completa en Angular con los siguientes conceptos
 
-- **routing** de páginas master / detail de tareas
+- **routing** para navegar desde la página principal a las que nos permiten crear o asignar una tarea, así como para volver
 - utilización de Bootstrap como framework de CSS + Font Awesome para los íconos
 - desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con [Spring Boot](https://spring.io/projects/spring-boot))
-- para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service
+- para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service, trabajando con **asincronismo** para disparar actualizaciones y consultas hacia el backend
 - la **separación de concerns** entre las tareas como objeto de dominio, la vista html, el componente que sirve como modelo de vista y el servicio que maneja el origen de los datos
-- el manejo del **asincronismo** para recibir parámetros en la ruta, así como para disparar actualizaciones y consultas hacia el backend
 - de yapa, repasaremos el uso de **pipes built-in** para formatear decimales en los números y uno propio para realizar el filtro de tareas en base a un valor ingresado
 
 # Preparación del proyecto
@@ -32,7 +31,7 @@ npm i @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortaw
 
 ## Configuración angular.json
 
-Es necesario incorporar Bootstrap dentro del archivo _angular.json_ de la siguiente manera:
+Es necesario incorporar Bootstrap dentro del archivo _angular.json_:
 
 ```json
     "styles": [
@@ -46,55 +45,34 @@ Es necesario incorporar Bootstrap dentro del archivo _angular.json_ de la siguie
 
 ## Configuración ruteo
 
-La aplicación tendrá dos páginas:
+La aplicación tendrá las siguientes páginas:
 
-- la vista master que muestra la lista de tareas (pendientes o cumplidas)
+- la vista principal que muestra la lista de tareas (pendientes o cumplidas)
+- una vista que nos permite crear una nueva tarea
 - y la vista de detalle que sirve para asignar un recurso a una tarea
 
-Recordamos que se definen en el archivo _app/app-routing.module.ts_ que se crea cuando hacemos `ng new nombre-app --routing`:
+Pueden ver la configuración en el archivo [routes](./src/app/app.routes.ts), donde en caso de no encontrar un path exacto redirigimos a la página principal:
 
 ```typescript
 const routes: Routes = [
   { path: 'tareas',           component: TareasComponent },
-  { path: 'nuevaTarea',       component: NuevaTareaComponent, },
-  { path: 'asignarTarea/:id', component: AsignarComponent},
-       // pasamos id dentro de la URL para asignar una tarea específica
+  ...
   { path: '', redirectTo: '/tareas', pathMatch: 'full' },
        // por defecto redirigimos a la lista de tareas
 ]
-
-...
-
-export const routingComponents = [ 
-  AsignarComponent,
-  NuevaTareaComponent,
-  TareasComponent, 
-]
 ```
 
-## Configuración del NgModule
+## Configuración de la vista principal
 
-Los routing components se importan en el módulo (archivo _app/app.module.ts_):
-
-```ts
-import { AppRoutingModule, routingComponents } from './app-routing.module'
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    routingComponents,
-    ...
-],
-```
-
-También es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
+Es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
 
 Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una biblioteca:
 
 ```typescript
-import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome'
-import { faUserCheck, faUserMinus, faCalendarCheck, faTasks } from '@fortawesome/free-solid-svg-icons'
-
+@NgModule({
+  imports: [FontAwesomeModule],
+  exports: [FontAwesomeModule],
+})
 export class IconsModule {
   constructor(library: FaIconLibrary) {
     library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
@@ -102,21 +80,17 @@ export class IconsModule {
 }
 ```
 
-Importamos esté modulo en _app.module.ts_ :
+Importamos esté modulo en [_tareas.component.ts_](./src/app/tareas/tareas.component.ts):
 
 ```typescript
-import { IconsModule } from "./icons.module";
-
-@NgModule({
-   imports: [
-    ...
-    IconsModule,
-  ],
-}
-
+@Component({
+  selector: 'app-tareas',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconsModule],
+  ...
 ```
 
-Por último dado que vamos a formatear a dos decimales con coma el % de completitud de una tarea, debemos importar los _locales_ o configuraciones regionales:
+Por último dado que vamos a formatear a dos decimales con coma el % de completitud de una tarea, debemos importar los _locales_ o configuraciones regionales. Esto lo hacemos en el archivo [main.ts](./src/main.ts) para que sea global en toda la aplicación:
 
 ```typescript
 import '@angular/common/locales/global/es'
@@ -142,13 +116,12 @@ Todas estas responsabilidades hacen que exista una clase Tarea, en lugar de un s
 
 ```json
 {
-    "id": 1,
-    "descripcion": "Desarrollar componente de envio de mails",
-    "iteracion": "Iteración 1",
-    "porcentajeCumplimiento": 0,
-    "new": false,
-    "asignadoA": "Juan Contardo",
-    "fecha": "02/06/2018"
+  "id": 1,
+  "descripcion": "Algo2: migrar ejemplo de Decorator a Kotlin",
+  "iteracion": "Iteración 1",
+  "porcentajeCumplimiento": 0,
+  "asignadoA": "Juan Contardo",
+  "fecha": "21/06/2024"
 }
 ```
 
@@ -174,7 +147,7 @@ static fromJson(tareaJSON): Tarea {
 
 Otra opción para construir una tarea como objeto de dominio con responsabilidades, es utilizar la técnica [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign), que permite construir una copia de un objeto en base a la unión de todos los atributos que enumeremos. Es una opción más simple y vamos a preferirla a la hora de implementar nuestra solución:
 
-```js
+```ts
 static fromJson(tareaJSON): Tarea {
   return Object.assign(new Tarea(), tareaJSON, { asignatario: Usuario.fromJSON(tareaJSON.asignadoA) })
 }
@@ -184,7 +157,7 @@ static fromJson(tareaJSON): Tarea {
 
 Vamos a disparar pedidos a nuestro server local de Spring Boot ubicado en el puerto 9000. Pero no queremos repetir el mismo _endpoint_ en todos los lugares, entonces creamos un archivo _configuration.ts_ en el directorio services y exportamos una constante:
 
-```typescript
+```ts
 export const REST_SERVER_URL = 'http://localhost:9000'
 ```
 
@@ -207,7 +180,7 @@ Veamos cómo es la definición de TareasService:
 })
 export class TareasService implements ITareasService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private httpClient: HttpClient) { }
 
   async todasLasTareas() {
     const tareas$ = this.httpClient.get<TareaJSON[]>(REST_SERVER_URL + '/tareas')
@@ -224,7 +197,7 @@ Esto y algunas novedades que trajo Angular 9, se explican
 - [en este artículo](https://dev.to/christiankohler/improved-dependeny-injection-with-the-new-providedin-scopes-any-and-platform-30bb).
 - [y este post más largo](https://medium.com/@tomastrajan/total-guide-to-angular-6-dependency-injection-providedin-vs-providers-85b7a347b59f)
 
-Para traer todas las tareas, disparamos un pedido asincrónico al servidor: "http://localhost:9000/tareas". Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
+Para traer todas las tareas, disparamos un pedido asincrónico al servidor: `http://localhost:9000/tareas`. Eso no devuelve una lista de tareas: veamos cuál es la interfaz del método get en Http:
 
 ```javascript 
 (method) (method) HttpClient.get<Tarea[]>(url: string, options?: Observable<Tarea[]>
@@ -252,7 +225,7 @@ Recibimos un _response_ del server, que si es 200 (OK) se ubicará en la variabl
 
 (para eso conviene bajarse el proyecto backend y simular un error adrede)
 
-```kotlin
+```kt
 @PutMapping("/tareas/{id}")
 @Operation(summary = "Permite actualizar la información de una tarea")
 fun actualizar(@PathVariable id: Int, @RequestBody tareaBody: Tarea): Tarea {
@@ -261,60 +234,31 @@ fun actualizar(@PathVariable id: Int, @RequestBody tareaBody: Tarea): Tarea {
 }
 ```
 
-Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como vemos a continuación:
+Del mismo modo el service define los métodos para leer una tarea por id y para actualizar, como pueden ver [en la implementación](./src/services/tareas.service.ts).
 
-```typescript
-async getTareaById(id: number) {
-  const tareaJSON$ = this.httpClient.get<TareaJSON>(REST_SERVER_URL + '/tareas/' + id)
-  const tareaJSON = await lastValueFrom(tareaJSON$)
-  return tareaJSON ? Tarea.fromJson(tareaJSON) : undefined
-}
-
-actualizarTarea(tarea: Tarea) {
-  return this.httpClient.put<TareaJSON>(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
-}
-```
-
-En el caso de la actualización de tareas, se devuelve un `Observable<TareaJSON>` en lugar de una Promise, para que veamos cómo en lugar de envolver la respuesta en un `await` utilizamos el método subscribe de Observable. Esto lo hacemos en el componente de Angular:
-
-```typescript
-async actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
-  callbackActualizacion(tarea)
-  await this.tareasService.actualizarTarea(tarea).subscribe(errorHandler(this))
-}
-```
-
-Tenemos una función errorHandler que permite mostrar un mensaje de error y volver a cargar las tareas.
+En el caso de la actualización de tareas, envolvemos la promise dentro de una función async que captura la excepción y la muestra al usuario:
 
 ```ts
-export const errorHandler = (component: TareasComponent) => ({
-  error: async (error: Error) => {
-    component.tareas = await component.tareasService.todasLasTareas()
-    mostrarError(component, error)
-  }
-})
-```
-
-### UsuarioService
-
-El service de usuarios sirve para traer la lista de usuarios en el combo de la página de asignación. También le inyectaremos el objeto `httpClient` para hacer el pedido al backend, pero utilizaremos la técnica de **Promises** estándar: el método no devuelve la lista de usuarios, sino la promesa de una respuesta (Promise<Usuario[]>)...
-
-```typescript
-@Injectable({
-  providedIn: 'root'
-})
-export class UsuariosService{
-
-  constructor(private http: HttpClient) { }
-
-  async usuariosPosibles() {
-    const usuarios$ = this.http.get<Usuario[]>(REST_SERVER_URL + '/usuarios')
-    return lastValueFrom(usuarios$)
+async actualizarTarea(..., tarea: Tarea) {
+  ... 
+  try {
+    await this.tareasService.actualizarTarea(tarea)
+  } catch (e) {
+    await errorHandler(this, e as unknown as Error)
   }
 }
 ```
 
-Luego el componente de asignación debe convertir la respuesta en JSON con la lista de tareas como veremos más abajo.
+Tenemos una función errorHandler que permite mostrar un mensaje de error y volver a cargar las tareas (como se puede ver, se envuelve en un try/catch vacío por si falla la operación, así nos concentramos en mostrar el mensaje de error original).
+
+```ts
+export const errorHandler = async (component: TareasComponent, error: Error) => {
+  try {
+    component.tareas = await component.tareasService.todasLasTareas()
+  } catch (e) {}
+  mostrarError(component, error)
+}
+```
 
 ## Casos de uso
 
@@ -328,7 +272,7 @@ La vista html
 
 - tiene binding bidireccional para sincronizar el valor de búsqueda (variable _tareaBuscada_),
 - también tiene una lista de errores que se visualizan si por ejemplo hay error al llamar al service
-- un ngFor que recorre la lista de tareas que sale de una llamada asincrónica al service: `await this.tareasService.todasLasTareas()`
+- un `@for` que recorre la lista de tareas que sale de una llamada asincrónica al service: `await this.tareasService.todasLasTareas()`
 - respecto a la botonera, tanto el cumplir como el desasignar actualizan el estado de la tarea en forma local y luego disparan un pedido PUT al server para sincronizar el estado...
 - ...y por último la asignación dispara la llamada a una página específica mediante el uso del router
 
@@ -341,38 +285,18 @@ En la asignación recibimos el id de la tarea, y pedimos al backend la tarea con
 - la lista de usuarios posibles que mostraremos como opciones del combo sale de una llamada al service propio para usuarios
 - además queremos tener binding contra el elemento seleccionado del combo. Las opciones serían 1) que sea "tarea.asignatario", 2) que sea una referencia que vive dentro del componente de asignación: la variable asignatario. Elegimos la segunda opción porque es más sencillo cancelar sin que haya cambios en el asignatario de la tarea (botón Cancelar). En caso de Aceptar el cambio, aquí sí actualizaremos el asignatario de la tarea dentro de nuestro entorno local y luego haremos un pedido PUT al servidor para sincronizar la información.
 
-La parte interesante es que la actualización de la tarea requiere subscribirse al observable pasando como parámetro un objeto que nos dice
-
-- en `next`, qué debemos hacer si la asignación resulta exitosa
-- en `error`, cómo debemos manejar el error (mostrando un mensaje al usuario)
-- y eventualmente podríamos haber pasado un callback más para decir qué hacer cuando el pedido se complete (una especie de finally)
-
-```ts
-async asignar() {
-  this.errors = []
-  this.validarAsignacion()
-  this.tarea.asignarA(this.asignatario)
-  this.tareasService.actualizarTarea(this.tarea).subscribe({
-    next: () => { this.navegarAHome() },
-    error: (error: Error) => {
-      console.error(error)
-      mostrarError(this, error)
-    }
-  })
-}
-```
-
 ## Pipes
 
 La página inicial permite filtrar las tareas:
 
 ```html
-  <tr *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas" class="animate-repeat">
+  @for (tarea of tareas | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
+    <tr>
 ```
 
 El criterio de filtro delega a su vez en la tarea esa responsabilidad:
 
-```typescript
+```ts
 export class FilterTareas implements PipeTransform {
 
   transform(tareas: Tarea[], palabra: string): Tarea[] {
@@ -384,15 +308,17 @@ export class FilterTareas implements PipeTransform {
 
 También tenemos el pipe orderTareas, que ordena las tareas por id:
 
-```typescript
+```ts
 export class OrderTareas implements PipeTransform {
 
   transform(tareas: Tarea[]): Tarea[] {
-    return tareas.sort((tarea, otraTarea) => tarea.id - otraTarea.id)
+    return tareas.sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
   }
 
 }
 ```
+
+La tarea es responsable de devolver un valor para el método key() con el que el pipe lo ordena.
 
 Por último, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
 
@@ -402,15 +328,13 @@ Por último, el % de cumplimiento se muestra con dos decimales y con comas, medi
 
 # Testing
 
-El testeo requiere una parte burocrática que es repetir la importación de todos los elementos del NgModule y los particulares de TareasComponent en nuestro spec. El lector puede ver la lista de imports completa en el archivo [tareas.component.spec.ts](src/components/tareas/tareas.component.spec.ts).
-
 ## Inyección de un stub para el httpClient
 
 Queremos mantener la unitariedad de los tests y cierto grado de determinismo que nos permita tener un entorno controlado de eventos y respuestas. Dado que nuestro service real hace una llamada http, 
 
 1. podríamos generar un stub del TareasService que maneje datos controlables
 
-```typescript
+```ts
 export const juana = new Usuario('Juana Molina')
 
 export class StubTareasService implements ITareasService {
@@ -439,85 +363,66 @@ Ahora sí, para que la inyección de dependencias reemplace nuestro objeto stub 
 - en el caso de hacer un get de una tarea, tiene que devolver un `Observable` de una tarea específica
 
 ```ts
-export const httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'put', 'post'])
+export const getHttpClientSpy = () => {
+  const httpClientSpy = jasmine.createSpyObj('HttpClient', [
+    'get',
+    'put',
+    'post'
+  ])
 
-...
+  httpClientSpy.get
+    .withArgs(`${REST_SERVER_URL}/tareas`)
+    .and.returnValue(of(tareasStub))
+  
+  httpClientSpy.get
+    .withArgs(`${REST_SERVER_URL}/tareas/1`)
+    .and.returnValue(of(tareasStub[0]))
 
-const tareasStub = [
-  tareaPrincipal,
-  new Tarea(2, 'Desarrollar testeo e2e', 'Iteración 2', undefined, '12/11/2020', 0),
-].map((tarea) => tarea.toJSON())
-
-const usuariosStub = [
-  { id: 1, nombre: 'Victoria Marconi', },
-  { id: 2, nombre: 'Gabriel Pérez'}
-]
-
-httpClientSpy.get.withArgs(`${REST_SERVER_URL}/tareas`).and.returnValue(of(tareasStub))
-httpClientSpy.get.withArgs(`${REST_SERVER_URL}/tareas/1`).and.returnValue(of(tareasStub[0]))
-...
+  // Incluso podemos controlar la búsqueda de usuarios:
+  httpClientSpy.get
+    .withArgs(`${REST_SERVER_URL}/usuarios`)
+    .and.returnValue(of(usuariosStub))
+  
+  httpClientSpy.put.and.returnValue(of(tareasStub[0]))
+ 
+  // En el caso del alta, nos permite incluso construir una función para simular un id nuevo:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  httpClientSpy.post.and.callFake((_url: string, body: any) =>
+    of({ ...body, id: 3 })
+  )
+  return httpClientSpy
+}
 ```
 
-Incluso podemos controlar la búsqueda de usuarios:
-
-```ts
-httpClientSpy.get.withArgs(`${REST_SERVER_URL}/usuarios`).and.returnValue(of(usuariosStub))
-httpClientSpy.put.and.returnValue(of(tareasStub[0]))
-```
-
-Y en el caso del alta, nos permite incluso construir una función para simular un id nuevo:
-
-```ts
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-httpClientSpy.post.and.callFake((_url: string, body: any) => of({ ...body, id: 3 }))
-```
-
-Y luego vamos a configurar **providers** en nuestro objeto TestBed, definiendo cuál es el objeto que debe inyectarse cuando alguna dependencia lo necesite:
+Luego vamos a configurar **providers** en nuestro objeto TestBed, definiendo cuál es el objeto que debe inyectarse cuando alguna dependencia lo necesite:
 
 - el router, que va a tener un **spy** para poder hacer tests sobre la navegación
 - y el httpClient como dijimos antes
 
 ```ts
 describe('TareasComponent', () => {
-  let component: TareasComponent
-  let fixture: ComponentFixture<TareasComponent>
+  ...
   let routerSpy: jasmine.SpyObj<Router>
+  let httpClientSpy: jasmine.SpyObj<HttpClient>
   
   beforeEach(async () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
+    // vamos a crear una nueva instancia del spy de httpClient para cada test
+    // esto es importante porque hay un test que le cambia dinámicamente el comportamiento
+    // para que tire error, y no queremos que ese cambio tenga efecto colateral en los demás tests
+    httpClientSpy = getHttpClientSpy()
 
     TestBed.configureTestingModule({
       declarations: [
         ...
       ],
-      imports: [
-        ...
-        // Super importante -> para poder mockear el service hay que importar el módulo HttpClient
-        HttpClientModule,
-      ],
       providers: [
-        { provide: HttpClient, useValue: httpClientSpy, }
-      ]
+        { provide: HttpClient, useValue: httpClientSpy },
+        { provide: Router, useValue: routerSpy }
+      ]      
     }).compileComponents()
-
-    TestBed.overrideComponent(TareasComponent, {
-      set: {
-        providers: [
-          { provide: Router, useValue: routerSpy, },
-        ]
-      }
-    })
-
     ....
   })
-```
-
-Es importante el orden aquí, si instanciamos el componente primero ya no será posible modificar el servicio a inyectar y veremos un error al correr nuestros tests.
-
-Recordamos que se corren los tests mediante
-
-```bash
-npm test
 ```
 
 ## Tests
@@ -526,17 +431,17 @@ npm test
 
 Veamos los tests más interesantes: este prueba que el stub del http client fue inyectado correctamente, porque el método GET de http `/tareas` devuelve 2 tareas:
 
-```typescript
-  it('should initially show 2 pending tasks', () => {
-    expect(2).toBe(component.tareas.length)
-  })
+```ts
+it('should initially show 2 pending tasks', (() => {
+  expect(2).toBe(component.tareas.length)
+}))
 ```
 
 ### Verificar que una tarea puede cumplirse
 
 El segundo test prueba que una tarea que no está cumplida y está asignada puede marcarse como cumplida:
 
-```typescript
+```ts
 it('first task can be marked as done', () => {
   expect(getByTestId('cumplir_1')).toBeTruthy()
 })
@@ -545,10 +450,10 @@ it('first task can be marked as done', () => {
 En la vista agregamos un `attr.data-testid` para el botón cumplir de cada tarea, que consiste en el string "cumplir_" concatenado con el identificador de la tarea:
 
 ```html
-<button type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
-  aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()" [attr.data-testid]="'cumplir_' + tarea.id">
-  <fa-icon icon="calendar-check"></fa-icon>
-</button>
+@if (tarea.sePuedeCumplir()) {
+  <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+    aria-label="Cumplir" [attr.data-testid]="'cumplir_' + tarea.id">
+    ...
 ```
 
 Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag cuyo atributo `data-testid` sea "cumplir_1" dentro del HTML que genera el componente. Podés investigar la función que busca por id, y te dejamos [el link](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) para entender las búsquedas que soporta querySelector.
@@ -560,24 +465,18 @@ Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag cuyo
 - hacemos click sobre el botón cumplir
 - esto debería mostrar el porcentaje de cumplimiento de dicha tarea con 100
 
-Bueno, no exactamente 100, sino "100,00" porque le aplicamos un filter. Aquí vemos que el testeo que estamos haciendo involucra no es tan unitario, sino más bien de integración, ya que se prueba componente de vista, objeto de dominio (que es quien cumple la tarea), el pipe de Angular que customizamos a dos decimales y con coma decimal y la vista html:
+Bueno, no exactamente 100, sino "100,00" porque le aplicamos un formateo. Aquí vemos que el testeo que estamos haciendo involucra no es tan unitario, sino más bien de integración, ya que se prueba componente de vista, objeto de dominio (que es quien cumple la tarea), el pipe de Angular que customizamos a dos decimales y con coma decimal y la vista html:
 
-```typescript
+```ts
 it('when a task is done, it has 100% of completion', () => {
   getByTestId('cumplir_1').click()
   fixture.detectChanges()
   expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
+  ...
 })
 ```
 
-A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento dentro de la tabla:
-
-```html
-<span class="text-xs-right"
-  [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
-```
-
-Y el último detalle, queremos chequear que al backend le enviamos una tarea con el 100% de cumplimiento:
+A la vista le agregamos un id para poder encontrar el porcentaje de cumplimiento dentro de la tabla. Y el último detalle, queremos chequear que al backend le enviamos una tarea con el 100% de cumplimiento, eso es lo que hacemos en las últimas dos líneas
 
 ```ts
   it('when a task is done, it has 100% of completion', () => {
@@ -592,20 +491,20 @@ Y el último detalle, queremos chequear que al backend le enviamos una tarea con
 Si buscamos "2", debería traernos únicamente la "Tarea 2". No podemos preguntar si la lista de tareas tiene un solo elemento, porque el componente siempre tiene las dos tareas y el que filtra es nuestro TareasPipe en su método transform. Entonces lo que vamos a hacer es buscar todos los elementos con data-testid "fila-tarea" que tienen nuestros tr en la vista _tareas.component.html_:
 
 ```html
-<tr 
-  data-testid="fila-tarea"
-  *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas"
-  class="animate-repeat">
+@for (tarea of tareas | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
+  <tr data-testid="fila-tarea" ...
 ```
 
 de la siguiente manera:
 
-```typescript
+```ts
 it('searching for second task should have one tr in tasks list', () => {
   component.tareaBuscada = 'e2e'
   fixture.detectChanges()
   const resultHtml = fixture.debugElement.nativeElement
-  expect(resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length).toBe(1)
+  expect(
+    resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length
+  ).toBe(1)
 })
 ```
 
@@ -618,11 +517,12 @@ Cuando queremos asignar una tarea, podemos agregar un test que verifica que se d
 ```ts
 it('assign task should navigate', () => {
   getByTestId('asignar_2').click()
-  
+
   fixture.detectChanges()
 
-  const route = routerSpy.navigate.calls.first().args[0]
-  expect(route).toEqual(['/asignarTarea', 2])
+  const [url, tareaId] = routerSpy.navigate.calls.first().args[0]
+  expect(url).toBe('/asignarTarea')
+  expect(tareaId).toBe(2)
 })
 ```
 
@@ -634,17 +534,21 @@ it('assign task should navigate', () => {
 Algo similar hacemos en la asignación, interceptando el objeto `httpClientSpy` y verificando que se haya llamado a la actualización de la tarea con el nuevo asignatario:
 
 ```ts
-it('assignment should take effect', (async () => {
+it('assignment should take effect', () => {
   const compiled = fixture.debugElement.nativeElement
   const nuevoAsignatario = component.usuariosPosibles[0]
   component.asignatario = nuevoAsignatario
   compiled.querySelector('[data-testid="guardar"]').click()
-  await fixture.whenStable()
 
-  // Queremos saber que en algún momento se haya pedido al backend que se asigne a otro usuarie
-  const tareaDesasignada = { ...tareaPrincipal.toJSON(), asignadoA: nuevoAsignatario.nombre }
-  expect(httpClientSpy.put).toHaveBeenCalledWith(`http://localhost:9000/tareas/${tareaPrincipal.id}`, tareaDesasignada)
-}))
+  const tareaAsignada = {
+    ...tareaPrincipal.toJSON(),
+    asignadoA: nuevoAsignatario.nombre
+  }
+  expect(httpClientSpy.put).toHaveBeenCalledWith(
+    `http://localhost:9000/tareas/${tareaPrincipal.id}`,
+    tareaAsignada
+  )
+})
 ```
 
 En este caso interceptamos el método `put` del espía para `httpClient`, con los dos parámetros correspondientes: la URL y el JSON con la tarea reasignada.
@@ -660,16 +564,16 @@ Si intentamos testear utilizando `fixture.detectChanges()` únicamente, el resul
 
 ```ts
 it('finish - should catch error gracefully', fakeAsync(() => {
-  spyOn(component.tareasService, 'actualizarTarea').and.callFake(
-    () => throwError(() => new Error('Fake Error'))
-  )
+  httpClientSpy.put.and.returnValue(throwError(() => new Error('Fake error')))
+
   getByTestId('cumplir_1').click()
-  // IMPORTANTE, avanzar un poco el reloj previo al detectChanges() para que se muestre el error
   tick(1000)
   fixture.detectChanges()
-  // El assert ocurre en este momento
   expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-  // Y tenemos que completar el setTimeout o nos aparecerá un error de que hay timers por completarse
-  tick(2000)
+  flush()
+
+  httpClientSpy.put.calls.reset()
 }))
 ```
+
+La función `flush()` termina de avanzar el tiempo para liberar el event loop de las tareas pendientes (de lo contrario el test tirará error), y de paso reseteamos el spy, no es algo estrictamente necesario porque en el beforeEach volvemos a inicializarlo de cero, pero esto permite que si agregamos líneas al test no tire error cuando hagamos una llamada PUT al httpClient.

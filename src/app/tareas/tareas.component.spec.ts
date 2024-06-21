@@ -53,7 +53,7 @@ describe('TareasComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should initially show 2 pending tasks', fakeAsync(() => {
+  it('should initially show 2 pending tasks', (() => {
     expect(2).toBe(component.tareas.length)
   }))
 

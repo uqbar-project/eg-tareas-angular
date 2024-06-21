@@ -32,49 +32,58 @@
               <th class="desktop">% cumplido</th>
               <th>Acciones</th>
             </tr>
-            <tr data-testid="fila-tarea" *ngFor="let tarea of tareas | filterTareas: tareaBuscada | orderTareas; index as i"
-              class="animate-repeat">
-              <td class="col-lg-12 mobile">
-                <div>
-                  {{tarea.descripcion}}<br>
-                  {{tarea.asignatario ? ' - ' + tarea.asignatario.nombre : ''}} - % {{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}
-                </div>
-              </td>
-              <td class="col-xs-4 desktop" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
-              <td class="col-xs-2 desktop" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
-              <td class="col-xs-3 desktop" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
-              <td class="col-xs-2 desktop" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
-              <td class="col-xs-1 desktop text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
-              'table-warning': tarea.cumplioMenosDe(50),
-              'table-info': tarea.cumplioMenosDe(100),
-              'table-success': tarea.cumplio(100)}">
-                <span
-                  [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}</span>
-              </td>
+            @for (tarea of tareas | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
+              <tr data-testid="fila-tarea" class="animate-repeat">
+                <td class="col-lg-12 mobile">
+                  <div>
+                    {{tarea.descripcion}}<br>
+                    {{tarea.asignatario ? ' - ' + tarea.asignatario.nombre : ''}} - % {{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}
+                  </div>
+                </td>
+                <td class="col-xs-4 desktop" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
+                <td class="col-xs-2 desktop" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
+                <td class="col-xs-3 desktop" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
+                <td class="col-xs-2 desktop" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
+                <td class="col-xs-1 desktop text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
+                'table-warning': tarea.cumplioMenosDe(50),
+                'table-info': tarea.cumplioMenosDe(100),
+                'table-success': tarea.cumplio(100)}">
+                  <span
+                    [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}</span>
+                </td>
 
-              <td nowrap class="col-xs-2">
-                <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
-                  aria-label="Cumplir" *ngIf="tarea.sePuedeCumplir()" [attr.data-testid]="'cumplir_' + tarea.id">
-                  <fa-icon icon="calendar-check"></fa-icon>
-                </button>
-                &nbsp;
-                <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
-                  (click)="asignar(tarea)" *ngIf="tarea.sePuedeAsignar()" aria-label="Asignarme"
-                  [attr.data-testid]="'asignar_' + tarea.id">
-                  <fa-icon icon="user-check"></fa-icon>
-                </button>
-                &nbsp;
-                <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger"
-                  (click)="desasignar(tarea)" *ngIf="tarea.sePuedeDesasignar()" aria-label="Desasignarme"
-                  [attr.data-testid]="'desasignar_' + tarea.id">
-                  <fa-icon icon="user-minus"></fa-icon>
-                </button>
-              </td>
-            </tr>
+                <td nowrap class="col-xs-2">
+                  @if (tarea.sePuedeCumplir()) {
+                    <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+                      aria-label="Cumplir" [attr.data-testid]="'cumplir_' + tarea.id">
+                      <fa-icon icon="calendar-check"></fa-icon>
+                    </button>
+                  }
+                  &nbsp;
+                  @if (tarea.sePuedeAsignar()) {
+                    <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
+                    (click)="asignar(tarea)" aria-label="Asignarme"
+                    [attr.data-testid]="'asignar_' + tarea.id">
+                      <fa-icon icon="user-check"></fa-icon>
+                    </button>
+                  }
+                  &nbsp;
+                  @if (tarea.sePuedeDesasignar()) {
+                    <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger"
+                      (click)="desasignar(tarea)" aria-label="Desasignarme"
+                      [attr.data-testid]="'desasignar_' + tarea.id">
+                      <fa-icon icon="user-minus"></fa-icon>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
-      <div class="alert alert-danger animate-repeat" data-testid="error-message" *ngFor="let error of errors">{{error}}</div>
+      @for (error of errors ; track error) {
+        <div class="alert alert-danger animate-repeat" data-testid="error-message">{{error}}</div>
+      }
     </div>
   </div>
 </div>
