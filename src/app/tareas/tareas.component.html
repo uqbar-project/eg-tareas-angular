@@ -59,7 +59,6 @@
                       <fa-icon icon="calendar-check"></fa-icon>
                     </button>
                   }
-                  &nbsp;
                   @if (tarea.sePuedeAsignar()) {
                     <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
                     (click)="asignar(tarea)" aria-label="Asignarme"
@@ -67,7 +66,6 @@
                       <fa-icon icon="user-check"></fa-icon>
                     </button>
                   }
-                  &nbsp;
                   @if (tarea.sePuedeDesasignar()) {
                     <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger"
                       (click)="desasignar(tarea)" aria-label="Desasignarme"
