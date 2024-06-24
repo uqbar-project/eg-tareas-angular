@@ -326,6 +326,70 @@ Por último, el % de cumplimiento se muestra con dos decimales y con comas, medi
   <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
 ```
 
+# Usando Observables
+
+Vamos a dejarte otra variante, que es utilizar RxJs, el framework que introduce los _Observables_ en lugar de las _Promises_. Si bien una promise es una herramienta estándar del mercado, los observables tienen algunas ventajas, como
+
+- trabaja sobre un stream múltiple de eventos (la promise solo maneja un evento)
+- y devuelve múltiples valores (la promise solo uno)
+- admite varias operaciones de transformación (map, filter, etc.)
+- puede cancelarse (necesitamos bibliotecas para cancelar una promise)
+- puede reintentarse
+
+httpClient devuelve observables, así que en nuestro service podemos devolver directamente el Observable, pero vamos a pedirle que siga tomando la responsabilidad de mapear el JSON a objetos de dominio Tarea:
+
+```ts
+export class TareasService {
+  constructor(private httpClient: HttpClient) { }
+
+  todasLasTareas() {
+    return this.httpClient
+      .get<TareaJSON[]>(REST_SERVER_URL + '/tareas')
+      .pipe(map((tareasJSON: TareaJSON[]) => tareasJSON.map((tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON) ?? [])))
+  }
+
+  getTareaById(id: number) {
+    return this.httpClient
+      .get<TareaJSON>(REST_SERVER_URL + '/tareas/' + id)
+      .pipe(map((tareaJSON: TareaJSON) => tareaJSON ? Tarea.fromJson(tareaJSON) : undefined))
+  }
+
+  actualizarTarea(tarea: Tarea) {
+    return this.httpClient.put<TareaJSON>(REST_SERVER_URL + '/tareas/' + tarea.id, tarea.toJSON())
+  }
+
+  crearTarea(tarea: Tarea) {
+    return this.httpClient.post<TareaJSON>(REST_SERVER_URL + '/tareas', tarea.toJSON())
+  }
+
+}
+```
+
+En el componente que muestra las tareas, el modelo de la vista
+
+- puede utilizar el mensaje `subscribe()` para efectivamente **disparar** la búsqueda (crear un Observable no tiene ningún efecto hasta que un componente no se suscribe). Podés ver un ejemplo en [esta página](https://blogs.halodoc.io/handling-subscription-angular/)
+- o bien puede simplemente definir el observable del método que trae todas las tareas, que es lo que vamos a hacer
+
+```ts
+export class TareasComponent implements OnInit {
+  tareas$!: Observable<Tarea[]>
+  ...
+
+  ngOnInit() {
+    this.tareas$ = this.tareasService.todasLasTareas()
+```
+
+Para poder disparar la búsqueda, el html va a usar el **async pipe**:
+
+```ts
+@for (tarea of (tareas$ | async)! | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
+```
+
+Esto requiere que también hagamos cambios en la manera de capturar los errores, que los dejamos para que los investigues por tu cuenta.
+
+> Nuestra recomendación es que trabajes con **promises** que tienen un uso más extendido independientemente de la tecnología de frontend que te toque trabajar
+
+
 # Testing
 
 ## Inyección de un stub para el httpClient

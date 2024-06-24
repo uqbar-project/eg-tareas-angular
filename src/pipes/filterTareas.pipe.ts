@@ -8,7 +8,7 @@ import { Tarea } from 'domain/tarea'
 export class FilterTareas implements PipeTransform {
 
   transform(tareas: Tarea[], palabra: string): Tarea[] {
-    return tareas.filter(tarea => tarea.contiene(palabra))
+    return tareas?.filter(tarea => tarea.contiene(palabra)) ?? []
   }
 
 }
