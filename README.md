@@ -385,7 +385,17 @@ Para poder disparar la búsqueda, el html va a usar el **async pipe**:
 @for (tarea of (tareas$ | async)! | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
 ```
 
-Esto requiere que también hagamos cambios en la manera de capturar los errores, que los dejamos para que los investigues por tu cuenta.
+Esto requiere que también hagamos cambios en la manera de capturar los errores, que los dejamos para que los investigues por tu cuenta. Como una muestra te dejamos esta variante a la hora de actualizar una tarea:
+
+```ts
+this.tareasService.actualizarTarea(this.tarea).subscribe({
+  next: () => { this.navegarAHome() },
+  error: (error: Error) => {
+    console.error(error)
+    mostrarError(this, error)
+  }
+})
+```
 
 > Nuestra recomendación es que trabajes con **promises** que tienen un uso más extendido independientemente de la tecnología de frontend que te toque trabajar
 
