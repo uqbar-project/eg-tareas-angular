@@ -345,7 +345,13 @@ export class TareasService {
   todasLasTareas() {
     return this.httpClient
       .get<TareaJSON[]>(REST_SERVER_URL + '/tareas')
-      .pipe(map((tareasJSON: TareaJSON[]) => tareasJSON.map((tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON) ?? [])))
+      .pipe(
+        map((tareasJSON: TareaJSON[]) => {
+          console.info('tareas JSON', tareasJSON)
+          return tareasJSON.map((tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON) ?? [])
+        }),
+        retry(2) // podemos pedir que intente n veces
+      )
   }
 
   getTareaById(id: number) {
@@ -377,6 +383,7 @@ export class TareasComponent implements OnInit {
 
   ngOnInit() {
     this.tareas$ = this.tareasService.todasLasTareas()
+  }
 ```
 
 Para poder disparar la búsqueda, el html va a usar el **async pipe**:
