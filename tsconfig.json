@@ -8,6 +8,7 @@
       "domain/*": ["./src/domain/*"],
       "pipes/*": ["./src/pipes/*"],
       "services/*": ["./src/services/*"],
+      "testing/*": ["./src/testing/*"],
       "util/*": ["./src/util/*"]
     },
     "strict": true,

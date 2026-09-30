@@ -1,13 +1,9 @@
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  flush,
-  tick
-} from '@angular/core/testing'
+import type { Mocked } from 'vitest'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { TareasComponent } from './tareas.component'
-import { getHttpClientSpy } from 'services/httpClientSpy'
+import { getHttpClientSpy } from 'testing/httpClientSpy'
+import { flushMicrotasks, stabilize } from 'testing/stabilize'
 import { HttpClient } from '@angular/common/http'
 import { Router } from '@angular/router'
 import { registerLocaleData } from '@angular/common'
@@ -23,14 +19,19 @@ import { throwError } from 'rxjs'
 
 registerLocaleData(localeEs)
 
+type RouterSpy = Mocked<Pick<Router, 'navigate' | 'navigateByUrl'>>
+
 describe('TareasComponent', () => {
   let component: TareasComponent
   let fixture: ComponentFixture<TareasComponent>
-  let routerSpy: jasmine.SpyObj<Router>
-  let httpClientSpy: jasmine.SpyObj<HttpClient>
+  let routerSpy: RouterSpy
+  let httpClientSpy: ReturnType<typeof getHttpClientSpy>
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
+    routerSpy = {
+      navigate: vi.fn(),
+      navigateByUrl: vi.fn()
+    }
     httpClientSpy = getHttpClientSpy()
 
     await TestBed.configureTestingModule({
@@ -43,19 +44,18 @@ describe('TareasComponent', () => {
 
     fixture = TestBed.createComponent(TareasComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
 
-    await fixture.whenStable()
-    fixture.detectChanges()
+    // ngOnInit es async y en zoneless whenStable() no la espera
+    await stabilize(fixture)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should initially show 2 pending tasks', (() => {
+  it('should initially show 2 pending tasks', () => {
     expect(2).toBe(component.tareas.length)
-  }))
+  })
 
   it('first task can be marked as done', () => {
     expect(getByTestId('cumplir_1')).toBeTruthy()
@@ -69,7 +69,7 @@ describe('TareasComponent', () => {
     expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
     // https://daveceddia.com/jasmine-2-spy-cheat-sheet/
     // Chequeamos que se haya enviado la información correctamente al backend
-    const tareaActualizada = httpClientSpy.put.calls.mostRecent().args[1]
+    const tareaActualizada = httpClientSpy.put.mock.lastCall![1]
     expect(tareaActualizada.porcentajeCumplimiento).toBe(100)
   })
 
@@ -79,49 +79,55 @@ describe('TareasComponent', () => {
     expect(getByTestId('asignatario_1').textContent).toBe('')
   })
 
-  it('searching for second task should have one tr in tasks list', () => {
-    component.tareaBuscada = 'e2e'
-    fixture.detectChanges()
+  it('searching for second task should have one tr in tasks list', async () => {
+    // Editamos el input como lo haria el usuario: mutar el campo del componente
+    // desincroniza el ngModel, que escribe el valor de forma asincrona.
+    const searchInput = getByTestId('tareaBuscada') as HTMLInputElement
+    searchInput.value = 'e2e'
+    searchInput.dispatchEvent(new Event('input'))
+    await stabilize(fixture)
     const resultHtml = fixture.debugElement.nativeElement
     expect(
       resultHtml.querySelectorAll('[data-testid="fila-tarea"]').length
     ).toBe(1)
   })
 
-  it('unassign - should catch error gracefully', fakeAsync(() => {
-    httpClientSpy.put.and.returnValue(throwError(() => new Error('Fake error')))
+  it('unassign - should catch error gracefully', async () => {
+    httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
 
     getByTestId('desasignar_1').click()
-    tick(1000)
+    // Ojo: sin whenStable() acá. El catch de actualizarTarea vuelve a pedir las
+    // tareas antes de registrar el error, y el tick que dispara whenStable()
+    // cae en medio de esa cadena y dispara NG0100.
+    await flushMicrotasks()
     fixture.detectChanges()
 
+    // mostrarError limpia los errores a los 5000ms con un setTimeout real, asi
+    // que alcanza con comprobar que el mensaje se muestra.
     expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-    // Importante para que no falle con "Error: 1 timer(s) still in the queue"
-    // tick(2000)
-    // o mejor...
-    flush()
+  })
 
-    httpClientSpy.put.calls.reset()
-  }))
-
-  it('finish - should catch error gracefully', fakeAsync(() => {
-    httpClientSpy.put.and.returnValue(throwError(() => new Error('Fake error')))
+  it('finish - should catch error gracefully', async () => {
+    httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
 
     getByTestId('cumplir_1').click()
-    tick(1000)
+    // Ojo: sin whenStable() acá. El catch de actualizarTarea vuelve a pedir las
+    // tareas antes de registrar el error, y el tick que dispara whenStable()
+    // cae en medio de esa cadena y dispara NG0100.
+    await flushMicrotasks()
     fixture.detectChanges()
-    expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-    flush()
 
-    httpClientSpy.put.calls.reset()
-  }))
+    // mostrarError limpia los errores a los 5000ms con un setTimeout real, asi
+    // que alcanza con comprobar que el mensaje se muestra.
+    expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
+  })
 
   it('create new task should navigate', async () => {
     getByTestId('nueva-tarea').click()
 
     fixture.detectChanges()
 
-    const route = routerSpy.navigateByUrl.calls.first().args[0]
+    const route = routerSpy.navigateByUrl.mock.calls[0][0]
     expect(route).toBe('/nuevaTarea')
   })
 
@@ -134,7 +140,7 @@ describe('TareasComponent', () => {
     // expect(route).toEqual(['/asignarTarea', 2])
 
     // Con destructuring
-    const [url, tareaId] = routerSpy.navigate.calls.first().args[0]
+    const [url, tareaId] = routerSpy.navigate.mock.calls[0][0]
     expect(url).toBe('/asignarTarea')
     expect(tareaId).toBe(2)
   })

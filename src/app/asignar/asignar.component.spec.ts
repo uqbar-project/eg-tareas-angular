@@ -1,3 +1,4 @@
+import type { Mocked } from 'vitest'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { AsignarComponent } from './asignar.component'
@@ -7,18 +8,21 @@ import {
   getHttpClientSpy,
   tareaPrincipal,
   usuarioAsignatario
-} from 'services/httpClientSpy'
+} from 'testing/httpClientSpy'
+import { stabilize } from 'testing/stabilize'
 
 const updatedTaskId = 1
 
 describe('AsignarComponent', () => {
   let component: AsignarComponent
   let fixture: ComponentFixture<AsignarComponent>
-  let routerSpy: jasmine.SpyObj<Router>
-  let httpClientSpy: jasmine.SpyObj<HttpClient>
+  let routerSpy: Mocked<Pick<Router, 'navigate'>>
+  let httpClientSpy: ReturnType<typeof getHttpClientSpy>
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate'])
+    routerSpy = {
+      navigate: vi.fn()
+    }
     httpClientSpy = getHttpClientSpy()
 
     await TestBed.configureTestingModule({
@@ -40,7 +44,7 @@ describe('AsignarComponent', () => {
     fixture = TestBed.createComponent(AsignarComponent)
     component = fixture.componentInstance
     await component.initialize()
-    fixture.detectChanges()
+    await stabilize(fixture)
   })
 
   it('should create', () => {
@@ -87,17 +91,17 @@ describe('AsignarComponent', () => {
   it('should navigate back to home when form submitted', async () => {
     const compiled = fixture.debugElement.nativeElement
     compiled.querySelector('[data-testid="guardar"]').click()
-    await fixture.whenStable()
+    await stabilize(fixture)
 
-    const [route] = routerSpy.navigate.calls.first().args[0]
+    const [route] = routerSpy.navigate.mock.calls[0][0]
     expect(route).toBe('/tareas')
   })
 
   it('should navigate back to home when close clicked', async () => {
     const compiled = fixture.debugElement.nativeElement
     compiled.querySelector('[data-testid="cerrar"]').click()
-    await fixture.whenStable()
-    const [route] = routerSpy.navigate.calls.first().args[0]
+    await stabilize(fixture)
+    const [route] = routerSpy.navigate.mock.calls[0][0]
     expect(route).toBe('/tareas')
   })
 })
