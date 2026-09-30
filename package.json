@@ -17,12 +17,12 @@
     "node": ">=24.15.0"
   },
   "dependencies": {
-    "@angular/common": "^19.2.25",
-    "@angular/compiler": "^19.2.25",
-    "@angular/core": "^19.2.25",
-    "@angular/forms": "^19.2.25",
-    "@angular/platform-browser": "^19.2.25",
-    "@angular/router": "^19.2.25",
+    "@angular/common": "^20.3.33",
+    "@angular/compiler": "^20.3.33",
+    "@angular/core": "^20.3.33",
+    "@angular/forms": "^20.3.33",
+    "@angular/platform-browser": "^20.3.33",
+    "@angular/router": "^20.3.33",
     "@fortawesome/angular-fontawesome": "2.0.1",
     "@fortawesome/fontawesome-svg-core": "6.7.2",
     "@fortawesome/free-solid-svg-icons": "6.7.2",
@@ -33,10 +33,10 @@
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.27",
-    "@angular/cli": "^19.2.27",
-    "@angular/compiler-cli": "^19.2.25",
-    "@angular/platform-browser-dynamic": "^19.2.25",
+    "@angular-devkit/build-angular": "^20.3.37",
+    "@angular/cli": "^20.3.37",
+    "@angular/compiler-cli": "^20.3.33",
+    "@angular/platform-browser-dynamic": "^20.3.33",
     "@types/jasmine": "~5.1.0",
     "@types/luxon": "^3.4.2",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
