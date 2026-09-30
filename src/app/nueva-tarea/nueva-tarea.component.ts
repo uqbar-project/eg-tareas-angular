@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ChangeDetectionStrategy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ValidationFieldComponent } from 'app/validation-field/validation-field.component'
@@ -13,6 +13,7 @@ import { mostrarError } from 'util/errorHandler'
   standalone: true,
   imports: [FormsModule, ValidationFieldComponent],
   templateUrl: './nueva-tarea.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nueva-tarea.component.css'
 })
 export class NuevaTareaComponent {
@@ -22,7 +23,11 @@ export class NuevaTareaComponent {
   errors: string[] = []
   fecha = ''
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     try {
@@ -35,7 +40,9 @@ export class NuevaTareaComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    this.usuariosPosibles = usuarios.map(
+      (usuarioJson) => new Usuario(usuarioJson.nombre)
+    )
     this.asignatario = undefined
   }
 
@@ -59,5 +66,4 @@ export class NuevaTareaComponent {
   navegarAHome() {
     this.router.navigateByUrl('/')
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, ChangeDetectionStrategy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Tarea } from 'domain/tarea'
@@ -12,6 +12,7 @@ import { mostrarError } from 'util/errorHandler'
   standalone: true,
   imports: [FormsModule],
   templateUrl: './asignar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './asignar.component.css'
 })
 export class AsignarComponent {
@@ -20,7 +21,12 @@ export class AsignarComponent {
   usuariosPosibles: Usuario[] = []
   errors: string[] = []
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   async ngOnInit() {
     try {
@@ -33,7 +39,9 @@ export class AsignarComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    this.usuariosPosibles = usuarios.map(
+      (usuarioJson) => new Usuario(usuarioJson.nombre)
+    )
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
     const idTarea = this.route.snapshot.params['id']
@@ -42,7 +50,9 @@ export class AsignarComponent {
       this.navegarAHome()
     }
     this.tarea = tarea as Tarea
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
+    this.asignatario = this.usuariosPosibles.find((usuarioPosible) =>
+      this.tarea.estaAsignadoA(usuarioPosible)
+    )
   }
 
   validarAsignacion() {
@@ -72,5 +82,4 @@ export class AsignarComponent {
   navegarAHome() {
     this.router.navigate(['/tareas'])
   }
-
 }

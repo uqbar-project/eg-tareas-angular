@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
 import { IconsModule } from 'app/icons.module'
@@ -12,8 +12,16 @@ import { mostrarError } from 'util/errorHandler'
 @Component({
   selector: 'app-tareas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    FilterTareas,
+    OrderTareas,
+    IconsModule
+  ],
   templateUrl: './tareas.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tareas.component.css'
 })
 export class TareasComponent implements OnInit {
@@ -21,13 +29,19 @@ export class TareasComponent implements OnInit {
   tareas: Array<Tarea> = []
   errors = []
 
-  constructor(public tareasService: TareasService, private router: Router) { }
+  constructor(
+    public tareasService: TareasService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await this.obtenerTodasLasTareas()
   }
 
-  async actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
+  async actualizarTarea(
+    callbackActualizacion: (tarea: Tarea) => void,
+    tarea: Tarea
+  ) {
     callbackActualizacion(tarea)
     try {
       await this.tareasService.actualizarTarea(tarea)
@@ -37,11 +51,15 @@ export class TareasComponent implements OnInit {
   }
 
   async cumplir(tarea: Tarea) {
-    await this.actualizarTarea((tarea: Tarea) => { tarea.cumplir() }, tarea)
+    await this.actualizarTarea((tarea: Tarea) => {
+      tarea.cumplir()
+    }, tarea)
   }
 
   async desasignar(tarea: Tarea) {
-    await this.actualizarTarea((tarea: Tarea) => { tarea.desasignar() }, tarea)
+    await this.actualizarTarea((tarea: Tarea) => {
+      tarea.desasignar()
+    }, tarea)
   }
 
   crearNuevaTarea() {
@@ -61,7 +79,10 @@ export class TareasComponent implements OnInit {
   }
 }
 
-export const errorHandler = async (component: TareasComponent, error: Error) => {
+export const errorHandler = async (
+  component: TareasComponent,
+  error: Error
+) => {
   try {
     component.tareas = await component.tareasService.todasLasTareas()
   } catch (e) {}

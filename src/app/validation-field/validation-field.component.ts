@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core'
 import { Tarea } from 'domain/tarea'
 
 @Component({
@@ -6,6 +6,7 @@ import { Tarea } from 'domain/tarea'
   standalone: true,
   imports: [],
   templateUrl: './validation-field.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './validation-field.component.css'
 })
 export class ValidationFieldComponent {
