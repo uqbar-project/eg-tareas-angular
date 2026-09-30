@@ -185,13 +185,13 @@ importers:
         specifier: ^19.2.25
         version: 19.2.25(@angular/common@19.2.25(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.25(@angular/common@19.2.25(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       '@fortawesome/angular-fontawesome':
-        specifier: ^0.15.0
-        version: 0.15.0(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))
+        specifier: 2.0.1
+        version: 2.0.1(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))
       '@fortawesome/fontawesome-svg-core':
-        specifier: ^6.5.2
+        specifier: 6.7.2
         version: 6.7.2
       '@fortawesome/free-solid-svg-icons':
-        specifier: ^6.5.2
+        specifier: 6.7.2
         version: 6.7.2
       bootstrap:
         specifier: ^5.3.3
@@ -1396,10 +1396,10 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@fortawesome/angular-fontawesome@0.15.0':
-    resolution: {integrity: sha512-oxmJDYGNSym5ycFR0LX4ZOPAU+wWmMAznYpkm5DNAtWWkhMLcrZl15eZQmVIEE+qruQ7JiVrg3tpo8bEkFlDgw==}
+  '@fortawesome/angular-fontawesome@2.0.1':
+    resolution: {integrity: sha512-IdklZkuw+WS2GQWhFnr1EX/tOALnrKaj4YGnUmPaUg2Uf+Amj8Xi+M/qDrr915YJ5MaDxd9tZ1kqOHRcvQqq2A==}
     peerDependencies:
-      '@angular/core': ^18.0.0
+      '@angular/core': ^20.0.0
 
   '@fortawesome/fontawesome-common-types@6.7.2':
     resolution: {integrity: sha512-Zs+YeHUC5fkt7Mg1l6XTniei3k4bwG/yo3iFUtZWd/pMx9g3fdvkSK9E0FOC+++phXOka78uJcYb8JaFkW52Xg==}
@@ -7095,7 +7095,7 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@fortawesome/angular-fontawesome@0.15.0(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))':
+  '@fortawesome/angular-fontawesome@2.0.1(@angular/core@19.2.25(rxjs@7.8.2)(zone.js@0.15.1))':
     dependencies:
       '@angular/core': 19.2.25(rxjs@7.8.2)(zone.js@0.15.1)
       '@fortawesome/fontawesome-svg-core': 6.7.2
