@@ -1,20 +1,24 @@
-.title {
-  padding: 1em 0;
-  font-size: 1.8em;
-  font-weight: bold;
-  color: rgb(87, 84, 84);
+.value {
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-.modal-dialog {
-  padding: 0 5em;
+.stack {
+  --stack-gap: 1.5rem;
 }
 
-.modal-footer {
-  padding: 3em 0;
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
 }
 
-@media (max-width: 450px) {
-  .modal-dialog {
-    padding: 0 0.5em;
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
   }
 }

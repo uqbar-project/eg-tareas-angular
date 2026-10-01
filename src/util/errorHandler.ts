@@ -1,14 +1,14 @@
-interface ConErrores {
-  errors: unknown[]
-}
-
-export function mostrarError(component: ConErrores, error: any): void {
-  const originalError = error.error ?? error
-  let errorMessage = originalError.message
-  if (error.status === 0) {
+export function mostrarError(
+  component: { errors: unknown[] },
+  error: unknown
+): void {
+  const { status } = error as { status?: number }
+  const originalError = (error as { error?: unknown }).error ?? error
+  let errorMessage = (originalError as { message?: string }).message
+  if (status === 0) {
     errorMessage =
       'No hay conexión con el backend, revise si el servidor remoto está levantado.'
-  } else if (error.status === 500) {
+  } else if (status === 500) {
     errorMessage =
       'Hubo un error al realizar la operación. Consulte al administrador del sistema.'
     console.error(error)

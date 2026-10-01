@@ -184,18 +184,6 @@ importers:
       '@angular/router':
         specifier: ^22.2.0
         version: 22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.2.0(@angular/common@22.2.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2)
-      '@fortawesome/angular-fontawesome':
-        specifier: 5.1.0
-        version: 5.1.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3))
-      '@fortawesome/fontawesome-svg-core':
-        specifier: 7.3.1
-        version: 7.3.1
-      '@fortawesome/free-solid-svg-icons':
-        specifier: 7.3.1
-        version: 7.3.1
-      bootstrap:
-        specifier: ^5.3.3
-        version: 5.3.8(@popperjs/core@2.11.8)
       luxon:
         specifier: ^3.4.4
         version: 3.7.2
@@ -788,23 +776,6 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@fortawesome/angular-fontawesome@5.1.0':
-    resolution: {integrity: sha512-22SF8aKzmOfeOKK2M8+hdGFw33p6S7kHWK5q/9bkqAl86SpcfIsfXVHMPhcyP0ZdiAMdeSjsuz76ye3gJbh25A==}
-    peerDependencies:
-      '@angular/core': ^22.0.0
-
-  '@fortawesome/fontawesome-common-types@7.3.1':
-    resolution: {integrity: sha512-k0C0sdHmZtAo6dRDtd1Z/qcpyHbL0CKsjV8seMY/21xGhY5Wsv0XRmiI/xEEH4y2c9b1+jvgNs/3EqhV27yUEA==}
-    engines: {node: '>=6'}
-
-  '@fortawesome/fontawesome-svg-core@7.3.1':
-    resolution: {integrity: sha512-BoxVN3PKnMbgStHhjoaky/oWdxHomDqmBVA24IA3KEmssFGeI7u9YT/BJceOjIum/t6TpPa/vcMKaVYQeIQ/3Q==}
-    engines: {node: '>=6'}
-
-  '@fortawesome/free-solid-svg-icons@7.3.1':
-    resolution: {integrity: sha512-v0BLa0eqg7ubvVWeNSHVBs8fWH/GJicERZoJaxJ3FE/lj67VSqzoMg9pzfZVOfLMX10y0pGwQAuxoRVVH2patg==}
-    engines: {node: '>=6'}
-
   '@harperfast/extended-iterable@1.0.3':
     resolution: {integrity: sha512-sSAYhQca3rDWtQUHSAPeO7axFIUJOI6hn1gjRC5APVE1a90tuyT8f5WIgRsFhhWA7htNkju2veB9eWL6YHi/Lw==}
 
@@ -1375,9 +1346,6 @@ packages:
     resolution: {integrity: sha512-7FNeNl8NCE7aINx7WXiKQrPYZWC/hvrTsmk6zmxbI7LTXE7hVek/n8AfVgpe2y82zl3w0HvCHN0bVKMBoJcC0w==}
     engines: {node: '>= 10.0.0'}
 
-  '@popperjs/core@2.11.8':
-    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
-
   '@rolldown/binding-android-arm-eabi@1.2.8':
     resolution: {integrity: sha512-tN5aztYkKCte4i5SIrrz5yK/HMjEuCqCSCJa418jOV8tZ1cBY3YF2otxB1ktPxzsLA1BeTqwapK0bfjxNvHJVw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -1748,11 +1716,6 @@ packages:
   boolbase@2.0.0:
     resolution: {integrity: sha512-DkVaaQHymRhpYEYo9x1oo7Q7B0Y6KJUsjm3c9eTyFDby4MHLBTwZ6ZDWBel5zrYxj1WsZgC5oLpiz+93MluXeA==}
     engines: {node: '>=20.19.0'}
-
-  bootstrap@5.3.8:
-    resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
-    peerDependencies:
-      '@popperjs/core': ^2.11.8
 
   brace-expansion@1.1.21:
     resolution: {integrity: sha512-9zeA+KLZNNzglF2TPKRQEDyx6Yby7daAkuy8MiPzpXPsYDWi/DRM8jmwUDxokQjYqBpv5DgPiwD4h4ZZSy1Ujw==}
@@ -3820,22 +3783,6 @@ snapshots:
     optionalDependencies:
       '@noble/hashes': 1.8.0
 
-  '@fortawesome/angular-fontawesome@5.1.0(@angular/core@22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3))':
-    dependencies:
-      '@angular/core': 22.2.0(@angular/compiler@22.2.0)(rxjs@7.8.2)(zone.js@0.16.3)
-      '@fortawesome/fontawesome-svg-core': 7.3.1
-      tslib: 2.8.1
-
-  '@fortawesome/fontawesome-common-types@7.3.1': {}
-
-  '@fortawesome/fontawesome-svg-core@7.3.1':
-    dependencies:
-      '@fortawesome/fontawesome-common-types': 7.3.1
-
-  '@fortawesome/free-solid-svg-icons@7.3.1':
-    dependencies:
-      '@fortawesome/fontawesome-common-types': 7.3.1
-
   '@harperfast/extended-iterable@1.0.3':
     optional: true
 
@@ -4240,8 +4187,6 @@ snapshots:
       '@parcel/watcher-win32-arm64': 2.6.0
       '@parcel/watcher-win32-x64': 2.6.0
 
-  '@popperjs/core@2.11.8': {}
-
   '@rolldown/binding-android-arm-eabi@1.2.8':
     optional: true
 
@@ -4516,10 +4461,6 @@ snapshots:
     optional: true
 
   boolbase@2.0.0: {}
-
-  bootstrap@5.3.8(@popperjs/core@2.11.8):
-    dependencies:
-      '@popperjs/core': 2.11.8
 
   brace-expansion@1.1.21:
     dependencies:

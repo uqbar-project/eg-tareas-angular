@@ -9,7 +9,8 @@
 Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y permite mostrar una aplicación completa en Angular con los siguientes conceptos
 
 - **routing** para navegar desde la página principal a las que nos permiten crear o asignar una tarea, así como para volver
-- utilización de Bootstrap como framework de CSS + Font Awesome para los íconos
+- estilos propios basados en _custom properties_ de CSS (sin framework de CSS) + íconos SVG inline
+- soporte de modo claro y oscuro vía `prefers-color-scheme`
 - desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con [Spring Boot](https://spring.io/projects/spring-boot))
 - para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service, trabajando con **asincronismo** para disparar actualizaciones y consultas hacia el backend
 - la **separación de concerns** entre las tareas como objeto de dominio, la vista html, el componente que sirve como modelo de vista y el servicio que maneja el origen de los datos
@@ -37,24 +38,93 @@ Pueden descargar [la implementación Spring Boot del backend](https://github.com
 
 ## Componentes adicionales
 
-La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
+Este ejemplo **no usa framework de CSS ni librería de íconos**. Los estilos
+viven en [_src/styles.css_](./src/styles.css) y los cuatro íconos que hacen
+falta son SVG inline en [_src/app/iconos.ts_](./src/app/iconos.ts).
+
+Lo que sí hay que instalar, porque lo usan los pipes de formato de fecha:
 
 ```bash
-pnpm add @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons bootstrap
+pnpm add luxon
 ```
+
+Esta decisión se tomó por performance: Bootstrap + Font Awesome sumaban
+**342 kB** al bundle inicial (230 kB de CSS y 112 kB de íconos) para una app que
+usaba cuatro íconos y un puñado de clases. Ver [la sección de estilos](#estilos)
+para el detalle.
 
 ## Configuración angular.json
 
-Es necesario incorporar Bootstrap dentro del archivo _angular.json_:
+Los estilos globales se cargan así, y no hay scripts porque no usamos el JS de
+ningún framework:
 
 ```json
-    "styles": [
-        "src/styles.css",
-        "./node_modules/bootstrap/dist/css/bootstrap.min.css"
-    ],
-    "scripts": [
-        "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-    ]
+    "styles": ["src/styles.css"]
+```
+
+## Estilos
+
+Los estilos viven en [_src/styles.css_](./src/styles.css), que hace de design
+system de la app: no hay framework de CSS. Está armado sobre _custom properties_,
+así que toda la paleta se cambia desde `:root`:
+
+```css
+:root {
+  --surface: #ffffff;
+  --text: #16202c;
+  --primary: #4f46e5;
+  --radius: 10px;
+  ...
+}
+```
+
+El modo oscuro no necesita reglas duplicadas: alcanza con redefinir los mismos
+tokens dentro de una media query.
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #161c24;
+    --text: #e6ebf2;
+    ...
+  }
+}
+```
+
+Los componentes usan clases semánticas en vez de utilidades: `.btn`,
+`.btn-primary`, `.input`, `.select`, `.card`, `.table`, `.alert`. Los
+estilos que son de un componente van en el `.css` del propio componente.
+
+Las tipografías también salen de [_src/styles.css_](./src/styles.css): **Inter**
+para el cuerpo de texto y **Instrument Sans** para los títulos, que le da un
+contraste de jerarquía sin necesidad de jerarquías de tamaño. Se cargan en
+[_src/index.html_](./src/index.html) con un `<link>` a Google Fonts y un `preconnect`,
+y el `font-family` final incluye una pila de system fonts, así que la app se ve
+bien aunque el CDN no llegue.
+
+```css
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Instrument Sans", "Inter", system-ui, sans-serif;
+}
+```
+
+En las tablas, `font-variant-numeric: tabular-nums` evita que los números
+bailen de columna en columna cuando el porcentaje cambia de largo.
+
+La tabla colapsa a una vista de tipo tarjeta en pantallas chicas, en vez de
+dejar al usuario scrolleando en horizontal:
+
+```css
+@media (max-width: 720px) {
+  .table thead {
+    display: none;
+  }
+
+  .table .desktop {
+    display: none;
+  }
+}
 ```
 
 ## Configuración ruteo
@@ -78,29 +148,53 @@ const routes: Routes = [
 
 ## Configuración de la vista principal
 
-Es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
-
-Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una biblioteca:
+Los íconos son paths SVG en [_iconos.ts_](./src/app/iconos.ts), con su
+`viewBox` y nada más:
 
 ```typescript
-@NgModule({
-  imports: [FontAwesomeModule],
-  exports: [FontAwesomeModule],
+export const ICONOS = {
+  calendarCheck: {
+    viewBox: '0 0 448 512',
+    path: 'M320 0c17.7 0 32 14.3 32 32l0 32 32 0c35.3 0 64 28.7 64 64...'
+  },
+  userCheck: { ... },
+  userMinus: { ... },
+  listCheck: { ... }
+} as const
+```
+
+El componente [_icon.component.ts_](./src/app/icon.component.ts) los dibuja. Como
+los íconos son fijos y no se parametrizan en runtime, no hace falta una librería:
+
+```typescript
+@Component({
+  selector: 'app-icon',
+  standalone: true,
+  template: `
+    <svg class="icon" [attr.viewBox]="def().viewBox" fill="currentColor" aria-hidden="true">
+      <path [attr.d]="def().path" />
+    </svg>
+  `
 })
-export class IconsModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
-  }
+export class IconComponent {
+  readonly nombre = input.required<NombreIcono>()
+  protected readonly def = () => ICONOS[this.nombre()]
 }
 ```
 
-Importamos esté modulo en [_tareas.component.ts_](./src/app/tareas/tareas.component.ts):
+Y en el template alcanza con pedirlo por nombre:
+
+```html
+<app-icon nombre="calendarCheck" />
+```
+
+Importamos el componente en [_tareas.component.ts_](./src/app/tareas/tareas.component.ts):
 
 ```typescript
 @Component({
   selector: 'app-tareas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconsModule],
+  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconComponent],
   ...
 ```
 
@@ -258,7 +352,7 @@ async actualizarTarea(..., tarea: Tarea) {
   try {
     await this.tareasService.actualizarTarea(tarea)
   } catch (e) {
-    await errorHandler(this, e as unknown as Error)
+    await errorHandler(this, e)
   }
 }
 ```
@@ -266,7 +360,7 @@ async actualizarTarea(..., tarea: Tarea) {
 Tenemos una función errorHandler que permite mostrar un mensaje de error y volver a cargar las tareas (como se puede ver, se envuelve en un try/catch vacío por si falla la operación, así nos concentramos en mostrar el mensaje de error original).
 
 ```ts
-export const errorHandler = async (component: TareasComponent, error: Error) => {
+export const errorHandler = async (component: TareasComponent, error: unknown) => {
   try {
     component.tareas = await component.tareasService.todasLasTareas()
   } catch (e) {}
@@ -326,7 +420,7 @@ También tenemos el pipe orderTareas, que ordena las tareas por id:
 export class OrderTareas implements PipeTransform {
 
   transform(tareas: Tarea[]): Tarea[] {
-    return tareas.sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
+    return [...tareas].sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
   }
 
 }
@@ -334,11 +428,40 @@ export class OrderTareas implements PipeTransform {
 
 La tarea es responsable de devolver un valor para el método key() con el que el pipe lo ordena.
 
-Por último, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
+Ojo con la copia: los pipes por definición son **puros**, o sea que Angular los
+cachea y solo los vuelve a correr si cambian sus argumentos. Sin el `[...]`, el
+`sort()` reordenaría el array del componente, que es un efecto lateral invisible.
+Además, si ese array viniera congelado, `sort()` explota.
+
+Por último, el % de cumplimiento se muestra con dos decimales y con coma
+decimal, mediante el pipe estándar de Angular:
 
 ```html
-  <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+  <span class="chip" [ngClass]="estadoCumplimiento(tarea)">
+    <span [attr.data-testid]="'porcentaje_' + tarea.id">{{
+      tarea.porcentajeCumplimiento | number: '1.2-2':'es'
+    }}</span>
+    <span class="chip-signo">%</span>
+  </span>
 ```
+
+El avance se muestra como un chip con tres variantes. Los cortes (**menos de 40**,
+**entre 40 y 80**, **80 en adelante**) los decide el componente, reusando los
+predicados que ya tenía el dominio:
+
+```ts
+estadoCumplimiento(tarea: Tarea): string {
+  if (tarea.cumplioMenosDe(40)) return 'chip-bajo'
+  if (tarea.cumplioMenosDe(80)) return 'chip-medio'
+  return 'chip-alto'
+}
+```
+
+Cada variante cambia el color **y** muestra un punto de estado, para que el
+avance se lea sin depender únicamente del color. Fijate además que el `%` va en
+un `<span>` aparte del que tiene el `data-testid`: los tests comparan el
+`textContent` de ese elemento contra `'100,00'` exacto, así que si el signo
+estuviera adentro la aserción fallaría.
 
 # Usando Observables
 
@@ -511,13 +634,11 @@ describe('TareasComponent', () => {
     httpClientSpy = getHttpClientSpy()
 
     TestBed.configureTestingModule({
-      declarations: [
-        ...
-      ],
+      imports: [TareasComponent],
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
         { provide: Router, useValue: routerSpy }
-      ]      
+      ]
     }).compileComponents()
     ....
   })
@@ -549,9 +670,10 @@ En la vista agregamos un `attr.data-testid` para el botón cumplir de cada tarea
 
 ```html
 @if (tarea.sePuedeCumplir()) {
-  <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+  <button type="button" title="Marcarla como cumplida" class="btn btn-icon btn-success" (click)="cumplir(tarea)"
     aria-label="Cumplir" [attr.data-testid]="'cumplir_' + tarea.id">
-    ...
+    <app-icon nombre="calendarCheck" />
+  </button>
 ```
 
 Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag cuyo atributo `data-testid` sea "cumplir_1" dentro del HTML que genera el componente. Podés investigar la función que busca por id, y te dejamos [el link](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) para entender las búsquedas que soporta querySelector.
@@ -694,17 +816,17 @@ Este es uno de los tests más complejos,
 - queremos simular un error de backend
 - pero además hay un timeout en el que se muestra por 3 segundos el mensaje de error
 
-Si intentamos testear utilizando `fixture.detectChanges()` únicamente, el resultado va a ser que nunca podemos atrapar el mensaje de error. Necesitamos simular el timeout avanzando manualmente el reloj, para lo cual nos va a servir la función `fakeAsync` que envuelve todo el test y `tick` que indica la cantidad de milisegundos a avanzar:
+Si intentamos testear utilizando `fixture.detectChanges()` únicamente, el resultado va a ser que nunca podemos atrapar el mensaje de error: el `setTimeout` de `mostrarError` todavía no corrió. Como migramos a Vitest **sin fake timers**, tampoco usamos `fakeAsync`/`tick`. La alternativa es vaciar las microtareas a mano, que para este caso alcanza:
 
 ```ts
-it('finish - should catch error gracefully', fakeAsync(() => {
-  httpClientSpy.put.and.returnValue(throwError(() => new Error('Fake error')))
+it('unassign - should catch error gracefully', async () => {
+  httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
 
-  getByTestId('cumplir_1').click()
-  tick(1000)
+  getByTestId('desasignar_1').click()
+  await flushMicrotasks()
   fixture.detectChanges()
+
   expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-  flush()
 
   httpClientSpy.put.calls.reset()
 }))

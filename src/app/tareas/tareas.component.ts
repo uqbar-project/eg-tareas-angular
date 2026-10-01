@@ -1,9 +1,15 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnInit
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { IconComponent } from 'app/icon.component'
 import { Tarea } from 'domain/tarea'
+import { EstadoCumplimientoPipe } from 'pipes/estadoCumplimiento.pipe'
 import { FilterTareas } from 'pipes/filterTareas.pipe'
 import { OrderTareas } from 'pipes/orderTareas.pipe'
 import { TareasService } from 'services/tareas.service'
@@ -18,7 +24,8 @@ import { mostrarError } from 'util/errorHandler'
     RouterModule,
     FilterTareas,
     OrderTareas,
-    FontAwesomeModule
+    EstadoCumplimientoPipe,
+    IconComponent
   ],
   templateUrl: './tareas.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,
@@ -31,7 +38,8 @@ export class TareasComponent implements OnInit {
 
   constructor(
     public tareasService: TareasService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   async ngOnInit() {
@@ -43,10 +51,11 @@ export class TareasComponent implements OnInit {
     tarea: Tarea
   ) {
     callbackActualizacion(tarea)
+    this.cdr.markForCheck()
     try {
       await this.tareasService.actualizarTarea(tarea)
     } catch (e) {
-      await errorHandler(this, e as unknown as Error)
+      await errorHandler(this, e)
     }
   }
 
@@ -73,6 +82,8 @@ export class TareasComponent implements OnInit {
   async obtenerTodasLasTareas() {
     try {
       this.tareas = await this.tareasService.todasLasTareas()
+      this.cdr.markForCheck()
+      console.info('Tareas obtenidas', this.tareas)
     } catch (error) {
       mostrarError(this, error)
     }
@@ -81,7 +92,7 @@ export class TareasComponent implements OnInit {
 
 export const errorHandler = async (
   component: TareasComponent,
-  error: Error
+  error: unknown
 ) => {
   try {
     component.tareas = await component.tareasService.todasLasTareas()

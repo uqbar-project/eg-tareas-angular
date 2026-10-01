@@ -44,6 +44,7 @@ export class AsignarComponent {
     )
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+    // biome-ignore lint/complexity/useLiteralKeys: tsconfig activa noPropertyAccessFromIndexSignature
     const idTarea = this.route.snapshot.params['id']
     const tarea = await this.tareasService.getTareaById(idTarea)
     if (!tarea) {

@@ -1,99 +1,97 @@
 <div class="container">
-  <h4>Crear nueva tarea</h4>
-  <form name="asignarTareaForm" role="form">
-    <div class="form-group">
-      <label for="descripcion">Descripción</label>
-      <input
-        type="text"
-        name="descripcion"
-        class="form-control"
-        [(ngModel)]="tarea.descripcion"
-        data-testid="descripcion"
-        autocomplete="off"
-        placeholder="Descripción de la tarea"
-      />
-      <validation-field
-        [tarea]="tarea"
-        [field]="'descripcion'"
-      ></validation-field>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Nueva tarea</h2>
     </div>
-    <div class="form-group">
-      <label for="iteracion">Iteración</label>
-      <input
-        type="text"
-        class="form-control"
-        name="iteracion"
-        [(ngModel)]="tarea.iteracion"
-        data-testid="iteracion"
-        autocomplete="off"
-        placeholder="Nombre del release o iteración"
-      />
-      <validation-field
-        [tarea]="tarea"
-        [field]="'iteracion'"
-      ></validation-field>
-    </div>
-    <div class="form-group">
-      <label for="asignatario">Asignado a</label>
-      <select
-        data-testid="asignatario"
-        name="asignatario"
-        class="form-control"
-        [(ngModel)]="asignatario"
-      >
-      @for (usuario of usuariosPosibles; track usuario) {
-        <option [ngValue]="usuario">
-          {{ usuario.nombre }}
-        </option>
-      }
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="cumplimiento">Fecha</label>
-      <div class="fila">
-        <input type="date" autocomplete="off" data-testid="fecha" name="fecha" class="form-control" [(ngModel)]="fecha"
-    name="fechaApuesta" data-testid="fecha" placeholder="Fecha de inicio de la tarea" required>
-      </div>
-      <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
-    </div>
-    <div class="form-group">
-      <label for="cumplimiento">% Cumplimiento</label>
-      <input
-        type="number"
-        class="form-control form-control--small"
-        name="cumplimiento"
-        [(ngModel)]="tarea.porcentajeCumplimiento"
-        data-testid="porcentaje-cumplimiento"
-        placeholder="Porcentaje de cumplimiento (0 a 100%)"
-      />
-      <validation-field
-        [tarea]="tarea"
-        [field]="'porcentajeCumplimiento'"
-      ></validation-field>
-    </div>
-    <div class="example-animate-container" style="padding-top: 10px">
-      @for (error of errors ; track error) {
-        <div class="alert alert-danger animate-repeat">
-          {{ error }}
-        </div>
-      }
-    </div>
-  </form>
 
-  <div class="form-group">
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-testid="guardar"
-      (click)="guardar()">
-      Guardar
-    </button>
-    <button
-      type="button"
-      class="btn btn-default"
-      data-testid="cerrar"
-      (click)="navegarAHome()">
-      Cancelar
-    </button>
+    <div class="card-body">
+      <form name="nuevaTareaForm" role="form" class="stack" (submit)="$event.preventDefault()">
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="descripcion">Descripción</label>
+            <input
+              type="text"
+              name="descripcion"
+              class="input"
+              [(ngModel)]="tarea.descripcion"
+              data-testid="descripcion"
+              autocomplete="off"
+              placeholder="Descripción de la tarea" />
+            <validation-field [tarea]="tarea" [field]="'descripcion'"></validation-field>
+          </div>
+
+          <div class="field">
+            <label class="label" for="iteracion">Iteración</label>
+            <input
+              type="text"
+              class="input"
+              name="iteracion"
+              [(ngModel)]="tarea.iteracion"
+              data-testid="iteracion"
+              autocomplete="off"
+              placeholder="Nombre del release o iteración" />
+            <validation-field [tarea]="tarea" [field]="'iteracion'"></validation-field>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="asignatario">Asignado a</label>
+            <select
+              data-testid="asignatario"
+              name="asignatario"
+              class="select"
+              [(ngModel)]="asignatario">
+              <option [ngValue]="undefined">Sin asignar</option>
+              @for (usuario of usuariosPosibles; track usuario) {
+                <option [ngValue]="usuario">{{ usuario.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="label" for="fecha">Fecha</label>
+            <input
+              type="date"
+              autocomplete="off"
+              data-testid="fecha"
+              name="fecha"
+              class="input"
+              [(ngModel)]="fecha"
+              placeholder="Fecha de inicio de la tarea" />
+            <validation-field [tarea]="tarea" [field]="'fecha'"></validation-field>
+          </div>
+
+          <div class="field">
+            <label class="label" for="cumplimiento">% Cumplimiento</label>
+            <input
+              type="number"
+              class="input"
+              name="cumplimiento"
+              [(ngModel)]="tarea.porcentajeCumplimiento"
+              data-testid="porcentaje-cumplimiento"
+              min="0"
+              max="100"
+              placeholder="0 a 100" />
+            <validation-field [tarea]="tarea" [field]="'porcentajeCumplimiento'"></validation-field>
+          </div>
+        </div>
+
+        @for (error of errors; track error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+      </form>
+
+      <hr class="divider" />
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" data-testid="guardar" (click)="guardar()">
+          Guardar
+        </button>
+        <button type="button" class="btn btn-ghost" data-testid="cerrar" (click)="navegarAHome()">
+          Cancelar
+        </button>
+      </div>
+    </div>
   </div>
 </div>
