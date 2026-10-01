@@ -46,7 +46,9 @@
                       [ngClass]="tarea.asignatario | colorAvatar"
                       [attr.data-testid]="'asignatario_' + tarea.id"
                       [attr.title]="tarea.asignatario?.nombre ?? 'Sin asignar'"
-                      aria-hidden="true">{{ tarea.asignatario | iniciales }}</span>
+                      [title]="tarea.asignatario?.nombre ?? 'Sin asignar'"
+                      aria-hidden="true">{{ tarea.asignatario | iniciales }}
+                    </span>
                     <span class="tarea-texto">
                       <span class="tarea-descripcion" [attr.data-testid]="'descripcion_' + i">
                         {{ tarea.descripcion }}
