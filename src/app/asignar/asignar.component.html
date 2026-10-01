@@ -1,33 +1,45 @@
-<div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h4 class="modal-title">Asignar Tarea</h4>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Asignar tarea</h2>
     </div>
-    <div class="modal-body">
-      <div class="title" data-testid="tareaDescripcion">{{tarea ? tarea.descripcion : ""}}</div>
 
-      <form name="asignarTareaForm" role="form">
-        <fieldset>
-          <div class="form-group">
-            <label for="asignatario">Asignado a</label>
-            <select data-testid="asignatario" name="asignatario" class="form-control" [(ngModel)]="asignatario">
-              @for (usuario of usuariosPosibles; track usuario) {
-                <option [ngValue]="usuario">{{usuario.nombre}}</option>
-              }
-            </select>
-          </div>
-          <div class="example-animate-container" style="padding-top:10px">
-            @for (error of errors; track error) {
-              <div class="alert alert-danger animate-repeat">{{error}}</div>
+    <div class="card-body">
+      <div class="field">
+        <span class="label">Tarea</span>
+        <div class="value" data-testid="tareaDescripcion">{{ tarea() ? tarea()?.descripcion : '' }}</div>
+      </div>
+
+      <form name="asignarTareaForm" role="form" class="stack" (submit)="$event.preventDefault()">
+        <div class="field">
+          <label class="label" for="asignatario">Asignado a</label>
+          <select
+            data-testid="asignatario"
+            name="asignatario"
+            class="select"
+            [ngModel]="asignatario()" (ngModelChange)="asignatario.set($event)">
+            <option [ngValue]="undefined">Sin asignar</option>
+            @for (usuario of usuariosPosibles(); track usuario) {
+              <option [ngValue]="usuario">{{ usuario.nombre }}</option>
             }
-          </div>
-        </fieldset>
+          </select>
+        </div>
+
+        @for (error of errors(); track error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
       </form>
 
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-testid="cerrar" (click)="navegarAHome()">Cerrar</button>
-      <button type="button" class="btn btn-primary" data-testid="guardar" (click)="asignar()">Guardar</button>
+      <hr class="divider" />
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" data-testid="guardar" (click)="asignar()">
+          Guardar
+        </button>
+        <button type="button" class="btn btn-ghost" data-testid="cerrar" (click)="navegarAHome()">
+          Cancelar
+        </button>
+      </div>
     </div>
   </div>
 </div>

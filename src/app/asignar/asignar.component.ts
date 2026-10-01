@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Tarea } from 'domain/tarea'
@@ -12,15 +12,21 @@ import { mostrarError } from 'util/errorHandler'
   standalone: true,
   imports: [FormsModule],
   templateUrl: './asignar.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './asignar.component.css'
 })
 export class AsignarComponent {
-  tarea!: Tarea
-  asignatario?: Usuario
-  usuariosPosibles: Usuario[] = []
-  errors: string[] = []
+  tarea = signal<Tarea | undefined>(undefined)
+  asignatario = signal<Usuario | undefined>(undefined)
+  usuariosPosibles = signal<Usuario[]>([])
+  errors = signal<string[]>([])
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router, private route: ActivatedRoute) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   async ngOnInit() {
     try {
@@ -33,35 +39,43 @@ export class AsignarComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    this.usuariosPosibles.set(
+      usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    )
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
+    // biome-ignore lint/complexity/useLiteralKeys: tsconfig activa noPropertyAccessFromIndexSignature
     const idTarea = this.route.snapshot.params['id']
     const tarea = await this.tareasService.getTareaById(idTarea)
     if (!tarea) {
       this.navegarAHome()
     }
-    this.tarea = tarea as Tarea
-    this.asignatario = this.usuariosPosibles.find(usuarioPosible => this.tarea.estaAsignadoA(usuarioPosible))
+    this.tarea.set(tarea as Tarea)
+    this.asignatario.set(
+      this.usuariosPosibles().find(usuarioPosible =>
+        (tarea as Tarea).estaAsignadoA(usuarioPosible)
+      )
+    )
   }
 
   validarAsignacion() {
-    if (!this.asignatario) {
+    if (!this.asignatario()) {
       throw new Error('Debe seleccionar un usuario')
     }
   }
 
   async asignar() {
-    this.errors = []
+    this.errors.set([])
     try {
       this.validarAsignacion()
     } catch (error) {
       mostrarError(this, error)
       return
     }
-    this.tarea.asignarA(this.asignatario)
+    const tarea = this.tarea() as Tarea
+    tarea.asignarA(this.asignatario() as Usuario)
     try {
-      await this.tareasService.actualizarTarea(this.tarea)
+      await this.tareasService.actualizarTarea(tarea)
       this.navegarAHome()
     } catch (error: unknown) {
       console.error(error)
@@ -72,5 +86,4 @@ export class AsignarComponent {
   navegarAHome() {
     this.router.navigate(['/tareas'])
   }
-
 }

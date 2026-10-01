@@ -1,10 +1,17 @@
 import { CommonModule } from '@angular/common'
-import { Component, OnInit } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  signal
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
-import { IconsModule } from 'app/icons.module'
+import { IconComponent } from 'app/icon.component'
 import { Tarea } from 'domain/tarea'
+import { EstadoCumplimientoPipe } from 'pipes/estadoCumplimiento.pipe'
 import { FilterTareas } from 'pipes/filterTareas.pipe'
+import { ColorAvatarPipe, InicialesPipe } from 'pipes/iniciales.pipe'
 import { OrderTareas } from 'pipes/orderTareas.pipe'
 import { TareasService } from 'services/tareas.service'
 import { mostrarError } from 'util/errorHandler'
@@ -12,36 +19,60 @@ import { mostrarError } from 'util/errorHandler'
 @Component({
   selector: 'app-tareas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+    FilterTareas,
+    OrderTareas,
+    InicialesPipe,
+    ColorAvatarPipe,
+    EstadoCumplimientoPipe,
+    IconComponent
+  ],
   templateUrl: './tareas.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './tareas.component.css'
 })
 export class TareasComponent implements OnInit {
   tareaBuscada = ''
-  tareas: Array<Tarea> = []
-  errors = []
+  tareas = signal<Array<Tarea>>([])
+  errors = signal<string[]>([])
 
-  constructor(public tareasService: TareasService, private router: Router) { }
+  constructor(
+    public tareasService: TareasService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     await this.obtenerTodasLasTareas()
   }
 
-  async actualizarTarea(callbackActualizacion: (tarea: Tarea) => void, tarea: Tarea) {
+  async actualizarTarea(
+    callbackActualizacion: (tarea: Tarea) => void,
+    tarea: Tarea
+  ) {
     callbackActualizacion(tarea)
+    // cumplir()/desasignar() mutan la Tarea dentro del array. Escribimos el
+    // signal con una copia para que la vista sepa que hay que releer todo.
+    this.tareas.update(tareas => [...tareas])
     try {
       await this.tareasService.actualizarTarea(tarea)
     } catch (e) {
-      await errorHandler(this, e as unknown as Error)
+      await errorHandler(this, e)
     }
   }
 
   async cumplir(tarea: Tarea) {
-    await this.actualizarTarea((tarea: Tarea) => { tarea.cumplir() }, tarea)
+    await this.actualizarTarea((tarea: Tarea) => {
+      tarea.cumplir()
+    }, tarea)
   }
 
   async desasignar(tarea: Tarea) {
-    await this.actualizarTarea((tarea: Tarea) => { tarea.desasignar() }, tarea)
+    await this.actualizarTarea((tarea: Tarea) => {
+      tarea.desasignar()
+    }, tarea)
   }
 
   crearNuevaTarea() {
@@ -54,16 +85,19 @@ export class TareasComponent implements OnInit {
 
   async obtenerTodasLasTareas() {
     try {
-      this.tareas = await this.tareasService.todasLasTareas()
+      this.tareas.set(await this.tareasService.todasLasTareas())
     } catch (error) {
       mostrarError(this, error)
     }
   }
 }
 
-export const errorHandler = async (component: TareasComponent, error: Error) => {
+export const errorHandler = async (
+  component: TareasComponent,
+  error: unknown
+) => {
   try {
-    component.tareas = await component.tareasService.todasLasTareas()
+    component.tareas.set(await component.tareasService.todasLasTareas())
   } catch (e) {}
   mostrarError(component, error)
 }

@@ -1,26 +1,26 @@
 {
-    "[javascript]": {
-      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-      "editor.formatOnPaste": false, // required 
-      "editor.formatOnType": false, // required
-      "editor.formatOnSave": true, // optional 
-      "editor.formatOnSaveMode": "file", // required to format on save
-    },
-    "[typescript]": {
-      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-      "editor.formatOnPaste": false, // required 
-      "editor.formatOnType": false, // required
-      "editor.formatOnSave": true, // optional 
-      "editor.formatOnSaveMode": "file", // required to format on save
-    },
-    "[json]": {
-      "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-      "editor.formatOnPaste": false, // required 
-      "editor.formatOnType": false, // required
-      "editor.formatOnSave": true, // optional 
-      "editor.formatOnSaveMode": "file", // required to format on save
-    },
-    "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit"
-    }
+  "[javascript]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+    "editor.formatOnPaste": false, // required
+    "editor.formatOnType": false, // required
+    "editor.formatOnSave": true, // optional
+    "editor.formatOnSaveMode": "file" // required to format on save
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+    "editor.formatOnPaste": false, // required
+    "editor.formatOnType": false, // required
+    "editor.formatOnSave": true, // optional
+    "editor.formatOnSaveMode": "file" // required to format on save
+  },
+  "[json]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+    "editor.formatOnPaste": false, // required
+    "editor.formatOnType": false, // required
+    "editor.formatOnSave": true, // optional
+    "editor.formatOnSaveMode": "file" // required to format on save
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  }
 }

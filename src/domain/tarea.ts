@@ -1,6 +1,6 @@
-import { Usuario } from './usuario'
-import { FORMATO_FECHA } from 'services/configuration'
 import { DateTime } from 'luxon'
+import { FORMATO_FECHA } from 'services/configuration'
+import { Usuario } from './usuario'
 
 const CUMPLIDA = 100
 
@@ -53,14 +53,6 @@ export class Tarea {
     )
   }
 
-  cumplio(porcentaje: number): boolean {
-    return this.porcentajeCumplimiento === porcentaje
-  }
-
-  cumplioMenosDe(porcentaje: number): boolean {
-    return this.porcentajeCumplimiento < porcentaje
-  }
-
   sePuedeCumplir(): boolean {
     return this.porcentajeCumplimiento < CUMPLIDA && this.estaAsignada()
   }
@@ -82,7 +74,7 @@ export class Tarea {
   }
 
   estaAsignadoA(asignatario: Usuario) {
-    return this.asignatario && this.asignatario.equals(asignatario)
+    return this.asignatario?.equals(asignatario)
   }
 
   sePuedeAsignar(): boolean {
@@ -108,13 +100,15 @@ export class Tarea {
     }
   }
 
-  // Ojo, es importante convertir la fecha 
+  // Ojo, es importante convertir la fecha
   // 1. de JS a Luxon
   // 2. luego cambiarle el timezone a UTC, para que no le reste la distancia al meridiano de Greenwich
   //    (en Argentina le resta 3 horas y pasa a ser el día anterior)
   // 3. y luego sí formatearlo a lo que el backend espera
   fechaString(): string | undefined {
-    return !this.fecha ? '' : DateTime.fromJSDate(this.fecha).toUTC().toFormat(FORMATO_FECHA)
+    return !this.fecha
+      ? ''
+      : DateTime.fromJSDate(this.fecha).toUTC().toFormat(FORMATO_FECHA)
   }
 
   key(): number {
@@ -126,13 +120,13 @@ export class Tarea {
   }
 
   hasErrors(field: string): boolean {
-    return this.errors.some((_) => _.field == field)
+    return this.errors.some(_ => _.field === field)
   }
 
   errorsFrom(field: string) {
     return this.errors
-      .filter((_) => _.field == field)
-      .map((_) => _.message)
+      .filter(_ => _.field === field)
+      .map(_ => _.message)
       .join('. ')
   }
 

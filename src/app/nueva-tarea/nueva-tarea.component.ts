@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ValidationFieldComponent } from 'app/validation-field/validation-field.component'
@@ -13,16 +13,21 @@ import { mostrarError } from 'util/errorHandler'
   standalone: true,
   imports: [FormsModule, ValidationFieldComponent],
   templateUrl: './nueva-tarea.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nueva-tarea.component.css'
 })
 export class NuevaTareaComponent {
   tarea: Tarea = new Tarea()
-  asignatario?: Usuario
-  usuariosPosibles: Usuario[] = []
-  errors: string[] = []
+  asignatario = signal<Usuario | undefined>(undefined)
+  usuariosPosibles = signal<Usuario[]>([])
+  errors = signal<string[]>([])
   fecha = ''
 
-  constructor(private usuariosService: UsuariosService, private tareasService: TareasService, private router: Router) { }
+  constructor(
+    private usuariosService: UsuariosService,
+    private tareasService: TareasService,
+    private router: Router
+  ) {}
 
   async ngOnInit() {
     try {
@@ -35,8 +40,9 @@ export class NuevaTareaComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
-    this.asignatario = undefined
+    this.usuariosPosibles.set(
+      usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
+    )
   }
 
   async guardar() {
@@ -48,7 +54,7 @@ export class NuevaTareaComponent {
       if (this.tarea.invalid()) {
         return
       }
-      this.tarea.asignarA(this.asignatario)
+      this.tarea.asignarA(this.asignatario() as Usuario)
       await this.tareasService.crearTarea(this.tarea)
       this.navegarAHome()
     } catch (error) {
@@ -59,5 +65,4 @@ export class NuevaTareaComponent {
   navegarAHome() {
     this.router.navigateByUrl('/')
   }
-
 }

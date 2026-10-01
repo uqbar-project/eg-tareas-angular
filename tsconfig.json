@@ -2,14 +2,28 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./src",
     "outDir": "./dist/out-tsc",
+    "rootDir": "./src",
+    "paths": {
+      "app/*": ["./src/app/*"],
+      "domain/*": ["./src/domain/*"],
+      "pipes/*": ["./src/pipes/*"],
+      "services/*": ["./src/services/*"],
+      "testing/*": ["./src/testing/*"],
+      "util/*": ["./src/util/*"]
+    },
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
+    /* El editor resuelve los .spec.ts contra este tsconfig (es el tsconfig.json
+       mas cercano), no contra tsconfig.spec.json, asi que sin esto los globals
+       de Vitest no existen y describe/it/expect salen como errores.
+       tsconfig.app.json lo pisa con "types": [] para que el codigo de
+       produccion nunca vea los helpers de test. */
+    "types": ["vitest/globals"],
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
@@ -18,11 +32,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ]
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

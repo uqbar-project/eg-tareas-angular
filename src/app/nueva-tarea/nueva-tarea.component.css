@@ -1,25 +1,18 @@
-label {
-  display: block;
-  margin: 0.2em 0;
-}
-
-.form-group {
-  margin: 2em 0;
-}
-
-.form-control {
-  width: 90%;
-  height: 2.3em;
-}
-
-.form-control--small {
-  width: 10em;
-  height: 2.3em;
-}
-
-.fila {
-  margin: 0;
+.form-actions {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  gap: 0.6rem;
+}
+
+.stack {
+  --stack-gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
 }

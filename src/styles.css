@@ -1,1 +1,598 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * Design system de la app. Reemplaza por completo a Bootstrap:
+ * acá viven los tokens y los componentes compartidos (botones, inputs,
+ * tabla, alertas) que antes venían de bootstrap.min.css.
+ *
+ * La paleta se define con custom properties y se adapta sola a modo oscuro
+ * vía prefers-color-scheme, así que no hace falta duplicar reglas.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* superficies */
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e2e6ec;
+  --border-strong: #cbd2dc;
+
+  /* texto */
+  --text: #16202c;
+  --text-muted: #63707f;
+  --text-faint: #8d98a6;
+
+  /* marca */
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-soft: #eef0ff;
+  --on-primary: #ffffff;
+
+  /* semánticos */
+  --success: #0f8a5f;
+  --success-soft: #e6f6ef;
+  --danger: #d3453b;
+  --danger-soft: #fdecea;
+  --warning: #b45309;
+  --warning-soft: #fdf3e3;
+  --info: #0369a1;
+  --info-soft: #e5f2fb;
+
+  /* tipografía: Inter para texto, Instrument Sans para títulos */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Instrument Sans", "Inter", system-ui, sans-serif;
+
+  /* forma */
+  --radius: 10px;
+  --radius-sm: 7px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 6%);
+  --shadow-md: 0 4px 14px -4px rgb(16 24 40 / 12%);
+
+  --ring: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1218;
+    --surface: #161c24;
+    --surface-2: #1e2530;
+    --border: #2a323d;
+    --border-strong: #3b4552;
+
+    --text: #e6ebf2;
+    --text-muted: #97a3b3;
+    --text-faint: #6d7987;
+
+    --primary: #7c78f0;
+    --primary-hover: #8f8cf4;
+    --primary-soft: #232347;
+    --on-primary: #10121c;
+
+    --success: #3ec48d;
+    --success-soft: #16352a;
+    --danger: #f0776c;
+    --danger-soft: #3a1e1c;
+    --warning: #e0a850;
+    --warning-soft: #3a2c14;
+    --info: #56b0e8;
+    --info-soft: #123243;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-md: 0 4px 14px -4px rgb(0 0 0 / 55%);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.022em;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+.stack > * + * {
+  margin-top: var(--stack-gap, 1rem);
+}
+
+/* --------------------------------------------------------------- surface */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* --------------------------------------------------------------- botones */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 550;
+  line-height: 1.2;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+.btn:hover {
+  background: var(--surface-2);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.btn-success {
+  color: var(--on-primary);
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.btn-success:hover {
+  filter: brightness(1.08);
+}
+
+.btn-danger {
+  color: var(--on-primary);
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-danger:hover {
+  filter: brightness(1.08);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.btn-ghost:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* botón cuadrado, solo ícono (reemplaza los <fa-icon> sueltos) */
+.btn-icon {
+  padding: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn-icon:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-icon .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* el boton grew agranda el cuadrado para que el icono no quede apretado */
+.btn-grew {
+  padding: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn-grew .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.btn-grew:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* ---------------------------------------------------------------- campos */
+
+.field {
+  display: block;
+}
+
+.label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.input,
+.select {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  font-size: 0.92rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+  color: var(--text-faint);
+}
+
+.input:hover,
+.select:hover {
+  border-color: var(--text-faint);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: var(--ring);
+}
+
+.select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentcolor 50%),
+    linear-gradient(135deg, currentcolor 50%, transparent 50%);
+  background-position:
+    right 0.95rem center,
+    right 0.65rem center;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.field-row {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+/* ---------------------------------------------------------------- tabla */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.8rem 0.9rem;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: var(--surface-2);
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 1.5rem;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 1.5rem;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* ------------------------------------------------- avatar con iniciales */
+
+.tarea-celda {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  user-select: none;
+}
+
+/* el texto se apila aparte para que la descripcion pueda ocupar dos lineas
+   sin que la iteracion se estire ni se corte */
+.tarea-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tarea-descripcion {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.tarea-iteracion {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* La paleta sale de un hash del nombre (ver ColorAvatarPipe), no es aleatoria:
+   la misma persona tiene siempre el mismo color. */
+.avatar-0 {
+  background: #4f46e5;
+}
+.avatar-1 {
+  background: #0d9488;
+}
+.avatar-2 {
+  background: #c2410c;
+}
+.avatar-3 {
+  background: #7c3aed;
+}
+.avatar-4 {
+  background: #0369a1;
+}
+.avatar-5 {
+  background: #b91c1c;
+}
+.avatar-6 {
+  background: #15803d;
+}
+.avatar-7 {
+  background: #a16207;
+}
+
+.avatar-vacio {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+}
+
+/* ------------------------------------------------------ chip de avance */
+
+/* Reemplaza el badge de Bootstrap: un pill con tres variantes. */
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1em;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.chip-signo {
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+.chip-bajo {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: color-mix(in oklab, var(--danger) 25%, transparent);
+}
+
+.chip-medio {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: color-mix(in oklab, var(--warning) 28%, transparent);
+}
+
+.chip-alto {
+  color: var(--success);
+  background: var(--success-soft);
+  border-color: color-mix(in oklab, var(--success) 28%, transparent);
+}
+
+/* el color no es el único indicador: el numero dentro del chip ya dice
+   el avance, y cada variante tiene su propio fondo */
+@media (forced-colors: active) {
+  .chip-bajo,
+  .chip-medio,
+  .chip-alto {
+    border-color: CanvasText;
+  }
+}
+
+/* -------------------------------------------------------------- alertas */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.88rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+}
+
+.alert-danger {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: color-mix(in oklab, var(--danger) 25%, transparent);
+}
+
+.alert-info {
+  color: var(--info);
+  background: var(--info-soft);
+  border-color: color-mix(in oklab, var(--info) 25%, transparent);
+}
+
+/* ----------------------------------------------------------------- varios */
+
+.muted {
+  color: var(--text-muted);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: 0;
+  margin: 1.5rem 0;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.3rem;
+  justify-content: flex-end;
+}
+
+/* sóloReaders, para texto que acompaña a un input sin duplicar el label */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .card-body {
+    padding: 1.1rem;
+  }
+
+  .table th:first-child,
+  .table td:first-child {
+    padding-left: 1.1rem;
+  }
+
+  .table th:last-child,
+  .table td:last-child {
+    padding-right: 1.1rem;
+  }
+}

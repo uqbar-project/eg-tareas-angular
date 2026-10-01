@@ -1,37 +1,73 @@
 .filtro {
-  margin-bottom: 1em;
+  margin-bottom: 1.25rem;
 }
 
-.nuevaTarea {
-  width: 20%;
+.table .col-principal {
+  font-weight: 500;
 }
 
-.fila {
-  margin-top: 1em;
+.table .acciones-col {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
 }
 
-.mobile {
-  display: none;
+.porcentaje {
+  white-space: nowrap;
 }
 
-td > button {
-  margin: 0 0.25rem;
+.vacio {
+  padding: 2.5rem 1.5rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
-/* .desktop {
-  display: inherit;
-} */
-
-@media (max-width: 450px) {
-  .nuevaTarea {
-    width: 100%;
-  }
-
+/* En pantallas chicas la tabla se oculta y queda una vista de tarjetas:
+   la columna principal se muestra como una "celda móvil". */
+@media (max-width: 720px) {
   .mobile {
-    display: inherit;
+    display: table-cell;
   }
 
   .desktop {
     display: none;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table .acciones-col {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0;
+    border-bottom: none;
+  }
+
+  .table .acciones-col::before {
+    content: "Acciones";
+    font-size: 0.75rem;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
   }
 }

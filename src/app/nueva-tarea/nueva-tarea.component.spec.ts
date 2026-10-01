@@ -1,19 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
-import { NuevaTareaComponent } from './nueva-tarea.component'
-import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
-import { getHttpClientSpy } from 'services/httpClientSpy'
+import { type ComponentFixture, TestBed } from '@angular/core/testing'
+import { Router } from '@angular/router'
 import { Usuario } from 'domain/usuario'
+import { getHttpClientSpy } from 'testing/httpClientSpy'
+import { stabilize } from 'testing/stabilize'
+import type { Mocked } from 'vitest'
+import { NuevaTareaComponent } from './nueva-tarea.component'
 
 describe('NuevaTareaComponent', () => {
   let component: NuevaTareaComponent
   let fixture: ComponentFixture<NuevaTareaComponent>
-  let routerSpy: jasmine.SpyObj<Router>
-  let httpClientSpy: jasmine.SpyObj<HttpClient>
+  let routerSpy: Mocked<Pick<Router, 'navigate' | 'navigateByUrl'>>
+  let httpClientSpy: ReturnType<typeof getHttpClientSpy>
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
+    routerSpy = {
+      navigate: vi.fn(),
+      navigateByUrl: vi.fn()
+    }
     httpClientSpy = getHttpClientSpy()
 
     await TestBed.configureTestingModule({
@@ -41,24 +45,22 @@ describe('NuevaTareaComponent', () => {
     // puede ser que tenga que ver con el evento de HTML
     // await sendInput('fecha', '02/22/2020')
     component.tarea.fecha = new Date()
-    component.asignatario = new Usuario('Nahuel Palumbo')
+    component.asignatario.set(new Usuario('Nahuel Palumbo'))
     await sendInput('porcentaje-cumplimiento', '20')
 
     // Act
     getByTestId('guardar').click()
-    fixture.detectChanges()
-    await fixture.whenStable()
+    await stabilize(fixture)
 
     // Assert
-    const route = routerSpy.navigateByUrl.calls.first().args[0]
+    const route = routerSpy.navigateByUrl.mock.calls[0][0]
     expect(route).toBe('/')
   })
 
   it('an invalid task cannot be created', async () => {
     await sendInput('porcentaje-cumplimiento', '101')
     getByTestId('guardar').click()
-    fixture.detectChanges()
-    await fixture.whenStable()
+    await stabilize(fixture)
     expect(routerSpy.navigateByUrl).toHaveBeenCalledTimes(0)
     expect(component.tarea.hasErrors).toBeTruthy()
     expect(component.tarea.errors.length).toBe(4)
@@ -77,8 +79,7 @@ describe('NuevaTareaComponent', () => {
     const inputElement = getByTestId(testId)
     inputElement.value = text
     inputElement.dispatchEvent(new Event('input'))
-    fixture.detectChanges()
-    return fixture.whenStable()
+    return stabilize(fixture)
   }
 
   function validateErrorField(field: string) {

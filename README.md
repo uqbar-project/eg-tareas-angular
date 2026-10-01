@@ -9,7 +9,8 @@
 Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y permite mostrar una aplicación completa en Angular con los siguientes conceptos
 
 - **routing** para navegar desde la página principal a las que nos permiten crear o asignar una tarea, así como para volver
-- utilización de Bootstrap como framework de CSS + Font Awesome para los íconos
+- estilos propios basados en _custom properties_ de CSS (sin framework de CSS) + íconos SVG inline
+- soporte de modo claro y oscuro vía `prefers-color-scheme`
 - desarrollo de front-end en Angular utilizando **servicios REST** desde el backend (por ejemplo, con [Spring Boot](https://spring.io/projects/spring-boot))
 - para lo cual es necesario la inyección del objeto **httpClient** dentro de los objetos service, trabajando con **asincronismo** para disparar actualizaciones y consultas hacia el backend
 - la **separación de concerns** entre las tareas como objeto de dominio, la vista html, el componente que sirve como modelo de vista y el servicio que maneja el origen de los datos
@@ -17,30 +18,113 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 # Preparación del proyecto
 
+## Requisitos
+
+- **Node 24.15 o superior** (ver `.nvmrc`)
+- **pnpm 12.8.1** (se instala solo vía el campo `packageManager`; si tenés otro
+  gestor de paquetes, usá `corepack enable`)
+
+```bash
+pnpm install
+pnpm start        # levanta la app en http://localhost:4200
+pnpm test         # corre los tests con Vitest
+pnpm run lint     # Biome
+pnpm run build:prod
+```
+
 ## Levantar el backend
 
 Pueden descargar [la implementación Spring Boot del backend](https://github.com/uqbar-project/eg-tareas-springboot-kotlin). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
 
 ## Componentes adicionales
 
-La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
+Este ejemplo **no usa framework de CSS ni librería de íconos**. Los estilos
+viven en [_src/styles.css_](./src/styles.css) y los cuatro íconos que hacen
+falta son SVG inline en [_src/app/iconos.ts_](./src/app/iconos.ts).
+
+Lo que sí hay que instalar, porque lo usan los pipes de formato de fecha:
 
 ```bash
-npm i @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons bootstrap
+pnpm add luxon
 ```
+
+Esta decisión se tomó por performance: Bootstrap + Font Awesome sumaban
+**342 kB** al bundle inicial (230 kB de CSS y 112 kB de íconos) para una app que
+usaba cuatro íconos y un puñado de clases. Ver [la sección de estilos](#estilos)
+para el detalle.
 
 ## Configuración angular.json
 
-Es necesario incorporar Bootstrap dentro del archivo _angular.json_:
+Los estilos globales se cargan así, y no hay scripts porque no usamos el JS de
+ningún framework:
 
 ```json
-    "styles": [
-        "src/styles.css",
-        "./node_modules/bootstrap/dist/css/bootstrap.min.css"
-    ],
-    "scripts": [
-        "./node_modules/bootstrap/dist/js/bootstrap.min.js"
-    ]
+    "styles": ["src/styles.css"]
+```
+
+## Estilos
+
+Los estilos viven en [_src/styles.css_](./src/styles.css), que hace de design
+system de la app: no hay framework de CSS. Está armado sobre _custom properties_,
+así que toda la paleta se cambia desde `:root`:
+
+```css
+:root {
+  --surface: #ffffff;
+  --text: #16202c;
+  --primary: #4f46e5;
+  --radius: 10px;
+  ...
+}
+```
+
+El modo oscuro no necesita reglas duplicadas: alcanza con redefinir los mismos
+tokens dentro de una media query.
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #161c24;
+    --text: #e6ebf2;
+    ...
+  }
+}
+```
+
+Los componentes usan clases semánticas en vez de utilidades: `.btn`,
+`.btn-primary`, `.input`, `.select`, `.card`, `.table`, `.alert`. Los
+estilos que son de un componente van en el `.css` del propio componente.
+
+Las tipografías también salen de [_src/styles.css_](./src/styles.css): **Inter**
+para el cuerpo de texto y **Instrument Sans** para los títulos, que le da un
+contraste de jerarquía sin necesidad de jerarquías de tamaño. Se cargan en
+[_src/index.html_](./src/index.html) con un `<link>` a Google Fonts y un `preconnect`,
+y el `font-family` final incluye una pila de system fonts, así que la app se ve
+bien aunque el CDN no llegue.
+
+```css
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Instrument Sans", "Inter", system-ui, sans-serif;
+}
+```
+
+En las tablas, `font-variant-numeric: tabular-nums` evita que los números
+bailen de columna en columna cuando el porcentaje cambia de largo.
+
+La tabla colapsa a una vista de tipo tarjeta en pantallas chicas, en vez de
+dejar al usuario scrolleando en horizontal:
+
+```css
+@media (max-width: 720px) {
+  .table thead {
+    display: none;
+  }
+
+  .table .desktop {
+    display: none;
+  }
+}
 ```
 
 ## Configuración ruteo
@@ -64,29 +148,53 @@ const routes: Routes = [
 
 ## Configuración de la vista principal
 
-Es necesario que importemos las definiciones de Font Awesome, y esto incluye lamentablemente cada uno de los íconos que vayamos a utilizar. Otra opción es importar todos los íconos del framework, pero esta es una práctica totalmente desaconsejable, ya que produce que el _bundle_ sea bastante voluminoso. Un bundle es lo más parecido a un ejecutable web, y se genera en base a todas las definiciones que hacemos en nuestros archivos (los de typescript se traspilan a javascript soportados por cualquier browser). 
-
-Creamos el módulo IconsModule y vemos cómo es el import de los íconos, que incluye la llamada a una biblioteca:
+Los íconos son paths SVG en [_iconos.ts_](./src/app/iconos.ts), con su
+`viewBox` y nada más:
 
 ```typescript
-@NgModule({
-  imports: [FontAwesomeModule],
-  exports: [FontAwesomeModule],
+export const ICONOS = {
+  calendarCheck: {
+    viewBox: '0 0 448 512',
+    path: 'M320 0c17.7 0 32 14.3 32 32l0 32 32 0c35.3 0 64 28.7 64 64...'
+  },
+  userCheck: { ... },
+  userMinus: { ... },
+  listCheck: { ... }
+} as const
+```
+
+El componente [_icon.component.ts_](./src/app/icon.component.ts) los dibuja. Como
+los íconos son fijos y no se parametrizan en runtime, no hace falta una librería:
+
+```typescript
+@Component({
+  selector: 'app-icon',
+  standalone: true,
+  template: `
+    <svg class="icon" [attr.viewBox]="def().viewBox" fill="currentColor" aria-hidden="true">
+      <path [attr.d]="def().path" />
+    </svg>
+  `
 })
-export class IconsModule {
-  constructor(library: FaIconLibrary) {
-    library.addIcons(faUserCheck, faUserMinus, faCalendarCheck, faTasks)
-  }
+export class IconComponent {
+  readonly nombre = input.required<NombreIcono>()
+  protected readonly def = () => ICONOS[this.nombre()]
 }
 ```
 
-Importamos esté modulo en [_tareas.component.ts_](./src/app/tareas/tareas.component.ts):
+Y en el template alcanza con pedirlo por nombre:
+
+```html
+<app-icon nombre="calendarCheck" />
+```
+
+Importamos el componente en [_tareas.component.ts_](./src/app/tareas/tareas.component.ts):
 
 ```typescript
 @Component({
   selector: 'app-tareas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconsModule],
+  imports: [CommonModule, FormsModule, RouterModule, FilterTareas, OrderTareas, IconComponent],
   ...
 ```
 
@@ -244,7 +352,7 @@ async actualizarTarea(..., tarea: Tarea) {
   try {
     await this.tareasService.actualizarTarea(tarea)
   } catch (e) {
-    await errorHandler(this, e as unknown as Error)
+    await errorHandler(this, e)
   }
 }
 ```
@@ -252,7 +360,7 @@ async actualizarTarea(..., tarea: Tarea) {
 Tenemos una función errorHandler que permite mostrar un mensaje de error y volver a cargar las tareas (como se puede ver, se envuelve en un try/catch vacío por si falla la operación, así nos concentramos en mostrar el mensaje de error original).
 
 ```ts
-export const errorHandler = async (component: TareasComponent, error: Error) => {
+export const errorHandler = async (component: TareasComponent, error: unknown) => {
   try {
     component.tareas = await component.tareasService.todasLasTareas()
   } catch (e) {}
@@ -312,7 +420,7 @@ También tenemos el pipe orderTareas, que ordena las tareas por id:
 export class OrderTareas implements PipeTransform {
 
   transform(tareas: Tarea[]): Tarea[] {
-    return tareas.sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
+    return [...tareas].sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
   }
 
 }
@@ -320,11 +428,71 @@ export class OrderTareas implements PipeTransform {
 
 La tarea es responsable de devolver un valor para el método key() con el que el pipe lo ordena.
 
-Por último, el % de cumplimiento se muestra con dos decimales y con comas, mediante el pipe estándar de Angular:
+Ojo con la copia: los pipes por definición son **puros**, o sea que Angular los
+cachea y solo los vuelve a correr si cambian sus argumentos. Sin el `[...]`, el
+`sort()` reordenaría el array del componente, que es un efecto lateral invisible.
+Además, si ese array viniera congelado, `sort()` explota.
+
+Por último, el % de cumplimiento se muestra con dos decimales y con coma
+decimal, mediante el pipe estándar de Angular:
 
 ```html
-  <span class="text-xs-right">{{tarea.porcentajeCumplimiento | number:'2.2-2':'es' }}</span>
+  <span
+    class="chip"
+    [attr.data-testid]="'chip_' + tarea.id"
+    [ngClass]="tarea.porcentajeCumplimiento | estadoCumplimiento">
+    <span [attr.data-testid]="'porcentaje_' + tarea.id">{{
+      tarea.porcentajeCumplimiento | number: '1.2-2':'es'
+    }}</span>
+    <span class="chip-signo">%</span>
+  </span>
 ```
+
+El avance se muestra como un chip con tres variantes, decididas por una pipe
+propia:
+
+```ts
+@Pipe({ name: 'estadoCumplimiento', standalone: true })
+export class EstadoCumplimientoPipe implements PipeTransform {
+  transform(porcentaje: number): string {
+    if (porcentaje < 40) return 'chip-bajo'
+    if (porcentaje < 80) return 'chip-medio'
+    return 'chip-alto'
+  }
+}
+```
+
+Los cortes (**menos de 40**, **entre 40 y 80**, **80 en adelante**) viven en la
+pipe y no en `Tarea`: son una decisión de presentación, no de negocio.
+
+### Ojo con el argumento de una pipe pura
+
+La pipe recibe el **número**, no la `Tarea`, y no es un detalle. Las pipes puras
+memoizan por identidad de cada argumento, usando `Object.is`. Como `cumplir()`
+**muta** la tarea en sitio:
+
+```ts
+cumplir() {
+  this.porcentajeCumplimiento = CUMPLIDA  // mismo objeto, otro valor
+}
+```
+
+la referencia de la `Tarea` no cambia. Si la pipe recibiera el objeto, Angular
+diría "los argumentos no cambiaron", devolvería el valor cacheado, y el chip se
+quedaría con el color viejo: el `100,00` al lado del color de antes. Pasando el
+porcentaje, el argumento **sí** cambia de valor (`50 → 100`) y la pipe vuelve a
+correrse sola.
+
+La regla general: **una pipe pura nunca debe recibir un objeto que mutás en
+sitio**. Si el valor que decide el resultado es un campo, pasá el campo. Si
+necesitás pasar el objeto, entonces la referencia tiene que cambiar, y en este
+repo eso significa escribir el signal con `set`/`update`.
+
+Fijate además que el `%` va en un `<span>` aparte del que tiene el `data-testid`
+del porcentaje: los tests comparan el `textContent` de ese elemento contra
+`'100,00'` exacto, así que si el signo estuviera adentro la aserción fallaría.
+El `data-testid` del chip (`chip_<id>`) es aparte, para poder assertar sobre la
+clase.
 
 # Usando Observables
 
@@ -347,7 +515,6 @@ export class TareasService {
       .get<TareaJSON[]>(REST_SERVER_URL + '/tareas')
       .pipe(
         map((tareasJSON: TareaJSON[]) => {
-          console.info('tareas JSON', tareasJSON)
           return tareasJSON.map((tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON) ?? [])
         }),
         retry(2) // podemos pedir que intente n veces
@@ -438,37 +605,37 @@ export class StubTareasService implements ITareasService {
 
 2. pero nos parece mejor generar un stub del `httpClient` inyectado en nuestro TareasService, de manera de poder aumentar el nivel de cobertura de nuestros tests de frontend.
 
-Ahora sí, para que la inyección de dependencias reemplace nuestro objeto stub de httpClient, vamos a crear un **spy** de Jasmine en un archivo aparte, indicando cuáles son los valores que deberíamos esperar:
+Ahora sí, para que la inyección de dependencias reemplace nuestro objeto stub de httpClient, vamos a crear un **mock** de Vitest en un archivo aparte (`src/testing/httpClientSpy.ts`), indicando cuáles son los valores que deberíamos esperar:
 
 - en el caso de hacer un get de tareas, tiene que devolver un `Observable` de muchas tareas
 - en el caso de hacer un get de una tarea, tiene que devolver un `Observable` de una tarea específica
 
 ```ts
-export const getHttpClientSpy = () => {
-  const httpClientSpy = jasmine.createSpyObj('HttpClient', [
-    'get',
-    'put',
-    'post'
-  ])
+export const getHttpClientSpy = (): HttpClientSpy => {
+  const httpClientSpy: HttpClientSpy = {
+    get: vi.fn(),
+    put: vi.fn(),
+    post: vi.fn()
+  }
 
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/tareas`)
-    .and.returnValue(of(tareasStub))
-  
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/tareas/1`)
-    .and.returnValue(of(tareasStub[0]))
+  httpClientSpy.get.mockImplementation((url: string) => {
+    switch (url) {
+      case `${REST_SERVER_URL}/tareas`:
+        return of(tareasStub)
+      case `${REST_SERVER_URL}/tareas/1`:
+        return of(tareasStub[0])
+      // Incluso podemos controlar la búsqueda de usuarios:
+      case `${REST_SERVER_URL}/usuarios`:
+        return of(usuariosStub)
+      default:
+        throw new Error(`httpClientSpy.get: URL sin stub para "${url}"`)
+    }
+  })
 
-  // Incluso podemos controlar la búsqueda de usuarios:
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/usuarios`)
-    .and.returnValue(of(usuariosStub))
-  
-  httpClientSpy.put.and.returnValue(of(tareasStub[0]))
- 
-  // En el caso del alta, nos permite incluso construir una función para simular un id nuevo:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  httpClientSpy.post.and.callFake((_url: string, body: any) =>
+  httpClientSpy.put.mockReturnValue(of(tareasStub[0]))
+
+  // En el caso del alta, nos permite incluso simular un id nuevo:
+  httpClientSpy.post.mockImplementation((_url: string, body: object) =>
     of({ ...body, id: 3 })
   )
   return httpClientSpy
@@ -483,24 +650,25 @@ Luego vamos a configurar **providers** en nuestro objeto TestBed, definiendo cu�
 ```ts
 describe('TareasComponent', () => {
   ...
-  let routerSpy: jasmine.SpyObj<Router>
-  let httpClientSpy: jasmine.SpyObj<HttpClient>
+  let routerSpy: Mocked<Pick<Router, 'navigate' | 'navigateByUrl'>>
+  let httpClientSpy: ReturnType<typeof getHttpClientSpy>
   
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
+    routerSpy = {
+      navigate: vi.fn(),
+      navigateByUrl: vi.fn()
+    }
     // vamos a crear una nueva instancia del spy de httpClient para cada test
     // esto es importante porque hay un test que le cambia dinámicamente el comportamiento
     // para que tire error, y no queremos que ese cambio tenga efecto colateral en los demás tests
     httpClientSpy = getHttpClientSpy()
 
     TestBed.configureTestingModule({
-      declarations: [
-        ...
-      ],
+      imports: [TareasComponent],
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
         { provide: Router, useValue: routerSpy }
-      ]      
+      ]
     }).compileComponents()
     ....
   })
@@ -532,9 +700,10 @@ En la vista agregamos un `attr.data-testid` para el botón cumplir de cada tarea
 
 ```html
 @if (tarea.sePuedeCumplir()) {
-  <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
+  <button type="button" title="Marcarla como cumplida" class="btn btn-icon btn-success" (click)="cumplir(tarea)"
     aria-label="Cumplir" [attr.data-testid]="'cumplir_' + tarea.id">
-    ...
+    <app-icon nombre="calendarCheck" />
+  </button>
 ```
 
 Así es fácil preguntar si la tarea 1 puede cumplirse: debe existir un tag cuyo atributo `data-testid` sea "cumplir_1" dentro del HTML que genera el componente. Podés investigar la función que busca por id, y te dejamos [el link](https://developer.mozilla.org/es/docs/Web/API/Document/querySelector) para entender las búsquedas que soporta querySelector.
@@ -554,6 +723,42 @@ it('when a task is done, it has 100% of completion', () => {
   fixture.detectChanges()
   expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
   ...
+})
+```
+
+> **Nota sobre zoneless y los tests.** La app corre sin `zone.js`, así que
+> `fixture.whenStable()` no espera las promesas "peladas" de un `ngOnInit` async
+> (sólo rastrea `PendingTasks`). Por eso los tests que esperan datos del backend
+> usan el helper `stabilize()` de `src/testing/stabilize.ts`, que fuerza el
+> vaciado de microtareas antes del último `detectChanges()`. Del mismo modo, los
+> `@Input()` se setean con `fixture.componentRef.setInput(...)` en vez de mutar el
+> componente, y para ejercitar `ngModel` hay que despachar el evento `input`
+> sobre el DOM en lugar de asignar el campo del componente.
+
+Un test que necesita esperar la carga asíncrona de tareas:
+
+```ts
+beforeEach(async () => {
+  // ...
+  // ngOnInit es async y en zoneless whenStable() no la espera
+  await stabilize(fixture)
+})
+```
+
+Y uno que dispara un error para verificar el manejo:
+
+```ts
+it('unassign - should catch error gracefully', async () => {
+  httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
+
+  getByTestId('desasignar_1').click()
+  // Ojo: sin whenStable() acá. El catch de actualizarTarea vuelve a pedir las
+  // tareas antes de registrar el error, y el tick que dispara whenStable()
+  // cae en medio de esa cadena y dispara NG0100.
+  await flushMicrotasks()
+  fixture.detectChanges()
+
+  expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
 })
 ```
 
@@ -641,17 +846,17 @@ Este es uno de los tests más complejos,
 - queremos simular un error de backend
 - pero además hay un timeout en el que se muestra por 3 segundos el mensaje de error
 
-Si intentamos testear utilizando `fixture.detectChanges()` únicamente, el resultado va a ser que nunca podemos atrapar el mensaje de error. Necesitamos simular el timeout avanzando manualmente el reloj, para lo cual nos va a servir la función `fakeAsync` que envuelve todo el test y `tick` que indica la cantidad de milisegundos a avanzar:
+Si intentamos testear utilizando `fixture.detectChanges()` únicamente, el resultado va a ser que nunca podemos atrapar el mensaje de error: el `setTimeout` de `mostrarError` todavía no corrió. Como migramos a Vitest **sin fake timers**, tampoco usamos `fakeAsync`/`tick`. La alternativa es vaciar las microtareas a mano, que para este caso alcanza:
 
 ```ts
-it('finish - should catch error gracefully', fakeAsync(() => {
-  httpClientSpy.put.and.returnValue(throwError(() => new Error('Fake error')))
+it('unassign - should catch error gracefully', async () => {
+  httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
 
-  getByTestId('cumplir_1').click()
-  tick(1000)
+  getByTestId('desasignar_1').click()
+  await flushMicrotasks()
   fixture.detectChanges()
+
   expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
-  flush()
 
   httpClientSpy.put.calls.reset()
 }))

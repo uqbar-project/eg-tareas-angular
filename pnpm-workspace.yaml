@@ -1,0 +1,15 @@
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  nice-napi: true
+minimumReleaseAgeExclude:
+  - '@angular/common@20.3.33 || 21.2.25'
+  - '@angular/compiler-cli@20.3.33 || 21.2.25'
+  - '@angular/compiler@20.3.33 || 21.2.25'
+  - '@angular/core@20.3.33 || 21.2.25'
+  - '@angular/forms@20.3.33 || 21.2.25'
+  - '@angular/platform-browser-dynamic@20.3.33 || 21.2.25'
+  - '@angular/platform-browser@20.3.33 || 21.2.25'
+  - '@angular/router@20.3.33 || 21.2.25'

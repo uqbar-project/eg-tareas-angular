@@ -1,77 +1,119 @@
 <div class="container">
-  <div class="row">
-
-    <!-- Busqueda y resultados -->
-    <div class="col-lg-12">
-      <div class="filtro">
-        <form role="form">
-          <div class="form-group">
-            <div class="fila">
-              <button type="button" title="Crear una nueva tarea" class="btn btn-info nuevaTarea"
-              (click)="crearNuevaTarea()" aria-label="Crear nueva tarea"
-              data-testid="nueva-tarea">Crear nueva tarea
-              </button>
-            </div>
-            <div class="fila">
-              <input [(ngModel)]="tareaBuscada" autocomplete="off" class="form-control"
-                id="tareaBuscada" name="tareaBuscada"
-                data-testid="tareaBuscada"
-                placeholder="Buscar Tarea o Persona Asignada">
-            </div>
-          </div>
-        </form>
+  <div class="card">
+    <div class="card-header">
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="crearNuevaTarea()"
+          data-testid="nueva-tarea">
+          <app-icon nombre="listCheck" />
+          Nueva tarea
+        </button>
       </div>
-      <div class="table-responsive">
-        <table class="table table-striped table-hover table-condensed example-animate-container">
-          <tbody>
+    </div>
+
+    <div class="card-body">
+      <div class="filtro">
+        <label class="sr-only" for="tareaBuscada">Buscar tarea</label>
+        <input
+          [(ngModel)]="tareaBuscada"
+          autocomplete="off"
+          class="input"
+          id="tareaBuscada"
+          name="tareaBuscada"
+          data-testid="tareaBuscada"
+          placeholder="Buscar por descripción o persona asignada" />
+      </div>
+
+      <div class="table-scroll">
+        <table class="table">
+          <thead>
             <tr>
-              <th>Descripción</th>
-              <th class="desktop">Iteración</th>
-              <th class="desktop">Asignado a</th>
+              <th class="col-principal">Tarea</th>
               <th class="desktop">Fecha</th>
               <th class="desktop">% cumplido</th>
-              <th>Acciones</th>
+              <th class="acciones-col">Acciones</th>
             </tr>
-            @for (tarea of tareas | filterTareas: tareaBuscada | orderTareas ; track tarea; let i = $index) {
-              <tr data-testid="fila-tarea" class="animate-repeat">
-                <td class="col-lg-12 mobile">
-                  <div>
-                    {{tarea.descripcion}}<br>
-                    {{tarea.asignatario ? ' - ' + tarea.asignatario.nombre : ''}} - % {{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}
+          </thead>
+          <tbody>
+            @for (tarea of tareas() | filterTareas: tareaBuscada | orderTareas; track tarea; let i = $index) {
+              <tr data-testid="fila-tarea">
+                <td class="col-principal mobile">
+                  <div class="tarea-celda">
+                    <span
+                      class="avatar"
+                      [ngClass]="tarea.asignatario | colorAvatar"
+                      [attr.data-testid]="'asignatario_' + tarea.id"
+                      [attr.title]="tarea.asignatario?.nombre ?? 'Sin asignar'"
+                      aria-hidden="true">{{ tarea.asignatario | iniciales }}</span>
+                    <span class="tarea-texto">
+                      <span class="tarea-descripcion" [attr.data-testid]="'descripcion_' + i">
+                        {{ tarea.descripcion }}
+                      </span>
+                      <span class="tarea-iteracion" [attr.data-testid]="'iteracion_' + tarea.id">
+                        {{ tarea.iteracion }}
+                      </span>
+                    </span>
                   </div>
                 </td>
-                <td class="col-xs-4 desktop" [attr.data-testid]="'descripcion_' + i">{{tarea.descripcion}}</td>
-                <td class="col-xs-2 desktop" [attr.data-testid]="'iteracion_' + tarea.id">{{tarea.iteracion}}</td>
-                <td class="col-xs-3 desktop" [attr.data-testid]="'asignatario_' + tarea.id">{{tarea.asignatario?.nombre}}</td>
-                <td class="col-xs-2 desktop" [attr.data-testid]="'fecha_' + tarea.id">{{tarea.fechaString()}}</td>
-                <td class="col-xs-1 desktop text-end" [ngClass]="{'table-danger': tarea.cumplio(0),
-                'table-warning': tarea.cumplioMenosDe(50),
-                'table-info': tarea.cumplioMenosDe(100),
-                'table-success': tarea.cumplio(100)}">
-                  <span
-                    [attr.data-testid]="'porcentaje_' + tarea.id">{{tarea.porcentajeCumplimiento | number:'1.2-2':'es' }}</span>
+                <td class="desktop" [attr.data-testid]="'fecha_' + tarea.id">
+                  {{ tarea.fechaString() }}
+                </td>
+                <td class="desktop porcentaje">
+                  <span class="chip" [attr.data-testid]="'chip_' + tarea.id" [ngClass]="tarea.porcentajeCumplimiento | estadoCumplimiento">
+                    <span [attr.data-testid]="'porcentaje_' + tarea.id">{{
+                      tarea.porcentajeCumplimiento | number: '1.2-2':'es'
+                    }}</span>
+                    <span class="chip-signo">%</span>
+                  </span>
                 </td>
 
-                <td nowrap class="col-xs-2">
-                  @if (tarea.sePuedeCumplir()) {
-                    <button id="cumplirTarea" type="button" title="Marcarla como cumplida" class="btn btn-default" (click)="cumplir(tarea)"
-                      aria-label="Cumplir" [attr.data-testid]="'cumplir_' + tarea.id">
-                      <fa-icon icon="calendar-check"></fa-icon>
-                    </button>
-                  }
-                  @if (tarea.sePuedeAsignar()) {
-                    <button id="asignarModal" type="button" title="Asignar una persona" class="btn btn-success"
-                    (click)="asignar(tarea)" aria-label="Asignarme"
-                    [attr.data-testid]="'asignar_' + tarea.id">
-                      <fa-icon icon="user-check"></fa-icon>
-                    </button>
-                  }
-                  @if (tarea.sePuedeDesasignar()) {
-                    <button type="button" title="Desasignar la persona a la tarea" class="btn btn-danger"
-                      (click)="desasignar(tarea)" aria-label="Desasignarme"
-                      [attr.data-testid]="'desasignar_' + tarea.id">
-                      <fa-icon icon="user-minus"></fa-icon>
-                    </button>
+                <td class="acciones-col">
+                  <div class="row-actions">
+                    @if (tarea.sePuedeCumplir()) {
+                      <button
+                        type="button"
+                        title="Marcarla como cumplida"
+                        class="btn btn-grew btn-success"
+                        (click)="cumplir(tarea)"
+                        aria-label="Cumplir"
+                        [attr.data-testid]="'cumplir_' + tarea.id">
+                        <app-icon nombre="calendarCheck" />
+                      </button>
+                    }
+                    @if (tarea.sePuedeAsignar()) {
+                      <button
+                        type="button"
+                        title="Asignar una persona"
+                        class="btn btn-grew btn-success"
+                        (click)="asignar(tarea)"
+                        aria-label="Asignarme"
+                        [attr.data-testid]="'asignar_' + tarea.id">
+                        <app-icon nombre="userCheck" />
+                      </button>
+                    }
+                    @if (tarea.sePuedeDesasignar()) {
+                      <button
+                        type="button"
+                        title="Desasignar la persona a la tarea"
+                        class="btn btn-grew btn-danger"
+                        (click)="desasignar(tarea)"
+                        aria-label="Desasignarme"
+                        [attr.data-testid]="'desasignar_' + tarea.id">
+                        <app-icon nombre="userMinus" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="vacio">
+                  @if (tareaBuscada) {
+                    Ninguna tarea coincide con "{{ tareaBuscada }}"
+                  } @else {
+                    No hay tareas todavía. Creá la primera.
                   }
                 </td>
               </tr>
@@ -79,8 +121,9 @@
           </tbody>
         </table>
       </div>
-      @for (error of errors ; track error) {
-        <div class="alert alert-danger animate-repeat" data-testid="error-message">{{error}}</div>
+
+      @for (error of errors(); track error) {
+        <div class="alert alert-danger" data-testid="error-message">{{ error }}</div>
       }
     </div>
   </div>

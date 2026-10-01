@@ -46,3 +46,6 @@ Thumbs.db
 
 # Angular cache
 .angular
+
+# local planning notes
+plans/
