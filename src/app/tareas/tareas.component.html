@@ -30,9 +30,7 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Descripción</th>
-              <th class="desktop">Iteración</th>
-              <th class="desktop">Asignado a</th>
+              <th class="col-principal">Tarea</th>
               <th class="desktop">Fecha</th>
               <th class="desktop">% cumplido</th>
               <th class="acciones-col">Acciones</th>
@@ -41,13 +39,24 @@
           <tbody>
             @for (tarea of tareas() | filterTareas: tareaBuscada | orderTareas; track tarea; let i = $index) {
               <tr data-testid="fila-tarea">
-                <td class="col-principal mobile" [attr.data-testid]="'descripcion_' + i">
-                  {{ tarea.descripcion }}
+                <td class="col-principal mobile">
+                  <div class="tarea-celda">
+                    <span
+                      class="avatar"
+                      [ngClass]="tarea.asignatario | colorAvatar"
+                      [attr.data-testid]="'asignatario_' + tarea.id"
+                      [attr.title]="tarea.asignatario?.nombre ?? 'Sin asignar'"
+                      aria-hidden="true">{{ tarea.asignatario | iniciales }}</span>
+                    <span class="tarea-texto">
+                      <span class="tarea-descripcion" [attr.data-testid]="'descripcion_' + i">
+                        {{ tarea.descripcion }}
+                      </span>
+                      <span class="tarea-iteracion" [attr.data-testid]="'iteracion_' + tarea.id">
+                        {{ tarea.iteracion }}
+                      </span>
+                    </span>
+                  </div>
                 </td>
-                <td class="desktop" [attr.data-testid]="'iteracion_' + tarea.id">
-                  {{ tarea.iteracion }}
-                </td>
-                <td class="desktop" [attr.data-testid]="'asignatario_' + tarea.id">{{ tarea.asignatario?.nombre }}</td>
                 <td class="desktop" [attr.data-testid]="'fecha_' + tarea.id">
                   {{ tarea.fechaString() }}
                 </td>

@@ -11,6 +11,7 @@ import { IconComponent } from 'app/icon.component'
 import { Tarea } from 'domain/tarea'
 import { EstadoCumplimientoPipe } from 'pipes/estadoCumplimiento.pipe'
 import { FilterTareas } from 'pipes/filterTareas.pipe'
+import { ColorAvatarPipe, InicialesPipe } from 'pipes/iniciales.pipe'
 import { OrderTareas } from 'pipes/orderTareas.pipe'
 import { TareasService } from 'services/tareas.service'
 import { mostrarError } from 'util/errorHandler'
@@ -24,6 +25,8 @@ import { mostrarError } from 'util/errorHandler'
     RouterModule,
     FilterTareas,
     OrderTareas,
+    InicialesPipe,
+    ColorAvatarPipe,
     EstadoCumplimientoPipe,
     IconComponent
   ],

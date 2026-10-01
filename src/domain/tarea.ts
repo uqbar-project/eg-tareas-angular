@@ -53,10 +53,6 @@ export class Tarea {
     )
   }
 
-  cumplio(porcentaje: number): boolean {
-    return this.porcentajeCumplimiento === porcentaje
-  }
-
   sePuedeCumplir(): boolean {
     return this.porcentajeCumplimiento < CUMPLIDA && this.estaAsignada()
   }

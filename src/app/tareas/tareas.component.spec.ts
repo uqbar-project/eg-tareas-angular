@@ -91,7 +91,16 @@ describe('TareasComponent', () => {
   it('unassign first task', async () => {
     getByTestId('desasignar_1').click()
     fixture.detectChanges()
-    expect(getByTestId('asignatario_1').textContent).toBe('')
+    // el avatar sin asignatario muestra '?', no el nombre
+    expect(getByTestId('asignatario_1').textContent).toBe('?')
+  })
+
+  it('el avatar muestra las iniciales del asignatario', () => {
+    const avatar = getByTestId('asignatario_1')
+    expect(avatar.textContent?.trim()).toBe('GP')
+    expect(avatar.className).toContain('avatar-')
+    // sin avatar no puede ser el color de una persona
+    expect(avatar.className).not.toContain('avatar-vacio')
   })
 
   it('searching for second task should have one tr in tasks list', async () => {

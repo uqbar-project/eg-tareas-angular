@@ -18,6 +18,12 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
+    /* El editor resuelve los .spec.ts contra este tsconfig (es el tsconfig.json
+       mas cercano), no contra tsconfig.spec.json, asi que sin esto los globals
+       de Vitest no existen y describe/it/expect salen como errores.
+       tsconfig.app.json lo pisa con "types": [] para que el codigo de
+       produccion nunca vea los helpers de test. */
+    "types": ["vitest/globals"],
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,

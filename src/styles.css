@@ -400,6 +400,82 @@ h5 {
   overflow-x: auto;
 }
 
+/* ------------------------------------------------- avatar con iniciales */
+
+.tarea-celda {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  user-select: none;
+}
+
+/* el texto se apila aparte para que la descripcion pueda ocupar dos lineas
+   sin que la iteracion se estire ni se corte */
+.tarea-texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tarea-descripcion {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.tarea-iteracion {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* La paleta sale de un hash del nombre (ver ColorAvatarPipe), no es aleatoria:
+   la misma persona tiene siempre el mismo color. */
+.avatar-0 {
+  background: #4f46e5;
+}
+.avatar-1 {
+  background: #0d9488;
+}
+.avatar-2 {
+  background: #c2410c;
+}
+.avatar-3 {
+  background: #7c3aed;
+}
+.avatar-4 {
+  background: #0369a1;
+}
+.avatar-5 {
+  background: #b91c1c;
+}
+.avatar-6 {
+  background: #15803d;
+}
+.avatar-7 {
+  background: #a16207;
+}
+
+.avatar-vacio {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+}
+
 /* ------------------------------------------------------ chip de avance */
 
 /* Reemplaza el badge de Bootstrap: un pill con tres variantes. */
