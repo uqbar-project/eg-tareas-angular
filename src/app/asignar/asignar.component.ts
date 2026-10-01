@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Tarea } from 'domain/tarea'
@@ -40,7 +40,7 @@ export class AsignarComponent {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
     this.usuariosPosibles = usuarios.map(
-      (usuarioJson) => new Usuario(usuarioJson.nombre)
+      usuarioJson => new Usuario(usuarioJson.nombre)
     )
 
     // Dado el identificador de la tarea, debemos obtenerlo y mostrar el asignatario en el combo
@@ -50,7 +50,7 @@ export class AsignarComponent {
       this.navegarAHome()
     }
     this.tarea = tarea as Tarea
-    this.asignatario = this.usuariosPosibles.find((usuarioPosible) =>
+    this.asignatario = this.usuariosPosibles.find(usuarioPosible =>
       this.tarea.estaAsignadoA(usuarioPosible)
     )
   }

@@ -1,14 +1,13 @@
-import type { Mocked } from 'vitest'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
-import { TareasComponent } from './tareas.component'
+import { registerLocaleData } from '@angular/common'
+import { HttpClient } from '@angular/common/http'
+import localeEs from '@angular/common/locales/es'
+import { type ComponentFixture, TestBed } from '@angular/core/testing'
+import { Router } from '@angular/router'
+import { throwError } from 'rxjs'
 import { getHttpClientSpy } from 'testing/httpClientSpy'
 import { flushMicrotasks, stabilize } from 'testing/stabilize'
-import { HttpClient } from '@angular/common/http'
-import { Router } from '@angular/router'
-import { registerLocaleData } from '@angular/common'
-import localeEs from '@angular/common/locales/es'
-import { throwError } from 'rxjs'
+import type { Mocked } from 'vitest'
+import { TareasComponent } from './tareas.component'
 
 //
 /** Registramos el locale ES para formatear números */

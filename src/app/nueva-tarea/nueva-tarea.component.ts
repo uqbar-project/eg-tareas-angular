@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ValidationFieldComponent } from 'app/validation-field/validation-field.component'
@@ -41,7 +41,7 @@ export class NuevaTareaComponent {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
     this.usuariosPosibles = usuarios.map(
-      (usuarioJson) => new Usuario(usuarioJson.nombre)
+      usuarioJson => new Usuario(usuarioJson.nombre)
     )
     this.asignatario = undefined
   }

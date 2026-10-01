@@ -1,12 +1,11 @@
-import type { Mocked } from 'vitest'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
-import { NuevaTareaComponent } from './nueva-tarea.component'
-import { Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
+import { type ComponentFixture, TestBed } from '@angular/core/testing'
+import { Router } from '@angular/router'
+import { Usuario } from 'domain/usuario'
 import { getHttpClientSpy } from 'testing/httpClientSpy'
 import { stabilize } from 'testing/stabilize'
-import { Usuario } from 'domain/usuario'
+import type { Mocked } from 'vitest'
+import { NuevaTareaComponent } from './nueva-tarea.component'
 
 describe('NuevaTareaComponent', () => {
   let component: NuevaTareaComponent

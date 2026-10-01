@@ -1,6 +1,6 @@
-import { of } from 'rxjs'
 import { Tarea } from 'domain/tarea'
 import { Usuario } from 'domain/usuario'
+import { of } from 'rxjs'
 import { REST_SERVER_URL } from '../services/configuration'
 
 export const usuarioAsignatario = new Usuario('Gabriel Pérez')
@@ -23,7 +23,7 @@ const tareasStub = [
     new Date('2020-11-12'),
     0
   )
-].map((tarea) => tarea.toJSON())
+].map(tarea => tarea.toJSON())
 
 const usuariosStub = [
   { id: 1, nombre: 'Victoria Marconi' },

@@ -17,6 +17,20 @@ Este ejemplo se basa en el seguimiento de tareas de un equipo de desarrollo y pe
 
 # Preparación del proyecto
 
+## Requisitos
+
+- **Node 24.15 o superior** (ver `.nvmrc`)
+- **pnpm 12.8.1** (se instala solo vía el campo `packageManager`; si tenés otro
+  gestor de paquetes, usá `corepack enable`)
+
+```bash
+pnpm install
+pnpm start        # levanta la app en http://localhost:4200
+pnpm test         # corre los tests con Vitest
+pnpm run lint     # Biome
+pnpm run build:prod
+```
+
 ## Levantar el backend
 
 Pueden descargar [la implementación Spring Boot del backend](https://github.com/uqbar-project/eg-tareas-springboot-kotlin). En el README encontrarán información de cómo levantar el servidor en el puerto 9000.
@@ -26,7 +40,7 @@ Pueden descargar [la implementación Spring Boot del backend](https://github.com
 La instalación de los componentes adicionales luego de hacer `ng new eg-tareas-angular --routing` requiere instalar dependencias adicionales. El ejemplo trabaja con Bootstrap y [font awesome para Angular](https://github.com/FortAwesome/angular-fontawesome) principalmente.
 
 ```bash
-npm i @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons bootstrap
+pnpm add @fortawesome/angular-fontawesome @fortawesome/fontawesome-svg-core @fortawesome/free-solid-svg-icons bootstrap
 ```
 
 ## Configuración angular.json
@@ -438,37 +452,37 @@ export class StubTareasService implements ITareasService {
 
 2. pero nos parece mejor generar un stub del `httpClient` inyectado en nuestro TareasService, de manera de poder aumentar el nivel de cobertura de nuestros tests de frontend.
 
-Ahora sí, para que la inyección de dependencias reemplace nuestro objeto stub de httpClient, vamos a crear un **spy** de Jasmine en un archivo aparte, indicando cuáles son los valores que deberíamos esperar:
+Ahora sí, para que la inyección de dependencias reemplace nuestro objeto stub de httpClient, vamos a crear un **mock** de Vitest en un archivo aparte (`src/testing/httpClientSpy.ts`), indicando cuáles son los valores que deberíamos esperar:
 
 - en el caso de hacer un get de tareas, tiene que devolver un `Observable` de muchas tareas
 - en el caso de hacer un get de una tarea, tiene que devolver un `Observable` de una tarea específica
 
 ```ts
-export const getHttpClientSpy = () => {
-  const httpClientSpy = jasmine.createSpyObj('HttpClient', [
-    'get',
-    'put',
-    'post'
-  ])
+export const getHttpClientSpy = (): HttpClientSpy => {
+  const httpClientSpy: HttpClientSpy = {
+    get: vi.fn(),
+    put: vi.fn(),
+    post: vi.fn()
+  }
 
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/tareas`)
-    .and.returnValue(of(tareasStub))
-  
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/tareas/1`)
-    .and.returnValue(of(tareasStub[0]))
+  httpClientSpy.get.mockImplementation((url: string) => {
+    switch (url) {
+      case `${REST_SERVER_URL}/tareas`:
+        return of(tareasStub)
+      case `${REST_SERVER_URL}/tareas/1`:
+        return of(tareasStub[0])
+      // Incluso podemos controlar la búsqueda de usuarios:
+      case `${REST_SERVER_URL}/usuarios`:
+        return of(usuariosStub)
+      default:
+        throw new Error(`httpClientSpy.get: URL sin stub para "${url}"`)
+    }
+  })
 
-  // Incluso podemos controlar la búsqueda de usuarios:
-  httpClientSpy.get
-    .withArgs(`${REST_SERVER_URL}/usuarios`)
-    .and.returnValue(of(usuariosStub))
-  
-  httpClientSpy.put.and.returnValue(of(tareasStub[0]))
- 
-  // En el caso del alta, nos permite incluso construir una función para simular un id nuevo:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  httpClientSpy.post.and.callFake((_url: string, body: any) =>
+  httpClientSpy.put.mockReturnValue(of(tareasStub[0]))
+
+  // En el caso del alta, nos permite incluso simular un id nuevo:
+  httpClientSpy.post.mockImplementation((_url: string, body: object) =>
     of({ ...body, id: 3 })
   )
   return httpClientSpy
@@ -483,11 +497,14 @@ Luego vamos a configurar **providers** en nuestro objeto TestBed, definiendo cu�
 ```ts
 describe('TareasComponent', () => {
   ...
-  let routerSpy: jasmine.SpyObj<Router>
-  let httpClientSpy: jasmine.SpyObj<HttpClient>
+  let routerSpy: Mocked<Pick<Router, 'navigate' | 'navigateByUrl'>>
+  let httpClientSpy: ReturnType<typeof getHttpClientSpy>
   
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'])
+    routerSpy = {
+      navigate: vi.fn(),
+      navigateByUrl: vi.fn()
+    }
     // vamos a crear una nueva instancia del spy de httpClient para cada test
     // esto es importante porque hay un test que le cambia dinámicamente el comportamiento
     // para que tire error, y no queremos que ese cambio tenga efecto colateral en los demás tests
@@ -554,6 +571,42 @@ it('when a task is done, it has 100% of completion', () => {
   fixture.detectChanges()
   expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
   ...
+})
+```
+
+> **Nota sobre zoneless y los tests.** La app corre sin `zone.js`, así que
+> `fixture.whenStable()` no espera las promesas "peladas" de un `ngOnInit` async
+> (sólo rastrea `PendingTasks`). Por eso los tests que esperan datos del backend
+> usan el helper `stabilize()` de `src/testing/stabilize.ts`, que fuerza el
+> vaciado de microtareas antes del último `detectChanges()`. Del mismo modo, los
+> `@Input()` se setean con `fixture.componentRef.setInput(...)` en vez de mutar el
+> componente, y para ejercitar `ngModel` hay que despachar el evento `input`
+> sobre el DOM en lugar de asignar el campo del componente.
+
+Un test que necesita esperar la carga asíncrona de tareas:
+
+```ts
+beforeEach(async () => {
+  // ...
+  // ngOnInit es async y en zoneless whenStable() no la espera
+  await stabilize(fixture)
+})
+```
+
+Y uno que dispara un error para verificar el manejo:
+
+```ts
+it('unassign - should catch error gracefully', async () => {
+  httpClientSpy.put.mockReturnValue(throwError(() => new Error('Fake error')))
+
+  getByTestId('desasignar_1').click()
+  // Ojo: sin whenStable() acá. El catch de actualizarTarea vuelve a pedir las
+  // tareas antes de registrar el error, y el tick que dispara whenStable()
+  // cae en medio de esa cadena y dispara NG0100.
+  await flushMicrotasks()
+  fixture.detectChanges()
+
+  expect(getByTestId('error-message')?.innerHTML).toBeTruthy()
 })
 ```
 

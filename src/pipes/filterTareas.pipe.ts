@@ -1,14 +1,12 @@
-import { PipeTransform, Pipe } from '@angular/core'
-import { Tarea } from 'domain/tarea'
+import { Pipe, type PipeTransform } from '@angular/core'
+import type { Tarea } from 'domain/tarea'
 
 @Pipe({
   name: 'filterTareas',
-  standalone: true,
+  standalone: true
 })
 export class FilterTareas implements PipeTransform {
-
   transform(tareas: Tarea[], palabra: string): Tarea[] {
     return tareas?.filter(tarea => tarea.contiene(palabra)) ?? []
   }
-
 }

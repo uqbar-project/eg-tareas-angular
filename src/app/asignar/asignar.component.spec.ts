@@ -1,15 +1,14 @@
-import type { Mocked } from 'vitest'
-import { ComponentFixture, TestBed } from '@angular/core/testing'
-
-import { AsignarComponent } from './asignar.component'
-import { ActivatedRoute, Router } from '@angular/router'
 import { HttpClient } from '@angular/common/http'
+import { type ComponentFixture, TestBed } from '@angular/core/testing'
+import { ActivatedRoute, Router } from '@angular/router'
 import {
   getHttpClientSpy,
   tareaPrincipal,
   usuarioAsignatario
 } from 'testing/httpClientSpy'
 import { stabilize } from 'testing/stabilize'
+import type { Mocked } from 'vitest'
+import { AsignarComponent } from './asignar.component'
 
 const updatedTaskId = 1
 
