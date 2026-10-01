@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
-import { IconsModule } from 'app/icons.module'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { Tarea } from 'domain/tarea'
 import { FilterTareas } from 'pipes/filterTareas.pipe'
 import { OrderTareas } from 'pipes/orderTareas.pipe'
@@ -18,7 +18,7 @@ import { mostrarError } from 'util/errorHandler'
     RouterModule,
     FilterTareas,
     OrderTareas,
-    IconsModule
+    FontAwesomeModule
   ],
   templateUrl: './tareas.component.html',
   changeDetection: ChangeDetectionStrategy.Eager,

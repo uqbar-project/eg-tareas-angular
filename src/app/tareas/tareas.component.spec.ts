@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import localeEs from '@angular/common/locales/es'
 import { type ComponentFixture, TestBed } from '@angular/core/testing'
 import { Router } from '@angular/router'
+import { provideIcons } from 'app/icons'
 import { throwError } from 'rxjs'
 import { getHttpClientSpy } from 'testing/httpClientSpy'
 import { flushMicrotasks, stabilize } from 'testing/stabilize'
@@ -37,7 +38,10 @@ describe('TareasComponent', () => {
       imports: [TareasComponent],
       providers: [
         { provide: HttpClient, useValue: httpClientSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        // el TestBed no corre los appInitializers de appConfig, así que
+        // registramos los íconos de Font Awesome explícitamente
+        provideIcons()
       ]
     }).compileComponents()
 

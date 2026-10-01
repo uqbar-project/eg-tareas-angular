@@ -7,6 +7,6 @@ import type { Tarea } from 'domain/tarea'
 })
 export class OrderTareas implements PipeTransform {
   transform(tareas: Tarea[]): Tarea[] {
-    return tareas.sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
+    return [...tareas].sort((tarea, otraTarea) => tarea.key() - otraTarea.key())
   }
 }
