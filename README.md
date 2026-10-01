@@ -515,7 +515,6 @@ export class TareasService {
       .get<TareaJSON[]>(REST_SERVER_URL + '/tareas')
       .pipe(
         map((tareasJSON: TareaJSON[]) => {
-          console.info('tareas JSON', tareasJSON)
           return tareasJSON.map((tareaJSON: TareaJSON) => Tarea.fromJson(tareaJSON) ?? [])
         }),
         retry(2) // podemos pedir que intente n veces

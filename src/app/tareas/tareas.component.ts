@@ -86,7 +86,6 @@ export class TareasComponent implements OnInit {
   async obtenerTodasLasTareas() {
     try {
       this.tareas.set(await this.tareasService.todasLasTareas())
-      console.info('Tareas obtenidas', this.tareas())
     } catch (error) {
       mostrarError(this, error)
     }
