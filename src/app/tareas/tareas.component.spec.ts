@@ -53,7 +53,7 @@ describe('TareasComponent', () => {
   })
 
   it('should initially show 2 pending tasks', () => {
-    expect(2).toBe(component.tareas.length)
+    expect(2).toBe(component.tareas().length)
   })
 
   it('first task can be marked as done', () => {
@@ -70,6 +70,22 @@ describe('TareasComponent', () => {
     // Chequeamos que se haya enviado la información correctamente al backend
     const tareaActualizada = httpClientSpy.put.mock.lastCall![1]
     expect(tareaActualizada.porcentajeCumplimiento).toBe(100)
+  })
+
+  it('the chip changes color when the task is done', () => {
+    // La pipe estadoCumplimiento es pura: si recibiera la Tarea, cumplir() la
+    // muta en sitio y la referencia no cambia, asi que devolveria el valor
+    // cacheado y el chip se quedaria con el color viejo. Por eso recibe el
+    // porcentaje, que si cambia de valor.
+    const chip = getByTestId('chip_1')
+    expect(chip.className).toContain('chip-medio')
+
+    getByTestId('cumplir_1').click()
+    fixture.detectChanges()
+
+    expect(getByTestId('porcentaje_1').textContent).toBe('100,00')
+    expect(chip.className).toContain('chip-alto')
+    expect(chip.className).not.toContain('chip-medio')
   })
 
   it('unassign first task', async () => {

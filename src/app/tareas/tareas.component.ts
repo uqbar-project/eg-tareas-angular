@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common'
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
-  OnInit
+  OnInit,
+  signal
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router, RouterModule } from '@angular/router'
@@ -33,13 +33,12 @@ import { mostrarError } from 'util/errorHandler'
 })
 export class TareasComponent implements OnInit {
   tareaBuscada = ''
-  tareas: Array<Tarea> = []
-  errors = []
+  tareas = signal<Array<Tarea>>([])
+  errors = signal<string[]>([])
 
   constructor(
     public tareasService: TareasService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   async ngOnInit() {
@@ -51,7 +50,9 @@ export class TareasComponent implements OnInit {
     tarea: Tarea
   ) {
     callbackActualizacion(tarea)
-    this.cdr.markForCheck()
+    // cumplir()/desasignar() mutan la Tarea dentro del array. Escribimos el
+    // signal con una copia para que la vista sepa que hay que releer todo.
+    this.tareas.update(tareas => [...tareas])
     try {
       await this.tareasService.actualizarTarea(tarea)
     } catch (e) {
@@ -81,9 +82,8 @@ export class TareasComponent implements OnInit {
 
   async obtenerTodasLasTareas() {
     try {
-      this.tareas = await this.tareasService.todasLasTareas()
-      this.cdr.markForCheck()
-      console.info('Tareas obtenidas', this.tareas)
+      this.tareas.set(await this.tareasService.todasLasTareas())
+      console.info('Tareas obtenidas', this.tareas())
     } catch (error) {
       mostrarError(this, error)
     }
@@ -95,7 +95,7 @@ export const errorHandler = async (
   error: unknown
 ) => {
   try {
-    component.tareas = await component.tareasService.todasLasTareas()
+    component.tareas.set(await component.tareasService.todasLasTareas())
   } catch (e) {}
   mostrarError(component, error)
 }

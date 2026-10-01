@@ -45,7 +45,7 @@ describe('NuevaTareaComponent', () => {
     // puede ser que tenga que ver con el evento de HTML
     // await sendInput('fecha', '02/22/2020')
     component.tarea.fecha = new Date()
-    component.asignatario = new Usuario('Nahuel Palumbo')
+    component.asignatario.set(new Usuario('Nahuel Palumbo'))
     await sendInput('porcentaje-cumplimiento', '20')
 
     // Act

@@ -258,8 +258,30 @@ h5 {
 }
 
 .btn-icon .icon {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+/* el boton grew agranda el cuadrado para que el icono no quede apretado */
+.btn-grew {
+  padding: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn-grew .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.btn-grew:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border);
 }
 
 /* ---------------------------------------------------------------- campos */
@@ -380,13 +402,12 @@ h5 {
 
 /* ------------------------------------------------------ chip de avance */
 
-/* Reemplaza el badge de Bootstrap: un pill con punto de estado, así el
-   avance se lee de un vistazo sin depender del color solo. */
+/* Reemplaza el badge de Bootstrap: un pill con tres variantes. */
 .chip {
   display: inline-flex;
   align-items: baseline;
   gap: 0.1em;
-  padding: 0.15rem 0.55rem 0.15rem 0.5rem;
+  padding: 0.15rem 0.55rem;
   font-size: 0.8rem;
   font-weight: 600;
   line-height: 1.4;
@@ -394,16 +415,6 @@ h5 {
   white-space: nowrap;
   border-radius: 999px;
   border: 1px solid transparent;
-}
-
-.chip::before {
-  content: "";
-  align-self: center;
-  width: 0.45rem;
-  height: 0.45rem;
-  margin-right: 0.4rem;
-  border-radius: 50%;
-  background: currentcolor;
 }
 
 .chip-signo {
@@ -429,11 +440,13 @@ h5 {
   border-color: color-mix(in oklab, var(--success) 28%, transparent);
 }
 
-/* sin punto para lectores de pantalla: el color no es el único indicador,
-   el número dentro del chip ya dice el avance */
+/* el color no es el único indicador: el numero dentro del chip ya dice
+   el avance, y cada variante tiene su propio fondo */
 @media (forced-colors: active) {
-  .chip::before {
-    content: none;
+  .chip-bajo,
+  .chip-medio,
+  .chip-alto {
+    border-color: CanvasText;
   }
 }
 

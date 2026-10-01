@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ValidationFieldComponent } from 'app/validation-field/validation-field.component'
@@ -18,9 +18,9 @@ import { mostrarError } from 'util/errorHandler'
 })
 export class NuevaTareaComponent {
   tarea: Tarea = new Tarea()
-  asignatario?: Usuario
-  usuariosPosibles: Usuario[] = []
-  errors: string[] = []
+  asignatario = signal<Usuario | undefined>(undefined)
+  usuariosPosibles = signal<Usuario[]>([])
+  errors = signal<string[]>([])
   fecha = ''
 
   constructor(
@@ -40,10 +40,9 @@ export class NuevaTareaComponent {
   async initialize() {
     // Llenamos el combo de usuarios
     const usuarios = await this.usuariosService.usuariosPosibles()
-    this.usuariosPosibles = usuarios.map(
-      usuarioJson => new Usuario(usuarioJson.nombre)
+    this.usuariosPosibles.set(
+      usuarios.map(usuarioJson => new Usuario(usuarioJson.nombre))
     )
-    this.asignatario = undefined
   }
 
   async guardar() {
@@ -55,7 +54,7 @@ export class NuevaTareaComponent {
       if (this.tarea.invalid()) {
         return
       }
-      this.tarea.asignarA(this.asignatario)
+      this.tarea.asignarA(this.asignatario() as Usuario)
       await this.tareasService.crearTarea(this.tarea)
       this.navegarAHome()
     } catch (error) {

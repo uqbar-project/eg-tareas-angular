@@ -51,15 +51,15 @@ describe('AsignarComponent', () => {
   })
 
   it('should show task assigned used first', () => {
-    expect(component.asignatario).toEqual(usuarioAsignatario)
+    expect(component.asignatario()).toEqual(usuarioAsignatario)
   })
 
   it('task unassigment', () => {
-    component.asignatario = undefined
+    component.asignatario.set(undefined)
     const resultHtml = fixture.debugElement.nativeElement
     resultHtml.querySelector('[data-testid="guardar"]').click()
     fixture.detectChanges()
-    expect(component.asignatario).toBeFalsy()
+    expect(component.asignatario()).toBeFalsy()
   })
 
   it('task label', () => {
@@ -72,8 +72,8 @@ describe('AsignarComponent', () => {
 
   it('assignment should take effect', () => {
     const compiled = fixture.debugElement.nativeElement
-    const nuevoAsignatario = component.usuariosPosibles[0]
-    component.asignatario = nuevoAsignatario
+    const nuevoAsignatario = component.usuariosPosibles()[0]
+    component.asignatario.set(nuevoAsignatario)
     compiled.querySelector('[data-testid="guardar"]').click()
 
     // Queremos saber que en algún momento se haya pedido al backend que se asigne a otro usuarie

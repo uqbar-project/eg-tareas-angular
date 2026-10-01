@@ -437,7 +437,10 @@ Por último, el % de cumplimiento se muestra con dos decimales y con coma
 decimal, mediante el pipe estándar de Angular:
 
 ```html
-  <span class="chip" [ngClass]="estadoCumplimiento(tarea)">
+  <span
+    class="chip"
+    [attr.data-testid]="'chip_' + tarea.id"
+    [ngClass]="tarea.porcentajeCumplimiento | estadoCumplimiento">
     <span [attr.data-testid]="'porcentaje_' + tarea.id">{{
       tarea.porcentajeCumplimiento | number: '1.2-2':'es'
     }}</span>
@@ -445,23 +448,51 @@ decimal, mediante el pipe estándar de Angular:
   </span>
 ```
 
-El avance se muestra como un chip con tres variantes. Los cortes (**menos de 40**,
-**entre 40 y 80**, **80 en adelante**) los decide el componente, reusando los
-predicados que ya tenía el dominio:
+El avance se muestra como un chip con tres variantes, decididas por una pipe
+propia:
 
 ```ts
-estadoCumplimiento(tarea: Tarea): string {
-  if (tarea.cumplioMenosDe(40)) return 'chip-bajo'
-  if (tarea.cumplioMenosDe(80)) return 'chip-medio'
-  return 'chip-alto'
+@Pipe({ name: 'estadoCumplimiento', standalone: true })
+export class EstadoCumplimientoPipe implements PipeTransform {
+  transform(porcentaje: number): string {
+    if (porcentaje < 40) return 'chip-bajo'
+    if (porcentaje < 80) return 'chip-medio'
+    return 'chip-alto'
+  }
 }
 ```
 
-Cada variante cambia el color **y** muestra un punto de estado, para que el
-avance se lea sin depender únicamente del color. Fijate además que el `%` va en
-un `<span>` aparte del que tiene el `data-testid`: los tests comparan el
-`textContent` de ese elemento contra `'100,00'` exacto, así que si el signo
-estuviera adentro la aserción fallaría.
+Los cortes (**menos de 40**, **entre 40 y 80**, **80 en adelante**) viven en la
+pipe y no en `Tarea`: son una decisión de presentación, no de negocio.
+
+### Ojo con el argumento de una pipe pura
+
+La pipe recibe el **número**, no la `Tarea`, y no es un detalle. Las pipes puras
+memoizan por identidad de cada argumento, usando `Object.is`. Como `cumplir()`
+**muta** la tarea en sitio:
+
+```ts
+cumplir() {
+  this.porcentajeCumplimiento = CUMPLIDA  // mismo objeto, otro valor
+}
+```
+
+la referencia de la `Tarea` no cambia. Si la pipe recibiera el objeto, Angular
+diría "los argumentos no cambiaron", devolvería el valor cacheado, y el chip se
+quedaría con el color viejo: el `100,00` al lado del color de antes. Pasando el
+porcentaje, el argumento **sí** cambia de valor (`50 → 100`) y la pipe vuelve a
+correrse sola.
+
+La regla general: **una pipe pura nunca debe recibir un objeto que mutás en
+sitio**. Si el valor que decide el resultado es un campo, pasá el campo. Si
+necesitás pasar el objeto, entonces la referencia tiene que cambiar, y en este
+repo eso significa escribir el signal con `set`/`update`.
+
+Fijate además que el `%` va en un `<span>` aparte del que tiene el `data-testid`
+del porcentaje: los tests comparan el `textContent` de ese elemento contra
+`'100,00'` exacto, así que si el signo estuviera adentro la aserción fallaría.
+El `data-testid` del chip (`chip_<id>`) es aparte, para poder assertar sobre la
+clase.
 
 # Usando Observables
 

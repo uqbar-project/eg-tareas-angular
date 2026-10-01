@@ -7,7 +7,7 @@
     <div class="card-body">
       <div class="field">
         <span class="label">Tarea</span>
-        <div class="value" data-testid="tareaDescripcion">{{ tarea ? tarea.descripcion : '' }}</div>
+        <div class="value" data-testid="tareaDescripcion">{{ tarea() ? tarea()?.descripcion : '' }}</div>
       </div>
 
       <form name="asignarTareaForm" role="form" class="stack" (submit)="$event.preventDefault()">
@@ -17,15 +17,15 @@
             data-testid="asignatario"
             name="asignatario"
             class="select"
-            [(ngModel)]="asignatario">
+            [ngModel]="asignatario()" (ngModelChange)="asignatario.set($event)">
             <option [ngValue]="undefined">Sin asignar</option>
-            @for (usuario of usuariosPosibles; track usuario) {
+            @for (usuario of usuariosPosibles(); track usuario) {
               <option [ngValue]="usuario">{{ usuario.nombre }}</option>
             }
           </select>
         </div>
 
-        @for (error of errors; track error) {
+        @for (error of errors(); track error) {
           <div class="alert alert-danger">{{ error }}</div>
         }
       </form>

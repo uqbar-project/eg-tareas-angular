@@ -39,7 +39,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (tarea of tareas | filterTareas: tareaBuscada | orderTareas; track tarea; let i = $index) {
+            @for (tarea of tareas() | filterTareas: tareaBuscada | orderTareas; track tarea; let i = $index) {
               <tr data-testid="fila-tarea">
                 <td class="col-principal mobile" [attr.data-testid]="'descripcion_' + i">
                   {{ tarea.descripcion }}
@@ -52,7 +52,7 @@
                   {{ tarea.fechaString() }}
                 </td>
                 <td class="desktop porcentaje">
-                  <span class="chip" [ngClass]="tarea | estadoCumplimiento">
+                  <span class="chip" [attr.data-testid]="'chip_' + tarea.id" [ngClass]="tarea.porcentajeCumplimiento | estadoCumplimiento">
                     <span [attr.data-testid]="'porcentaje_' + tarea.id">{{
                       tarea.porcentajeCumplimiento | number: '1.2-2':'es'
                     }}</span>
@@ -66,7 +66,7 @@
                       <button
                         type="button"
                         title="Marcarla como cumplida"
-                        class="btn btn-icon btn-success"
+                        class="btn btn-grew btn-success"
                         (click)="cumplir(tarea)"
                         aria-label="Cumplir"
                         [attr.data-testid]="'cumplir_' + tarea.id">
@@ -77,7 +77,7 @@
                       <button
                         type="button"
                         title="Asignar una persona"
-                        class="btn btn-icon btn-success"
+                        class="btn btn-grew btn-success"
                         (click)="asignar(tarea)"
                         aria-label="Asignarme"
                         [attr.data-testid]="'asignar_' + tarea.id">
@@ -88,7 +88,7 @@
                       <button
                         type="button"
                         title="Desasignar la persona a la tarea"
-                        class="btn btn-icon btn-danger"
+                        class="btn btn-grew btn-danger"
                         (click)="desasignar(tarea)"
                         aria-label="Desasignarme"
                         [attr.data-testid]="'desasignar_' + tarea.id">
@@ -113,7 +113,7 @@
         </table>
       </div>
 
-      @for (error of errors; track error) {
+      @for (error of errors(); track error) {
         <div class="alert alert-danger" data-testid="error-message">{{ error }}</div>
       }
     </div>

@@ -1,25 +1,27 @@
 import { Pipe, type PipeTransform } from '@angular/core'
-import { Tarea } from 'domain/tarea'
 
 /**
- * Traduce el porcentaje de una tarea a la variante del chip: menos de 40,
- * entre 40 y 80, y 80 en adelante. Reusa los predicados del dominio en vez
- * de comparar numeros aca.
+ * Traduce un porcentaje de cumplimiento a la variante del chip: menos de 40,
+ * entre 40 y 80, y 80 en adelante.
  *
- * Es una pipe y no un metodo del componente a proposito: al ser pura Angular
- * memoiza por identidad del argumento, asi que el valor no cambia entre la
- * pasada de refresh y la de checkNoChanges. Un metodo invocado desde el
- * binding se recalcula en cada una de esas pasadas y tira NG0100 cuando el
- * dato de abajo muta.
+ * Ojo con el argumento: recibe el **numero**, no la Tarea. Las pipes puras
+ * memoizan por identidad de cada argumento, y `cumplir()` muta la Tarea en
+ * sitio, asi que la referencia no cambia y una pipe que reciba el objeto
+ * devolveria el valor cacheado: el chip se quedaria con el color viejo
+ * despues de cumplir. Con un primitivo el argumento si cambia (50 -> 100) y
+ * la pipe vuelve a correr.
+ *
+ * Los cortes son 40 y 80 a proposito: son una decision de presentacion, no del
+ * dominio, asi que no van en la clase Tarea.
  */
 @Pipe({
   name: 'estadoCumplimiento',
   standalone: true
 })
 export class EstadoCumplimientoPipe implements PipeTransform {
-  transform(tarea: Tarea): string {
-    if (tarea.cumplioMenosDe(40)) return 'chip-bajo'
-    if (tarea.cumplioMenosDe(80)) return 'chip-medio'
+  transform(porcentaje: number): string {
+    if (porcentaje < 40) return 'chip-bajo'
+    if (porcentaje < 80) return 'chip-medio'
     return 'chip-alto'
   }
 }
